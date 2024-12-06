@@ -17,8 +17,8 @@ export default function RootLayout({
 }) {
   return (
     <html lang="es">
-      <body className={inter.className}>
-        <main className="container mx-auto max-w-md p-4">
+      <body className={inter.className + " bg-[#f5f5f5] min-h-screen"}>
+        <main className="mx-auto mb-10">
           {children}
         </main>
         <BottomNav />

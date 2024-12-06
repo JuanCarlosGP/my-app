@@ -23,14 +23,19 @@ export default function AjustesPage() {
   }
 
   return (
-    <div className="-mt-4">
+    <div>
       <ProfileHeader phoneNumber={phoneNumber} />
-      
-      <div className="space-y-2 divide-y">
-        <MenuItem 
+    
+      <div className="space-y-2 divide-y mt-4">
+      <MenuItem 
           icon={MapPin} 
           label="Mis Direcciones" 
           onClick={() => setIsAddressFormOpen(true)} 
+        />
+        <MenuItem 
+          icon={Store} 
+          label="Añadir Tienda" 
+          onClick={handleAddStore} 
         />
         <MenuItem 
           icon={Store} 

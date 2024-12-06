@@ -10,9 +10,9 @@ interface HeaderProps {
 
 export function Header({ title, showAddButton = false, onAddClick, onSearchClick }: HeaderProps) {
   return (
-    <header className="flex justify-between items-center mb-4">
-      <Button variant="ghost" size="icon" onClick={onSearchClick}>
-        <Search className="h-6 w-6" />
+    <header className="flex justify-between items-center mb-4 pt-4 px-4">
+      <Button variant="ghost" onClick={onSearchClick}>
+        
       </Button>
       <h1 className="text-xl font-bold">{title}</h1>
       {showAddButton ? (

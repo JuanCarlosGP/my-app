@@ -20,7 +20,12 @@ export function BottomNav() {
       <ul className="flex justify-around">
         {navItems.map(({ href, icon: Icon, label }) => (
           <li key={href}>
-            <Link href={href} className={`flex flex-col items-center p-2 ${pathname === href ? 'text-blue-500' : 'text-gray-500'}`}>
+            <Link
+              href={href}
+              className={`flex flex-col items-center p-2 ${
+                pathname === href || (href !== '/' && pathname.startsWith(href)) ? 'text-blue-500' : 'text-gray-500'
+              }`}
+            >
               <Icon className="h-6 w-6" />
               <span className="text-xs">{label}</span>
             </Link>
@@ -30,4 +35,3 @@ export function BottomNav() {
     </nav>
   )
 }
-
