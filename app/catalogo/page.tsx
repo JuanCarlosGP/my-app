@@ -1,30 +1,30 @@
 'use client'
 
-import { Header } from '../components/header'
-import Image from 'next/image'
-
-const products = [
-  { id: 1, name: 'Producto 1', image: '/placeholder.svg' },
-  { id: 2, name: 'Producto 2', image: '/placeholder.svg' },
-  // Añade más productos aquí
-]
+import { useEffect } from 'react'
+import { useRouter } from 'next/navigation'
 
 export default function CatalogoPage() {
-  return (
-    <div>
-      <Header 
-        title="Nombre de la Tienda" 
-        onSearchClick={() => alert('Búsqueda de productos')}
-      />
-      <div className="grid grid-cols-2 gap-4">
-        {products.map((product) => (
-          <div key={product.id} className="border rounded p-2">
-            <Image src={product.image} alt={product.name} width={100} height={100} className="w-full h-auto" />
-            <p className="mt-2 text-center">{product.name}</p>
-          </div>
-        ))}
-      </div>
-    </div>
-  )
+  const router = useRouter();
+
+  useEffect(() => {
+    try {
+      const savedCatalog = localStorage.getItem('lastViewedCatalog');
+      
+      if (savedCatalog) {
+        const parsedCatalog = JSON.parse(savedCatalog);
+        // Redirigimos al catálogo específico usando el storeId guardado
+        router.push(`/catalogo/${parsedCatalog.storeId}`);
+      } else {
+        // Si no hay catálogo guardado, redirigimos a tiendas
+        router.push('/tiendas');
+      }
+    } catch (error) {
+      console.error('Error al cargar el último catálogo:', error);
+      router.push('/tiendas');
+    }
+  }, []);
+
+  // Mostramos un loading mientras se realiza la redirección
+  return <div className="flex items-center justify-center h-screen">Redirigiendo...</div>;
 }
 
