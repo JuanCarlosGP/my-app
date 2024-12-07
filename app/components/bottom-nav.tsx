@@ -23,7 +23,7 @@ export function BottomNav() {
             <Link
               href={href}
               className={`flex flex-col items-center p-2 ${
-                pathname === href || (href !== '/' && pathname.startsWith(href)) ? 'text-blue-500' : 'text-gray-500'
+                pathname === href || (href !== '/' && pathname.startsWith(href)) ? 'text-black-500' : 'text-gray-500'
               }`}
             >
               <Icon className="h-6 w-6" />

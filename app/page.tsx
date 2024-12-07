@@ -16,71 +16,71 @@ export default function TiendaPage() {
     {
       id: "1",
       name: "La Casa de los Bigotes",
-      phone: "912 345 678",
-      description: "Tienda de artículos y juguetes para gatos amantes de la diversión.",
+      description: "912 345 678",
+      subdescription: "Tienda de artículos y juguetes para gatos amantes de la diversión.",
       imageUrl: "https://cataas.com/cat?width=300&height=200&random=1"
     },
     {
       id: "2",
       name: "Gatitos Gourmet",
-      phone: "911 223 344",
-      description: "Especialistas en comida premium para los paladares felinos más exigentes.",
+      description: "911 223 344",
+      subdescription: "Especialistas en comida premium para los paladares felinos más exigentes.",
       imageUrl: "https://cataas.com/cat?width=300&height=200&random=2"
     },
     {
       id: "3",
       name: "Bigotes Saludables",
-      phone: "913 456 789",
-      description: "Productos naturales y suplementos para mantener a tu gato en forma.",
+      description: "913 456 789",
+      subdescription: "Productos naturales y suplementos para mantener a tu gato en forma.",
       imageUrl: "https://cataas.com/cat?width=300&height=200&random=3"
     },
     {
       id: "4",
       name: "Rascadores y Más",
-      phone: "914 567 890",
-      description: "Todo lo que necesitas para que tu gato se divierta y cuide sus uñas.",
+      description: "914 567 890",
+      subdescription: "Todo lo que necesitas para que tu gato se divierta y cuide sus uñas.",
       imageUrl: "https://cataas.com/cat?width=300&height=200&random=4"
     },
     {
       id: "5",
       name: "Gatolandia",
-      phone: "915 678 901",
-      description: "Tienda integral con todo tipo de productos para consentir a tu gato.",
+      description: "915 678 901",
+      subdescription: "Tienda integral con todo tipo de productos para consentir a tu gato.",
       imageUrl: "https://cataas.com/cat?width=300&height=200&random=5"
     },
     {
       id: "6",
       name: "El Paraíso del Gato",
-      phone: "916 789 012",
-      description: "Desde camas cómodas hasta accesorios modernos, el lugar perfecto para tu gato.",
+      description: "916 789 012",
+      subdescription: "Desde camas cómodas hasta accesorios modernos, el lugar perfecto para tu gato.",
       imageUrl: "https://cataas.com/cat?width=300&height=200&random=6"
     },
     {
       id: "7",
       name: "Felinos Fashion",
-      phone: "917 890 123",
-      description: "Ropa y accesorios de moda para que tu gato luzca increíble.",
+      description: "917 890 123",
+      subdescription: "Ropa y accesorios de moda para que tu gato luzca increíble.",
       imageUrl: "https://cataas.com/cat?width=300&height=200&random=7"
     },
     {
       id: "8",
       name: "Los Reyes del Miau",
-      phone: "918 901 234",
-      description: "Coronas, juguetes y más para los auténticos reyes felinos.",
+      description: "918 901 234",
+      subdescription: "Coronas, juguetes y más para los auténticos reyes felinos.",
       imageUrl: "https://cataas.com/cat?width=300&height=200&random=8"
     },
     {
       id: "9",
       name: "Bigotes de Lujo",
-      phone: "919 012 345",
-      description: "Productos premium para consentir a tu gato con estilo y comodidad.",
+      description: "919 012 345",
+      subdescription: "Productos premium para consentir a tu gato con estilo y comodidad.",
       imageUrl: "https://cataas.com/cat?width=300&height=200&random=9"
     },
     {
       id: "10",
       name: "Miau Relax",
-      phone: "920 123 456",
-      description: "Spa para gatos con productos relajantes y espacios únicos para el descanso.",
+      description: "920 123 456",
+      subdescription: "Spa para gatos con productos relajantes y espacios únicos para el descanso.",
       imageUrl: "https://cataas.com/cat?width=300&height=200&random=10"
     }
   ];
@@ -125,8 +125,8 @@ export default function TiendaPage() {
             key={store.id}
             id={store.id}
             name={store.name}
-            phone={store.phone}
             description={store.description}
+            subdescription={store.subdescription}
             imageUrl={store.imageUrl}
           />
         ))}

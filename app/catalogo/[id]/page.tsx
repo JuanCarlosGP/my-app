@@ -1,19 +1,23 @@
 "use client";
 
-import { useRouter } from 'next/navigation';
-import { Button } from '@/components/ui/button';
-import { useEffect, useState } from 'react';
+import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
+import { Header } from "../../components/header";
+import { StoreCard } from "@/app/components/store-card";
 
-interface Product {
-  id: number;
+interface Category {
+  id: string;
   name: string;
-  image: string;
+  description: string;
+  subdescription: string;
+  imageUrl: string;
 }
 
 interface Catalog {
   storeId: string;
   storeName: string;
-  products: Product[];
+  bannerImage: string;
+  categories: Category[];
 }
 
 export default function CatalogoPage({ params }: { params: { id: string } }) {
@@ -21,39 +25,86 @@ export default function CatalogoPage({ params }: { params: { id: string } }) {
   const [catalog, setCatalog] = useState<Catalog | null>(null);
 
   useEffect(() => {
-    // Simulamos obtener datos de la tienda
+    // Simulación de datos de la tienda
     const catalogData: Catalog = {
       storeId: params.id,
       storeName: `Tienda ${params.id}`,
-      products: [
-        { id: 1, name: 'Producto 1', image: '/placeholder.svg' },
-        { id: 2, name: 'Producto 2', image: '/placeholder.svg' },
-        // Aquí irían tus productos reales
-      ]
+      bannerImage: "https://images.pexels.com/photos/414171/pexels-photo-414171.jpeg",
+      categories: [
+        {
+          id: "1",
+          name: "Cepillos",
+          description: "Importados de China",
+          subdescription: "Cepillos ergonómicos y de alta calidad para diversas superficies",
+          imageUrl: "https://cataas.com/cat?width=300&height=200&random=1",
+        },
+        {
+          id: "2",
+          name: "Bayetas",
+          description: "Importadas de Italia",
+          subdescription: "Bayetas de microfibra muy resistentes y absorbentes",
+          imageUrl: "https://cataas.com/cat?width=300&height=200&random=2",
+        },
+        {
+          id: "3",
+          name: "Caja de Herramientas",
+          description: "Fabricada en acero duradero",
+          subdescription: "Caja completa con herramientas esenciales para tus proyectos",
+          imageUrl: "https://cataas.com/cat?width=300&height=200&random=3",
+        },
+        {
+          id: "4",
+          name: "Perchitas",
+          description: "Enganches para pared",
+          subdescription: "Perchas adhesivas ideales para colgar objetos sin dañar la pared",
+          imageUrl: "https://cataas.com/cat?width=300&height=200&random=4",
+        },
+        {
+          id: "5",
+          name: "Perchas de Ropa",
+          description: "Paquete de 10 unidades",
+          subdescription: "Perchas antideslizantes para mantener tu ropa organizada",
+          imageUrl: "https://cataas.com/cat?width=300&height=200&random=5",
+        },
+      ],      
     };
-    
-    // Guardamos en el estado y en localStorage
+
     setCatalog(catalogData);
-    localStorage.setItem('lastViewedCatalog', JSON.stringify(catalogData));
+    localStorage.setItem("lastViewedCatalog", JSON.stringify(catalogData));
   }, [params.id]);
 
   if (!catalog) {
-    return <div>Cargando...</div>;
+    return <div className="text-center py-20">Cargando...</div>;
   }
 
   return (
-    <div className="container mx-auto py-8">
-      <h1 className="text-2xl font-bold">Catálogo de {catalog.storeName}</h1>
-      <div className="grid grid-cols-2 gap-4 mt-4">
-        {catalog.products.map((product) => (
-          <div key={product.id} className="border rounded p-2">
-            <p className="mt-2 text-center">{product.name}</p>
-          </div>
+    <div>
+      <div className="sticky top-0 z-10 bg-white/70 backdrop-blur-md">
+        <Header title={`Catálogo de ${catalog.storeName}`} />
+      </div>
+
+      {/* Banner publicitario */}
+      <div className="px-4 mx-auto max-w-5xl">
+        <img
+          src={catalog.bannerImage}
+          alt="Banner publicitario"
+          className="w-full h-[48vw] md:h-60 object-cover rounded-lg mb-6"
+        />
+      </div>
+
+      {/* Categorías */}
+      <div className="max-w-3xl mx-auto pb-20">
+        {catalog.categories.map((category) => (
+          <StoreCard
+            key={category.id}
+            id={category.id}
+            name={category.name}
+            description={category.description}
+            subdescription={category.subdescription}
+            imageUrl={category.imageUrl}
+          />
         ))}
       </div>
-      <Button onClick={() => router.back()} className="mt-4">
-        Volver
-      </Button>
     </div>
   );
 }

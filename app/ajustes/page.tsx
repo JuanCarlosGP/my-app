@@ -17,7 +17,7 @@ export default function AjustesPage() {
   const [isFeedbackSheetOpen, setIsFeedbackSheetOpen] = useState(false)
 
   return (
-    <div className="bg-white min-h-screen">
+    <div className="bg-[#f5f5f5] min-h-screen max-w-3xl m-auto ">
       <ProfileHeader phoneNumber={phoneNumber} />
     
       <div className="space-y-2 divide-y mt-4">
