@@ -2,8 +2,15 @@
 
 import { ArrowLeft, Check } from 'lucide-react'
 import { Button } from '@/components/ui/button'
+import { Checkbox } from "@/components/ui/checkbox"
 import { Input } from '@/components/ui/input'
-import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog'
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion"
+
 
 interface AddressFormProps {
   isOpen: boolean
@@ -33,54 +40,45 @@ export function AddressForm({ isOpen, onClose, onSave }: AddressFormProps) {
   }
 
   return (
-    <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-md p-0">
-        <DialogTitle className="sr-only">Detalles de dirección</DialogTitle>
-        <div className="sticky top-0 flex justify-between items-center p-4 border-b bg-white">
-          <Button variant="ghost" size="icon" onClick={onClose}>
-            <ArrowLeft className="h-6 w-6" />
-          </Button>
-          <h2 className="text-lg font-semibold">Detalles</h2>
-          <Button variant="ghost" size="icon" type="submit" form="addressForm">
-            <Check className="h-6 w-6" />
-          </Button>
-        </div>
-        <form id="addressForm" onSubmit={handleSubmit} className="space-y-4 p-4 bg-white">
-          <div className="space-y-4">
-            <div className="border-b pb-4">
-              <Input name="empresa" placeholder="Introduzca Empresa" />
-            </div>
-            <div className="border-b pb-4">
-              <Input name="contactos" placeholder="Introduzca Contactos" />
-            </div>
-            <div className="border-b pb-4">
-              <Input name="cif" placeholder="Introduzca CIF" />
-            </div>
-            <div className="border-b pb-4">
-              <Input name="direccion" placeholder="Introduzca Dirección" />
-            </div>
-            <div className="border-b pb-4">
-              <Input name="ciudad" placeholder="Introduzca Ciudad" />
-            </div>
-            <div className="border-b pb-4">
-              <Input name="provincia" placeholder="Introduzca Provincia" />
-            </div>
-            <div className="border-b pb-4">
-              <Input name="pais" placeholder="Introduzca País" />
-            </div>
-            <div className="border-b pb-4">
-              <Input name="codigoPostal" placeholder="Introduzca Código Postal" />
-            </div>
-            <div className="border-b pb-4">
-              <Input name="telefono" placeholder="Introduzca Teléfono" />
-            </div>
-            <div className="border-b pb-4">
-              <Input name="email" type="email" placeholder="Introduzca E-Mail" />
-            </div>
+    <div className={`transition-opacity ${isOpen ? 'opacity-100' : 'opacity-0'}`}>
+      <div className="sticky top-0 flex justify-between items-center p-4 border-b bg-white">
+      </div>
+      <form id="addressForm" onSubmit={handleSubmit} className="space-y-4 p-4 bg-white">
+        <div className="space-y-4">
+          <div className="border-b pb-4">
+            <Input name="empresa" placeholder="Nombre Empresa" />
           </div>
-        </form>
-      </DialogContent>
-    </Dialog>
+          <div className="border-b pb-4">
+            <Input name="cif" placeholder="CIF" />
+          </div>
+          <div className="border-b pb-4">
+            <Input name="direccion" placeholder="Dirección" />
+          </div>
+          <div className="border-b pb-4">
+            <Input name="codigoPostal" placeholder="Código Postal" />
+          </div>
+          <div className="border-b pb-4">
+            <Input name="ciudad" placeholder="Ciudad" />
+          </div>
+          <div className="border-b pb-4">
+            <Input name="provincia" placeholder="Provincia" />
+          </div>
+          <div className="border-b pb-4">
+            <Input name="email" type="email" placeholder="E-Mail" />
+          </div>
+        </div>
+      </form>
+      <Accordion type="single" collapsible>
+        <AccordionItem value="item-1">
+          <AccordionTrigger>¿Por qué pedimos estos datos?</AccordionTrigger>
+          <AccordionContent>
+            Solicitamos estos datos para validar que la empresa es real. Si no proporcionas esta información, no podrás acceder al sistema para formar una tienda. Esto nos ayuda a mantener un entorno seguro y confiable para todos los usuarios.
+          </AccordionContent>
+        </AccordionItem>
+      </Accordion>
+
+
+    </div>
   )
 }
 
