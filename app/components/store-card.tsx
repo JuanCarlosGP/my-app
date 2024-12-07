@@ -8,6 +8,7 @@ interface StoreCardProps {
   description?: string
   subdescription?: string
   imageUrl: string
+  onClick?: () => void
 }
 
 export function StoreCard({ id, name, description, subdescription, imageUrl }: StoreCardProps) {

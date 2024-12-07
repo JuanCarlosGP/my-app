@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { Header } from "../../components/header";
 import { StoreCard } from "@/app/components/store-card";
+import { PlusCircle, ThumbsUp, Tag } from "lucide-react";
 
 interface Category {
   id: string;
@@ -23,6 +24,7 @@ interface Catalog {
 export default function CatalogoPage({ params }: { params: { id: string } }) {
   const router = useRouter();
   const [catalog, setCatalog] = useState<Catalog | null>(null);
+
 
   useEffect(() => {
     // Simulación de datos de la tienda
@@ -90,6 +92,30 @@ export default function CatalogoPage({ params }: { params: { id: string } }) {
           alt="Banner publicitario"
           className="w-full h-[48vw] md:h-60 object-cover rounded-lg mb-6"
         />
+
+        {/* Iconos de categorías */}
+        <div className="grid grid-cols-3 gap-4 mb-6 px-4">
+          <div className="flex flex-col items-center bg-white p-4 rounded-lg shadow-sm">
+            <div className="p-2.5 bg-gray-100 rounded-full mb-2">
+              <PlusCircle className="w-5 h-5 text-blue-600" />
+            </div>
+            <span className="text-xs font-medium text-gray-700">Nuevo</span>
+          </div>
+          
+          <div className="flex flex-col items-center bg-white p-4 rounded-lg shadow-sm">
+            <div className="p-2.5 bg-gray-100 rounded-full mb-2">
+              <ThumbsUp className="w-5 h-5 text-green-600" />
+            </div>
+            <span className="text-xs font-medium text-gray-700">Recomendado</span>
+          </div>
+          
+          <div className="flex flex-col items-center bg-white p-4 rounded-lg shadow-sm">
+            <div className="p-2.5 bg-gray-100 rounded-full mb-2">
+              <Tag className="w-5 h-5 text-red-600" />
+            </div>
+            <span className="text-xs font-medium text-gray-700">Promoción</span>
+          </div>
+        </div>
       </div>
 
       {/* Categorías */}
