@@ -36,7 +36,7 @@ export default function CatalogoPage({ params }: { params: { id: string } }) {
     <SearchProvider>
       <div>
         <div className="sticky top-0 z-10 bg-white/70 backdrop-blur-md">
-          <Header title={`Catálogo de ${store.name}`} />
+          <Header title={`${store.name}`} />
         </div>
 
         {/* Banner publicitario */}
