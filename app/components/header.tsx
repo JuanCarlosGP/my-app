@@ -15,14 +15,9 @@ export function Header({ title, showAddButton = false, onAddClick, onSearchClick
         
       </Button>
       <h1 className="text-xl font-bold truncate max-w-[450px]">{title}</h1>
-      {showAddButton ? (
         <Button variant="ghost" size="icon" onClick={onAddClick}>
           <Plus className="h-6 w-6" />
         </Button>
-      ) : (
-        <div className="w-10" />
-      )}
     </header>
   )
 }
-

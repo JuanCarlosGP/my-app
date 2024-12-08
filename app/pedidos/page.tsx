@@ -4,7 +4,7 @@ import { Card } from "@/components/ui/card"
 import Image from "next/image"
 import { formatPrice } from "@/lib/utils"
 import { useCart } from "@/hooks/use-cart"
-import { Header } from '@/app/components/header'
+import { HeaderPedidos } from '@/app/pedidos/components/header-pedidos'
 import { ChevronRight } from 'lucide-react'
 
 export default function PedidosPage() {
@@ -13,7 +13,7 @@ export default function PedidosPage() {
   return (
     <div>
       <div className="sticky top-0 z-10 bg-white/70 backdrop-blur-md pb-4">
-        <Header 
+        <HeaderPedidos 
           title="Pedido"
         />
       </div>
