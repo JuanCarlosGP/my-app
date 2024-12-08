@@ -24,11 +24,11 @@ export function StoreCard({ id, name, description, subdescription, imageUrl }: S
               className="rounded object-cover"
             />
           </div>
-          <div className="flex-1 min-w-0">
+          <div className="flex-1 min-w-0 mr-2">
             <h2 className="text-base font-semibold text-gray-900 mb-3">{name}</h2>
-            <p className="text-sm text-gray-500">{description}</p>
+            <p className="text-sm text-gray-500 truncate">{description}</p>
             <Separator />
-            <p className="text-sm text-gray-600 mt-1">{subdescription}</p>
+            <p className="text-sm text-gray-600 mt-1 line-clamp-2">{subdescription}</p>
           </div>
         </div>
       </div>
