@@ -98,33 +98,33 @@ export function CategorySheet({ id, name, description, subdescription, imageUrl 
                   {product.name}
                 </h3>
               </div>
-              <div className="flex items-center justify-between pb-2 px-2">
-                <div className="flex items-center gap-2">
+              <div className="flex flex-col pb-2 px-2">
+                <div className="flex items-center justify-between">
                   <span className="font-bold text-l">{product.price.toFixed(2)}€</span>
-                  <span className="text-sm text-gray-500">{product.unitsPerBox} u/c</span>
-                </div>
-                <div className="flex gap-2">
-                  {productQuantities[product.id] > 0 && (
+                  <div className="flex gap-2">
+                    {productQuantities[product.id] > 0 && (
+                      <button 
+                        className="p-2.5 bg-gray-100 rounded-full transition-transform active:scale-90 hover:bg-gray-200"
+                        onClick={(e) => {
+                          e.preventDefault();
+                          removeProduct(product.id, product.unitsPerBox);
+                        }}
+                      >
+                        <Minus className="w-5 h-5 text-red-600" />
+                      </button>
+                    )}
                     <button 
                       className="p-2.5 bg-gray-100 rounded-full transition-transform active:scale-90 hover:bg-gray-200"
                       onClick={(e) => {
                         e.preventDefault();
-                        removeProduct(product.id, product.unitsPerBox);
+                        addProduct(product.id, product.unitsPerBox);
                       }}
                     >
-                      <Minus className="w-5 h-5 text-red-600" />
+                      <Plus className="w-5 h-5 text-green-600" />
                     </button>
-                  )}
-                  <button 
-                    className="p-2.5 bg-gray-100 rounded-full transition-transform active:scale-90 hover:bg-gray-200"
-                    onClick={(e) => {
-                      e.preventDefault();
-                      addProduct(product.id, product.unitsPerBox);
-                    }}
-                  >
-                    <Plus className="w-5 h-5 text-green-600" />
-                  </button>
+                  </div>
                 </div>
+                <span className="text-sm text-gray-500">{product.unitsPerBox} u/c</span>
               </div>
             </div>
           ))}
