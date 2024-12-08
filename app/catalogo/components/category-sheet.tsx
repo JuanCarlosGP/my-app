@@ -3,12 +3,14 @@
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger, SheetClose } from "@/components/ui/sheet"
 import { CategoryCard } from "@/app/components/category-card"
 import { SearchSheet } from "./search-sheet"
-import { ArrowLeft, Search, Plus } from "lucide-react"
+import { ArrowLeft, Search, Plus, Minus } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
 import Image from 'next/image'
 import { useState, useEffect } from 'react'
 import { getCategoryProducts, Product } from "@/app/data/stores"
 import { useParams } from 'next/navigation'
+import { useCart } from "@/app/context/cart-context"
+import { ProductSheet } from "./product-sheet"
 
 interface CategorySheetProps {
   id: string
@@ -22,22 +24,20 @@ export function CategorySheet({ id, name, description, subdescription, imageUrl 
   const params = useParams()
   const storeId = params.id as string
   const [products, setProducts] = useState<Product[]>([])
-  const [productQuantities, setProductQuantities] = useState<{ [key: string]: number }>({})
+  const { productQuantities, addProduct, removeProduct } = useCart()
+  const [selectedProduct, setSelectedProduct] = useState<Product | null>(null)
 
   useEffect(() => {
     const categoryProducts = getCategoryProducts(storeId, id)
     setProducts(categoryProducts)
   }, [storeId, id])
 
-  const handleAddProduct = (productId: string, unitsPerBox: number) => {
-    setProductQuantities(prev => {
-      const currentQuantity = prev[productId] || 0
-      return {
-        ...prev,
-        [productId]: currentQuantity + unitsPerBox
-      }
-    })
-  }
+  const handleProductClick = (e: React.MouseEvent, product: Product) => {
+    if ((e.target as HTMLElement).closest('button')) {
+      return;
+    }
+    setSelectedProduct(product);
+  };
 
   return (
     <Sheet>
@@ -71,7 +71,11 @@ export function CategorySheet({ id, name, description, subdescription, imageUrl 
         
         <div className="grid grid-cols-2 gap-2 m-1 mt-4">
           {products.map((product) => (
-            <div key={product.id} className="flex flex-col bg-white rounded-lg mb-3">
+            <div 
+              key={product.id} 
+              className="flex flex-col bg-white rounded-lg mb-3"
+              onClick={(e) => handleProductClick(e, product)}
+            >
               <div className="relative aspect-square mb-2">
                 {productQuantities[product.id] > 0 && (
                   <Badge 
@@ -98,19 +102,40 @@ export function CategorySheet({ id, name, description, subdescription, imageUrl 
                   <span className="font-bold text-l">{product.price.toFixed(2)}€</span>
                   <span className="text-sm text-gray-500">{product.unitsPerBox} u/c</span>
                 </div>
-                <button 
-                  className="p-2.5 bg-gray-100 rounded-full transition-transform active:scale-90 hover:bg-gray-200"
-                  onClick={(e) => {
-                    e.preventDefault();
-                    handleAddProduct(product.id, product.unitsPerBox);
-                  }}
-                >
-                  <Plus className="w-5 h-5 text-green-600" />
-                </button>
+                <div className="flex gap-2">
+                  {productQuantities[product.id] > 0 && (
+                    <button 
+                      className="p-2.5 bg-gray-100 rounded-full transition-transform active:scale-90 hover:bg-gray-200"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        removeProduct(product.id, product.unitsPerBox);
+                      }}
+                    >
+                      <Minus className="w-5 h-5 text-red-600" />
+                    </button>
+                  )}
+                  <button 
+                    className="p-2.5 bg-gray-100 rounded-full transition-transform active:scale-90 hover:bg-gray-200"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      addProduct(product.id, product.unitsPerBox);
+                    }}
+                  >
+                    <Plus className="w-5 h-5 text-green-600" />
+                  </button>
+                </div>
               </div>
             </div>
           ))}
         </div>
+
+        {selectedProduct && (
+          <ProductSheet
+            isOpen={!!selectedProduct}
+            onClose={() => setSelectedProduct(null)}
+            product={selectedProduct}
+          />
+        )}
       </SheetContent>
     </Sheet>
   )
