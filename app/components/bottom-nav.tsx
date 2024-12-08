@@ -8,7 +8,7 @@ const navItems = [
   { href: '/', icon: Home, label: 'Tienda' },
   { href: '/catalogo', icon: Book, label: 'Catálogo' },
   { href: '/pedidos', icon: ShoppingCart, label: 'Pedidos' },
-  { href: '/historial', icon: Clock, label: 'Historial' },
+  // { href: '/historial', icon: Clock, label: 'Historial' },
   { href: '/ajustes', icon: Settings, label: 'Ajustes' },
 ]
 
