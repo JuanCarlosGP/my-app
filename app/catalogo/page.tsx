@@ -1,10 +1,11 @@
 'use client'
 
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 
 export default function CatalogoPage() {
   const router = useRouter();
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     try {
@@ -12,19 +13,29 @@ export default function CatalogoPage() {
       
       if (savedCatalog) {
         const parsedCatalog = JSON.parse(savedCatalog);
-        // Redirigimos al catálogo específico usando el storeId guardado
         router.push(`/catalogo/${parsedCatalog.storeId}`);
       } else {
-        // Si no hay catálogo guardado, redirigimos a tiendas
-        router.push('/tiendas');
+        setIsLoading(false);
       }
     } catch (error) {
       console.error('Error al cargar el último catálogo:', error);
-      router.push('/tiendas');
+      setIsLoading(false);
     }
-  }, []);
+  }, [router]);
 
-  // Mostramos un loading mientras se realiza la redirección
-  return <div className="flex items-center justify-center h-screen">Redirigiendo...</div>;
+  if (isLoading) {
+    return <div className="flex items-center justify-center h-screen">Cargando...</div>;
+  }
+
+  return (
+    <div className="flex flex-col items-center justify-center min-h-screen p-4 text-center">
+      <p className="text-gray-600 text-lg">
+        Aquí se mostrarán las categorías de tus tiendas guardadas.
+      </p>
+      <p className="text-gray-500 mt-2">
+        Guarda algunas tiendas para empezar a ver sus categorías.
+      </p>
+    </div>
+  );
 }
 

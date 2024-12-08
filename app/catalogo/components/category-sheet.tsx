@@ -6,15 +6,9 @@ import { SearchSheet } from "./search-sheet"
 import { ArrowLeft, Search, Plus } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
 import Image from 'next/image'
-import { useState } from 'react'
-
-interface Product {
-  id: string
-  name: string
-  price: number
-  unitsPerBox: number
-  imageUrl: string
-}
+import { useState, useEffect } from 'react'
+import { getCategoryProducts, Product } from "@/app/data/stores"
+import { useParams } from 'next/navigation'
 
 interface CategorySheetProps {
   id: string
@@ -24,57 +18,16 @@ interface CategorySheetProps {
   imageUrl: string
 }
 
-// Simulación de productos por categoría
-const getProductsByCategory = (categoryId: string): Product[] => {
-  return [
-    {
-      id: `${categoryId}-1`,
-      name: "Set de utensilios de cocina básico para la casa",
-      price: 19.99,
-      unitsPerBox: 12,
-      imageUrl: "https://cataas.com/cat?width=200&height=200&random=1"
-    },
-    {
-      id: `${categoryId}-2`,
-      name: "Juego de costura multiusos para la ropa", 
-      price: 29.99,
-      unitsPerBox: 24,
-      imageUrl: "https://cataas.com/cat?width=200&height=200&random=2"
-    },
-    {
-      id: `${categoryId}-3`,
-      name: "Pack de pinzas para la ropa y el hogar",
-      price: 9.99,
-      unitsPerBox: 9,
-      imageUrl: "https://cataas.com/cat?width=200&height=200&random=3"
-    },
-    {
-      id: `${categoryId}-4`,
-      name: "Organizador de plástico para cajones de ropa y accesorios",
-      price: 39.99,
-      unitsPerBox: 12,
-      imageUrl: "https://cataas.com/cat?width=200&height=200&random=4"
-    },
-    {
-        id: `${categoryId}-3`,
-        name: "Pack de pinzas para la ropa y el hogar",
-        price: 9.99,
-        unitsPerBox: 9,
-        imageUrl: "https://cataas.com/cat?width=200&height=200&random=3"
-      },
-      {
-        id: `${categoryId}-4`,
-        name: "Organizador de plástico para cajones de ropa y accesorios",
-        price: 39.99,
-        unitsPerBox: 12,
-        imageUrl: "https://cataas.com/cat?width=200&height=200&random=4"
-      }
-  ]  
-}
-
 export function CategorySheet({ id, name, description, subdescription, imageUrl }: CategorySheetProps) {
-  const products = getProductsByCategory(id)
+  const params = useParams()
+  const storeId = params.id as string
+  const [products, setProducts] = useState<Product[]>([])
   const [productQuantities, setProductQuantities] = useState<{ [key: string]: number }>({})
+
+  useEffect(() => {
+    const categoryProducts = getCategoryProducts(storeId, id)
+    setProducts(categoryProducts)
+  }, [storeId, id])
 
   const handleAddProduct = (productId: string, unitsPerBox: number) => {
     setProductQuantities(prev => {
@@ -106,11 +59,6 @@ export function CategorySheet({ id, name, description, subdescription, imageUrl 
               <SheetClose className="p-2 hover:bg-gray-100 rounded-full">
                 <ArrowLeft className="h-6 w-6" />
               </SheetClose>
-              {/* {Object.keys(productQuantities).length > 0 && (
-                <Badge variant="destructive" className="ml-2">
-                  {Object.values(productQuantities).reduce((a, b) => a + b, 0)}
-                </Badge>
-              )} */}
             </div>
             
             <h2 className="font-semibold text-lg absolute left-1/2 -translate-x-1/2">
