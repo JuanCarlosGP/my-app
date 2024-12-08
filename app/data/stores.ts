@@ -4,7 +4,10 @@ export interface Product {
     price: number
     unitsPerBox: number
     imageUrl: string
-  }
+    reference: string
+    barcode: string
+    unitsPerPackage: number
+}
   
   export interface Category {
     id: string
@@ -42,39 +45,54 @@ export interface Product {
           "imageUrl": "https://cataas.com/cat?width=300&height=200&random=1",
           "products": [
             {
-              "id": "prod-1-1-1",
-              "name": "Set de utensilios básicos",
-              "price": 19.99,
-              "unitsPerBox": 12,
-              "imageUrl": "https://cataas.com/cat?width=200&height=200&random=1"
-            },
-            {
-              "id": "prod-1-1-2",
-              "name": "Wok tradicional",
-              "price": 29.99,
+              "id": "prod-1-1-6",
+              "name": "Tetera de cerámica japonesa",
+              "price": 34.99,
               "unitsPerBox": 6,
-              "imageUrl": "https://cataas.com/cat?width=200&height=200&random=2"
+              "unitsPerPackage": 2,
+              "reference": "UTN-014",
+              "barcode": "8400000123469",
+              "imageUrl": "https://cataas.com/cat?width=200&height=200&random=30"
             },
             {
-              "id": "prod-1-1-3",
-              "name": "Cuchillo de chef japonés",
-              "price": 39.99,
-              "unitsPerBox": 8,
-              "imageUrl": "https://cataas.com/cat?width=200&height=200&random=21"
+              "id": "prod-1-1-7",
+              "name": "Juego de palillos de bambú",
+              "price": 9.99,
+              "unitsPerBox": 20,
+              "unitsPerPackage": 10,
+              "reference": "UTN-015",
+              "barcode": "8400000123470",
+              "imageUrl": "https://cataas.com/cat?width=200&height=200&random=31"
             },
             {
-              "id": "prod-1-1-4",
-              "name": "Tabla de cortar de bambú",
-              "price": 14.99,
-              "unitsPerBox": 10,
-              "imageUrl": "https://cataas.com/cat?width=200&height=200&random=22"
-            },
-            {
-              "id": "prod-1-1-5",
-              "name": "Set de moldes para sushi",
+              "id": "prod-1-1-8",
+              "name": "Set de tazones de porcelana",
               "price": 24.99,
+              "unitsPerBox": 10,
+              "unitsPerPackage": 5,
+              "reference": "UTN-018",
+              "barcode": "8400000123473",
+              "imageUrl": "https://cataas.com/cat?width=200&height=200&random=39"
+            },
+            {
+              "id": "prod-1-1-9",
+              "name": "Rallador multifunción japonés",
+              "price": 12.99,
               "unitsPerBox": 15,
-              "imageUrl": "https://cataas.com/cat?width=200&height=200&random=23"
+              "unitsPerPackage": 6,
+              "reference": "UTN-019",
+              "barcode": "8400000123474",
+              "imageUrl": "https://cataas.com/cat?width=200&height=200&random=40"
+            },
+            {
+              "id": "prod-1-1-10",
+              "name": "Cuchara de madera tallada",
+              "price": 5.99,
+              "unitsPerBox": 30,
+              "unitsPerPackage": 15,
+              "reference": "UTN-020",
+              "barcode": "8400000123475",
+              "imageUrl": "https://cataas.com/cat?width=200&height=200&random=41"
             }
           ]
         },
@@ -86,39 +104,54 @@ export interface Product {
           "imageUrl": "https://cataas.com/cat?width=300&height=200&random=2",
           "products": [
             {
-              "id": "prod-1-2-1",
-              "name": "Pack de bayetas premium",
-              "price": 9.99,
-              "unitsPerBox": 24,
-              "imageUrl": "https://cataas.com/cat?width=200&height=200&random=3"
-            },
-            {
-              "id": "prod-1-2-2",
-              "name": "Escoba multisuperficie",
-              "price": 15.99,
+              "id": "prod-1-2-6",
+              "name": "Guantes de limpieza reutilizables",
+              "price": 7.99,
               "unitsPerBox": 12,
-              "imageUrl": "https://cataas.com/cat?width=200&height=200&random=4"
+              "unitsPerPackage": 6,
+              "reference": "UTN-021",
+              "barcode": "8400000123476",
+              "imageUrl": "https://cataas.com/cat?width=200&height=200&random=42"
             },
             {
-              "id": "prod-1-2-3",
-              "name": "Detergente ecológico",
-              "price": 12.99,
+              "id": "prod-1-2-7",
+              "name": "Esponja ecológica para vajilla",
+              "price": 4.99,
+              "unitsPerBox": 24,
+              "unitsPerPackage": 12,
+              "reference": "UTN-022",
+              "barcode": "8400000123477",
+              "imageUrl": "https://cataas.com/cat?width=200&height=200&random=43"
+            },
+            {
+              "id": "prod-1-2-8",
+              "name": "Spray anti grasa concentrado",
+              "price": 10.99,
               "unitsPerBox": 18,
-              "imageUrl": "https://cataas.com/cat?width=200&height=200&random=24"
+              "unitsPerPackage": 9,
+              "reference": "UTN-023",
+              "barcode": "8400000123478",
+              "imageUrl": "https://cataas.com/cat?width=200&height=200&random=44"
             },
             {
-              "id": "prod-1-2-4",
-              "name": "Limpiador multiusos concentrado",
+              "id": "prod-1-2-9",
+              "name": "Trapo multiusos de microfibra",
+              "price": 3.99,
+              "unitsPerBox": 50,
+              "unitsPerPackage": 25,
+              "reference": "UTN-024",
+              "barcode": "8400000123479",
+              "imageUrl": "https://cataas.com/cat?width=200&height=200&random=45"
+            },
+            {
+              "id": "prod-1-2-10",
+              "name": "Bolsas de basura biodegradables",
               "price": 8.99,
-              "unitsPerBox": 30,
-              "imageUrl": "https://cataas.com/cat?width=200&height=200&random=25"
-            },
-            {
-              "id": "prod-1-2-5",
-              "name": "Cepillo para limpieza de esquinas",
-              "price": 6.99,
-              "unitsPerBox": 20,
-              "imageUrl": "https://cataas.com/cat?width=200&height=200&random=26"
+              "unitsPerBox": 10,
+              "unitsPerPackage": 5,
+              "reference": "UTN-025",
+              "barcode": "8400000123480",
+              "imageUrl": "https://cataas.com/cat?width=200&height=200&random=46"
             }
           ]
         },
@@ -130,18 +163,24 @@ export interface Product {
           "imageUrl": "https://cataas.com/cat?width=300&height=200&random=18",
           "products": [
             {
-              "id": "prod-1-3-1",
-              "name": "Lámpara de papel japonesa",
-              "price": 19.99,
+              "id": "prod-1-3-3",
+              "name": "Cojines con motivos orientales",
+              "price": 29.99,
               "unitsPerBox": 8,
-              "imageUrl": "https://cataas.com/cat?width=200&height=200&random=27"
+              "unitsPerPackage": 4,
+              "reference": "UTN-026",
+              "barcode": "8400000123481",
+              "imageUrl": "https://cataas.com/cat?width=200&height=200&random=47"
             },
             {
-              "id": "prod-1-3-2",
-              "name": "Figuritas de porcelana",
-              "price": 12.99,
-              "unitsPerBox": 12,
-              "imageUrl": "https://cataas.com/cat?width=200&height=200&random=28"
+              "id": "prod-1-3-4",
+              "name": "Reloj de pared minimalista",
+              "price": 19.99,
+              "unitsPerBox": 10,
+              "unitsPerPackage": 5,
+              "reference": "UTN-027",
+              "barcode": "8400000123482",
+              "imageUrl": "https://cataas.com/cat?width=200&height=200&random=48"
             }
           ]
         },
@@ -153,11 +192,24 @@ export interface Product {
           "imageUrl": "https://cataas.com/cat?width=300&height=200&random=19",
           "products": [
             {
-              "id": "prod-1-4-1",
-              "name": "Kimono tradicional",
-              "price": 49.99,
-              "unitsPerBox": 4,
-              "imageUrl": "https://cataas.com/cat?width=200&height=200&random=29"
+              "id": "prod-1-4-2",
+              "name": "Zapatos de madera Geta",
+              "price": 39.99,
+              "unitsPerBox": 6,
+              "unitsPerPackage": 3,
+              "reference": "UTN-028",
+              "barcode": "8400000123483",
+              "imageUrl": "https://cataas.com/cat?width=200&height=200&random=49"
+            },
+            {
+              "id": "prod-1-4-3",
+              "name": "Obi para kimono",
+              "price": 24.99,
+              "unitsPerBox": 8,
+              "unitsPerPackage": 4,
+              "reference": "UTN-029",
+              "barcode": "8400000123484",
+              "imageUrl": "https://cataas.com/cat?width=200&height=200&random=50"
             }
           ]
         }
@@ -165,25 +217,57 @@ export interface Product {
     },
     {
       "id": "2",
-      "name": "Rincón Mediterráneo",
-      "description": "Productos gourmet mediterráneos",
-      "subdescription": "Sabores auténticos de la región",
-      "imageUrl": "https://cataas.com/cat?width=300&height=200&random=20",
+      "name": "Delicias Mediterráneas",
+      "description": "Lo mejor de la dieta mediterránea",
+      "subdescription": "Productos frescos y auténticos",
+      "imageUrl": "https://cataas.com/cat?width=300&height=200&random=22",
       "bannerImage": "https://images.pexels.com/photos/1239401/pexels-photo-1239401.jpeg",
       "categories": [
         {
           "id": "cat-2-1",
           "name": "Aceites y Vinagres",
-          "description": "Variedades de alta calidad",
-          "subdescription": "Perfectos para tus ensaladas",
-          "imageUrl": "https://cataas.com/cat?width=300&height=200&random=21",
+          "description": "Calidad gourmet",
+          "subdescription": "Perfectos para tus recetas",
+          "imageUrl": "https://cataas.com/cat?width=300&height=200&random=24",
           "products": [
             {
               "id": "prod-2-1-1",
               "name": "Aceite de oliva virgen extra",
-              "price": 15.99,
+              "price": 14.99,
               "unitsPerBox": 6,
-              "imageUrl": "https://cataas.com/cat?width=200&height=200&random=31"
+              "unitsPerPackage": 3,
+              "reference": "MED-001",
+              "barcode": "8500000123471",
+              "imageUrl": "https://cataas.com/cat?width=200&height=200&random=34"
+            },
+            {
+              "id": "prod-2-1-2",
+              "name": "Vinagre balsámico envejecido",
+              "price": 11.99,
+              "unitsPerBox": 8,
+              "unitsPerPackage": 4,
+              "reference": "MED-002",
+              "barcode": "8500000123472",
+              "imageUrl": "https://cataas.com/cat?width=200&height=200&random=35"
+            }
+          ]
+        },
+        {
+          "id": "cat-2-2",
+          "name": "Quesos Artesanales",
+          "description": "De pequeñas granjas locales",
+          "subdescription": "Sabores únicos",
+          "imageUrl": "https://cataas.com/cat?width=300&height=200&random=25",
+          "products": [
+            {
+              "id": "prod-2-2-1",
+              "name": "Queso Manchego curado",
+              "price": 19.99,
+              "unitsPerBox": 5,
+              "unitsPerPackage": 2,
+              "reference": "MED-003",
+              "barcode": "8500000123473",
+              "imageUrl": "https://cataas.com/cat?width=200&height=200&random=36"
             }
           ]
         }
@@ -191,25 +275,47 @@ export interface Product {
     },
     {
       "id": "3",
-      "name": "Delicias del Norte",
-      "description": "Lo mejor del norte de Europa",
-      "subdescription": "Productos frescos y tradicionales",
-      "imageUrl": "https://cataas.com/cat?width=300&height=200&random=22",
+      "name": "Sabores del Norte",
+      "description": "Especialidades del norte de Europa",
+      "subdescription": "Productos exclusivos y tradicionales",
+      "imageUrl": "https://cataas.com/cat?width=300&height=200&random=23",
       "bannerImage": "https://images.pexels.com/photos/3155666/pexels-photo-3155666.jpeg",
       "categories": [
         {
           "id": "cat-3-1",
           "name": "Lácteos",
-          "description": "Leche, quesos y más",
+          "description": "Leche y quesos únicos",
           "subdescription": "Directamente de granjas nórdicas",
-          "imageUrl": "https://cataas.com/cat?width=300&height=200&random=23",
+          "imageUrl": "https://cataas.com/cat?width=300&height=200&random=26",
           "products": [
             {
               "id": "prod-3-1-1",
-              "name": "Queso Gouda premium",
-              "price": 10.99,
-              "unitsPerBox": 5,
-              "imageUrl": "https://cataas.com/cat?width=200&height=200&random=32"
+              "name": "Queso Gouda ahumado",
+              "price": 12.99,
+              "unitsPerBox": 8,
+              "unitsPerPackage": 4,
+              "reference": "NORD-001",
+              "barcode": "8600000123471",
+              "imageUrl": "https://cataas.com/cat?width=200&height=200&random=37"
+            }
+          ]
+        },
+        {
+          "id": "cat-3-2",
+          "name": "Panadería",
+          "description": "Pan y dulces artesanales",
+          "subdescription": "Sabores auténticos",
+          "imageUrl": "https://cataas.com/cat?width=300&height=200&random=27",
+          "products": [
+            {
+              "id": "prod-3-2-1",
+              "name": "Pan de centeno",
+              "price": 7.99,
+              "unitsPerBox": 10,
+              "unitsPerPackage": 5,
+              "reference": "NORD-002",
+              "barcode": "8600000123472",
+              "imageUrl": "https://cataas.com/cat?width=200&height=200&random=38"
             }
           ]
         }
@@ -218,13 +324,17 @@ export interface Product {
   ]
   
   
+  
+  
   export const getStoreById = (storeId: string) => {
     return stores.find(store => store.id === storeId)
   }
   
   export const getCategoryProducts = (storeId: string, categoryId: string) => {
     const store = getStoreById(storeId)
-    return store?.categories.find(cat => cat.id === categoryId)?.products || []
+    const products = store?.categories.find(cat => cat.id === categoryId)?.products || []
+    console.log('Products from stores.ts:', products)
+    return products
   }
   
   export function getAllProducts(storeId: string): Product[] {

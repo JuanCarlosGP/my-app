@@ -1,25 +1,39 @@
 "use client"
 
 import { Sheet, SheetContent, SheetHeader, SheetClose } from "@/components/ui/sheet"
-import { ArrowLeft } from "lucide-react"
+import { ArrowLeft, Plus, Minus } from "lucide-react"
 import Image from 'next/image'
 import { Badge } from "@/components/ui/badge"
 import { useCart } from "@/app/context/cart-context"
+import { Product } from "@/app/data/stores"
+import { useState, useEffect } from 'react'
 
 interface ProductSheetProps {
   isOpen: boolean
   onClose: () => void
-  product: {
-    id: string
-    name: string
-    price: number
-    unitsPerBox: number
-    imageUrl: string
-  }
+  product: Product
 }
 
 export function ProductSheet({ isOpen, onClose, product }: ProductSheetProps) {
-  const { productQuantities } = useCart()
+  const { productQuantities, addProduct, removeProduct } = useCart()
+  const [comment, setComment] = useState('')
+
+  // Cargar comentario guardado al abrir el producto
+  useEffect(() => {
+    const savedComment = localStorage.getItem(`comment-${product.id}`)
+    if (savedComment) {
+      setComment(savedComment)
+    }
+  }, [product.id])
+
+  // Guardar comentario cuando cambie
+  const handleCommentChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    const newComment = e.target.value
+    setComment(newComment)
+    localStorage.setItem(`comment-${product.id}`, newComment)
+  }
+
+  console.log('Product data:', product)
 
   return (
     <Sheet open={isOpen} onOpenChange={onClose}>
@@ -32,7 +46,7 @@ export function ProductSheet({ isOpen, onClose, product }: ProductSheetProps) {
               </SheetClose>
             </div>
             
-            <h2 className="font-semibold text-lg absolute left-1/2 -translate-x-1/2">
+            <h2 className="font-semibold text-lg absolute left-1/2 -translate-x-1/2 max-w-[60%] truncate text-center">
               {product.name}
             </h2>
           </div>
@@ -56,11 +70,96 @@ export function ProductSheet({ isOpen, onClose, product }: ProductSheetProps) {
             />
           </div>
 
-          <div className="bg-white rounded-lg p-4">
-            <h3 className="text-xl font-semibold mb-4">{product.name}</h3>
-            <div className="flex items-center justify-between">
-              <span className="text-2xl font-bold">{product.price.toFixed(2)}€</span>
-              <span className="text-gray-500">{product.unitsPerBox} u/c</span>
+          <div className="space-y-4">
+            <div className="bg-white rounded-lg p-4">
+              <h3 className="text-2xl font-bold mb-2">{product.name}</h3>
+              <span className="text-3xl font-bold text-blue-600">
+                {product.price.toFixed(2)}€
+              </span>
+            </div>
+
+            <div className="bg-white rounded-lg p-4">
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <p className="text-sm text-gray-600 text-center mb-2">Por paquete</p>
+                  <button 
+                    className="w-full py-2 px-4 bg-blue-50 hover:bg-blue-100 rounded-lg flex items-center justify-center gap-2"
+                    onClick={() => addProduct(product.id, product.unitsPerPackage)}
+                  >
+                    <Plus className="w-5 h-5 text-blue-600" />
+                    <span className="text-sm">{product.unitsPerPackage} uds.</span>
+                  </button>
+                  <button 
+                    className="w-full py-2 px-4 bg-blue-50 hover:bg-blue-100 rounded-lg flex items-center justify-center gap-2"
+                    onClick={() => removeProduct(product.id, product.unitsPerPackage)}
+                  >
+                    <Minus className="w-5 h-5 text-blue-600" />
+                    <span className="text-sm">{product.unitsPerPackage} uds.</span>
+                  </button>
+                </div>
+
+                <div className="space-y-2">
+                  <p className="text-sm text-gray-600 text-center mb-2">Por caja</p>
+                  <button 
+                    className="w-full py-2 px-4 bg-blue-50 hover:bg-blue-100 rounded-lg flex items-center justify-center gap-2"
+                    onClick={() => addProduct(product.id, product.unitsPerBox)}
+                  >
+                    <Plus className="w-5 h-5 text-blue-600" />
+                    <span className="text-sm">{product.unitsPerBox} uds.</span>
+                  </button>
+                  <button 
+                    className="w-full py-2 px-4 bg-blue-50 hover:bg-blue-100 rounded-lg flex items-center justify-center gap-2"
+                    onClick={() => removeProduct(product.id, product.unitsPerBox)}
+                  >
+                    <Minus className="w-5 h-5 text-blue-600" />
+                    <span className="text-sm">{product.unitsPerBox} uds.</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <div className="bg-white rounded-lg p-4 space-y-3">
+              <div className="flex justify-between items-center">
+                <span className="text-gray-600">Referencia:</span>
+                <span className="font-medium">{product.reference || 'N/A'}</span>
+              </div>
+              
+              <div className="flex justify-between items-center">
+                <span className="text-gray-600">Código de barras:</span>
+                <span className="font-medium">{product.barcode || 'N/A'}</span>
+              </div>
+
+              <div className="h-px bg-gray-200 my-2" />
+
+              <div className="flex justify-between items-center">
+                <span className="text-gray-600">Unidades por paquete:</span>
+                <span className="font-medium">{product.unitsPerPackage || 'N/A'} uds.</span>
+              </div>
+
+              <div className="flex justify-between items-center">
+                <span className="text-gray-600">Unidades por caja:</span>
+                <span className="font-medium">{product.unitsPerBox} uds.</span>
+              </div>
+            </div>
+
+            <div className="bg-white rounded-lg p-4">
+              <label 
+                htmlFor="comment" 
+                className="block text-sm font-medium text-gray-600 mb-2"
+              >
+                Comentarios para este producto:
+              </label>
+              <textarea
+                id="comment"
+                rows={3}
+                className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 resize-none bg-gray-50"
+                placeholder="Añade aquí tus comentarios o instrucciones especiales..."
+                value={comment}
+                onChange={handleCommentChange}
+              />
+              <p className="text-xs text-gray-500 mt-1">
+                El comentario se guardará automáticamente
+              </p>
             </div>
           </div>
         </div>
