@@ -1,10 +1,10 @@
 "use client"
 
-import { Sheet, SheetContent, SheetHeader, SheetClose } from "@/components/ui/sheet"
+import { Sheet, SheetContent, SheetHeader, SheetClose, SheetTitle } from "@/components/ui/sheet"
 import { ArrowLeft, Plus, Minus } from "lucide-react"
 import Image from 'next/image'
 import { Badge } from "@/components/ui/badge"
-import { useCart } from "@/app/context/cart-context"
+import { useCart } from "@/hooks/use-cart"
 import { Product } from "@/app/data/stores"
 import { useState, useEffect } from 'react'
 
@@ -15,7 +15,7 @@ interface ProductSheetProps {
 }
 
 export function ProductSheet({ isOpen, onClose, product }: ProductSheetProps) {
-  const { productQuantities, addProduct, removeProduct } = useCart()
+  const { productQuantities, addToCart, removeFromCart } = useCart()
   const [comment, setComment] = useState('')
 
   // Cargar comentario guardado al abrir el producto
@@ -38,6 +38,12 @@ export function ProductSheet({ isOpen, onClose, product }: ProductSheetProps) {
   return (
     <Sheet open={isOpen} onOpenChange={onClose}>
       <SheetContent className="w-full sm:max-w-md bg-[#f5f5f5] p-0 overflow-y-auto">
+        <SheetHeader>
+          <SheetTitle className="sr-only">
+            {product.name}
+          </SheetTitle>
+        </SheetHeader>
+        
         <div className="sticky top-0 bg-white/70 backdrop-blur-md z-10">
           <div className="flex items-center justify-between p-4">
             <div className="flex items-center gap-2">
@@ -84,14 +90,14 @@ export function ProductSheet({ isOpen, onClose, product }: ProductSheetProps) {
                   <p className="text-sm text-gray-600 text-center mb-2">Por paquete</p>
                   <button 
                     className="w-full py-2 px-4 bg-blue-50 hover:bg-blue-100 rounded-lg flex items-center justify-center gap-2"
-                    onClick={() => addProduct(product.id, product.unitsPerPackage)}
+                    onClick={() => addToCart(product, product.unitsPerPackage)}
                   >
                     <Plus className="w-5 h-5 text-blue-600" />
                     <span className="text-sm">{product.unitsPerPackage} uds.</span>
                   </button>
                   <button 
                     className="w-full py-2 px-4 bg-blue-50 hover:bg-blue-100 rounded-lg flex items-center justify-center gap-2"
-                    onClick={() => removeProduct(product.id, product.unitsPerPackage)}
+                    onClick={() => removeFromCart(product, product.unitsPerPackage)}
                   >
                     <Minus className="w-5 h-5 text-blue-600" />
                     <span className="text-sm">{product.unitsPerPackage} uds.</span>
@@ -102,14 +108,14 @@ export function ProductSheet({ isOpen, onClose, product }: ProductSheetProps) {
                   <p className="text-sm text-gray-600 text-center mb-2">Por caja</p>
                   <button 
                     className="w-full py-2 px-4 bg-blue-50 hover:bg-blue-100 rounded-lg flex items-center justify-center gap-2"
-                    onClick={() => addProduct(product.id, product.unitsPerBox)}
+                    onClick={() => addToCart(product, product.unitsPerBox)}
                   >
                     <Plus className="w-5 h-5 text-blue-600" />
                     <span className="text-sm">{product.unitsPerBox} uds.</span>
                   </button>
                   <button 
                     className="w-full py-2 px-4 bg-blue-50 hover:bg-blue-100 rounded-lg flex items-center justify-center gap-2"
-                    onClick={() => removeProduct(product.id, product.unitsPerBox)}
+                    onClick={() => removeFromCart(product, product.unitsPerBox)}
                   >
                     <Minus className="w-5 h-5 text-blue-600" />
                     <span className="text-sm">{product.unitsPerBox} uds.</span>

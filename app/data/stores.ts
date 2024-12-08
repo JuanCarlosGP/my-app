@@ -3,10 +3,12 @@ export interface Product {
     name: string
     price: number
     unitsPerBox: number
-    imageUrl: string
+    unitsPerPackage: number
     reference: string
     barcode: string
-    unitsPerPackage: number
+    imageUrl: string
+    image: string
+    storeName: string
 }
   
   export interface Category {
@@ -52,7 +54,9 @@ export interface Product {
               "unitsPerPackage": 2,
               "reference": "UTN-014",
               "barcode": "8400000123469",
-              "imageUrl": "https://cataas.com/cat?width=200&height=200&random=30"
+              "imageUrl": "https://cataas.com/cat?width=200&height=200&random=30",
+              "image": "https://cataas.com/cat?width=200&height=200&random=30",
+              "storeName": "Bazar Oriental"
             },
             {
               "id": "prod-1-1-7",
@@ -62,7 +66,9 @@ export interface Product {
               "unitsPerPackage": 10,
               "reference": "UTN-015",
               "barcode": "8400000123470",
-              "imageUrl": "https://cataas.com/cat?width=200&height=200&random=31"
+              "imageUrl": "https://cataas.com/cat?width=200&height=200&random=31",
+              "image": "https://cataas.com/cat?width=200&height=200&random=31",
+              "storeName": "Bazar Oriental"
             },
             {
               "id": "prod-1-1-8",
@@ -72,7 +78,9 @@ export interface Product {
               "unitsPerPackage": 5,
               "reference": "UTN-018",
               "barcode": "8400000123473",
-              "imageUrl": "https://cataas.com/cat?width=200&height=200&random=39"
+              "imageUrl": "https://cataas.com/cat?width=200&height=200&random=39",
+              "image": "https://cataas.com/cat?width=200&height=200&random=39",
+              "storeName": "Bazar Oriental"
             },
             {
               "id": "prod-1-1-9",
@@ -82,7 +90,9 @@ export interface Product {
               "unitsPerPackage": 6,
               "reference": "UTN-019",
               "barcode": "8400000123474",
-              "imageUrl": "https://cataas.com/cat?width=200&height=200&random=40"
+              "imageUrl": "https://cataas.com/cat?width=200&height=200&random=40",
+              "image": "https://cataas.com/cat?width=200&height=200&random=40",
+              "storeName": "Bazar Oriental"
             },
             {
               "id": "prod-1-1-10",
@@ -92,7 +102,9 @@ export interface Product {
               "unitsPerPackage": 15,
               "reference": "UTN-020",
               "barcode": "8400000123475",
-              "imageUrl": "https://cataas.com/cat?width=200&height=200&random=41"
+              "imageUrl": "https://cataas.com/cat?width=200&height=200&random=41",
+              "image": "https://cataas.com/cat?width=200&height=200&random=41",
+              "storeName": "Bazar Oriental"
             }
           ]
         },
@@ -107,11 +119,13 @@ export interface Product {
               "id": "prod-1-2-6",
               "name": "Guantes de limpieza reutilizables",
               "price": 7.99,
-              "unitsPerBox": 12,
-              "unitsPerPackage": 6,
+              "unitsPerBox": 72,
+              "unitsPerPackage": 12,
               "reference": "UTN-021",
               "barcode": "8400000123476",
-              "imageUrl": "https://cataas.com/cat?width=200&height=200&random=42"
+              "imageUrl": "https://cataas.com/cat?width=200&height=200&random=42",
+              "image": "https://cataas.com/cat?width=200&height=200&random=42",
+              "storeName": "Bazar Oriental"
             },
             {
               "id": "prod-1-2-7",
@@ -121,7 +135,9 @@ export interface Product {
               "unitsPerPackage": 12,
               "reference": "UTN-022",
               "barcode": "8400000123477",
-              "imageUrl": "https://cataas.com/cat?width=200&height=200&random=43"
+              "imageUrl": "https://cataas.com/cat?width=200&height=200&random=43",
+              "image": "https://cataas.com/cat?width=200&height=200&random=43",
+              "storeName": "Bazar Oriental"
             },
             {
               "id": "prod-1-2-8",
@@ -131,7 +147,9 @@ export interface Product {
               "unitsPerPackage": 9,
               "reference": "UTN-023",
               "barcode": "8400000123478",
-              "imageUrl": "https://cataas.com/cat?width=200&height=200&random=44"
+              "imageUrl": "https://cataas.com/cat?width=200&height=200&random=44",
+              "image": "https://cataas.com/cat?width=200&height=200&random=44",
+              "storeName": "Bazar Oriental"
             },
             {
               "id": "prod-1-2-9",
@@ -141,7 +159,9 @@ export interface Product {
               "unitsPerPackage": 25,
               "reference": "UTN-024",
               "barcode": "8400000123479",
-              "imageUrl": "https://cataas.com/cat?width=200&height=200&random=45"
+              "imageUrl": "https://cataas.com/cat?width=200&height=200&random=45",
+              "image": "https://cataas.com/cat?width=200&height=200&random=45",
+              "storeName": "Bazar Oriental"
             },
             {
               "id": "prod-1-2-10",
@@ -151,7 +171,9 @@ export interface Product {
               "unitsPerPackage": 5,
               "reference": "UTN-025",
               "barcode": "8400000123480",
-              "imageUrl": "https://cataas.com/cat?width=200&height=200&random=46"
+              "imageUrl": "https://cataas.com/cat?width=200&height=200&random=46",
+              "image": "https://cataas.com/cat?width=200&height=200&random=46",
+              "storeName": "Bazar Oriental"
             }
           ]
         },
@@ -170,7 +192,9 @@ export interface Product {
               "unitsPerPackage": 4,
               "reference": "UTN-026",
               "barcode": "8400000123481",
-              "imageUrl": "https://cataas.com/cat?width=200&height=200&random=47"
+              "imageUrl": "https://cataas.com/cat?width=200&height=200&random=47",
+              "image": "https://cataas.com/cat?width=200&height=200&random=47",
+              "storeName": "Bazar Oriental"
             },
             {
               "id": "prod-1-3-4",
@@ -180,7 +204,9 @@ export interface Product {
               "unitsPerPackage": 5,
               "reference": "UTN-027",
               "barcode": "8400000123482",
-              "imageUrl": "https://cataas.com/cat?width=200&height=200&random=48"
+              "imageUrl": "https://cataas.com/cat?width=200&height=200&random=48",
+              "image": "https://cataas.com/cat?width=200&height=200&random=48",
+              "storeName": "Bazar Oriental"
             }
           ]
         },
@@ -199,7 +225,9 @@ export interface Product {
               "unitsPerPackage": 3,
               "reference": "UTN-028",
               "barcode": "8400000123483",
-              "imageUrl": "https://cataas.com/cat?width=200&height=200&random=49"
+              "imageUrl": "https://cataas.com/cat?width=200&height=200&random=49",
+              "image": "https://cataas.com/cat?width=200&height=200&random=49",
+              "storeName": "Bazar Oriental"
             },
             {
               "id": "prod-1-4-3",
@@ -209,7 +237,9 @@ export interface Product {
               "unitsPerPackage": 4,
               "reference": "UTN-029",
               "barcode": "8400000123484",
-              "imageUrl": "https://cataas.com/cat?width=200&height=200&random=50"
+              "imageUrl": "https://cataas.com/cat?width=200&height=200&random=50",
+              "image": "https://cataas.com/cat?width=200&height=200&random=50",
+              "storeName": "Bazar Oriental"
             }
           ]
         }
@@ -238,7 +268,9 @@ export interface Product {
               "unitsPerPackage": 3,
               "reference": "MED-001",
               "barcode": "8500000123471",
-              "imageUrl": "https://cataas.com/cat?width=200&height=200&random=34"
+              "imageUrl": "https://cataas.com/cat?width=200&height=200&random=34",
+              "image": "https://cataas.com/cat?width=200&height=200&random=34",
+              "storeName": "Delicias Mediterráneas"
             },
             {
               "id": "prod-2-1-2",
@@ -248,7 +280,9 @@ export interface Product {
               "unitsPerPackage": 4,
               "reference": "MED-002",
               "barcode": "8500000123472",
-              "imageUrl": "https://cataas.com/cat?width=200&height=200&random=35"
+              "imageUrl": "https://cataas.com/cat?width=200&height=200&random=35",
+              "image": "https://cataas.com/cat?width=200&height=200&random=35",
+              "storeName": "Delicias Mediterráneas"
             }
           ]
         },
@@ -267,7 +301,9 @@ export interface Product {
               "unitsPerPackage": 2,
               "reference": "MED-003",
               "barcode": "8500000123473",
-              "imageUrl": "https://cataas.com/cat?width=200&height=200&random=36"
+              "imageUrl": "https://cataas.com/cat?width=200&height=200&random=36",
+              "image": "https://cataas.com/cat?width=200&height=200&random=36",
+              "storeName": "Delicias Mediterráneas"
             }
           ]
         }
@@ -296,7 +332,9 @@ export interface Product {
               "unitsPerPackage": 4,
               "reference": "NORD-001",
               "barcode": "8600000123471",
-              "imageUrl": "https://cataas.com/cat?width=200&height=200&random=37"
+              "imageUrl": "https://cataas.com/cat?width=200&height=200&random=37",
+              "image": "https://cataas.com/cat?width=200&height=200&random=37",
+              "storeName": "Sabores del Norte"
             }
           ]
         },
@@ -315,7 +353,9 @@ export interface Product {
               "unitsPerPackage": 5,
               "reference": "NORD-002",
               "barcode": "8600000123472",
-              "imageUrl": "https://cataas.com/cat?width=200&height=200&random=38"
+              "imageUrl": "https://cataas.com/cat?width=200&height=200&random=38",
+              "image": "https://cataas.com/cat?width=200&height=200&random=38",
+              "storeName": "Sabores del Norte"
             }
           ]
         }

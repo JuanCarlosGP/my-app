@@ -1,6 +1,6 @@
 "use client"
 
-import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger, SheetClose } from "@/components/ui/sheet"
+import { Sheet, SheetContent, SheetHeader, SheetClose, SheetTitle, SheetTrigger } from "@/components/ui/sheet"
 import { CategoryCard } from "@/app/components/category-card"
 import { SearchSheet } from "./search-sheet"
 import { ArrowLeft, Search, Plus, Minus } from "lucide-react"
@@ -9,8 +9,9 @@ import Image from 'next/image'
 import { useState, useEffect } from 'react'
 import { getCategoryProducts, Product } from "@/app/data/stores"
 import { useParams } from 'next/navigation'
-import { useCart } from "@/app/context/cart-context"
+import { useCart } from "@/hooks/use-cart"
 import { ProductSheet } from "./product-sheet"
+import { toast } from "react-hot-toast"
 
 interface CategorySheetProps {
   id: string
@@ -24,7 +25,7 @@ export function CategorySheet({ id, name, description, subdescription, imageUrl 
   const params = useParams()
   const storeId = params.id as string
   const [products, setProducts] = useState<Product[]>([])
-  const { productQuantities, addProduct, removeProduct } = useCart()
+  const { productQuantities, addToCart, removeFromCart } = useCart()
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null)
 
   useEffect(() => {
@@ -40,6 +41,11 @@ export function CategorySheet({ id, name, description, subdescription, imageUrl 
     setSelectedProduct(product);
   };
 
+  const handleAddToCart = (product: Product, quantity: number) => {
+    addToCart(product, quantity)
+    toast.success(`Se han añadido ${quantity} unidades al pedido`)
+  }
+
   return (
     <Sheet>
       <SheetTrigger asChild>
@@ -54,6 +60,12 @@ export function CategorySheet({ id, name, description, subdescription, imageUrl 
         </div>
       </SheetTrigger>
       <SheetContent className="w-full sm:max-w-md bg-[#f5f5f5] p-0 overflow-y-auto">
+        <SheetHeader>
+          <SheetTitle className="sr-only">
+            {name}
+          </SheetTitle>
+        </SheetHeader>
+        
         <div className="sticky top-0 bg-white/70 backdrop-blur-md z-10">
           <div className="flex items-center justify-between p-4">
             <div className="flex items-center gap-2">
@@ -107,7 +119,7 @@ export function CategorySheet({ id, name, description, subdescription, imageUrl 
                         className="p-2.5 bg-gray-100 rounded-full transition-transform active:scale-90 hover:bg-gray-200"
                         onClick={(e) => {
                           e.preventDefault();
-                          removeProduct(product.id, product.unitsPerBox);
+                          removeFromCart(product, product.unitsPerPackage);
                         }}
                       >
                         <Minus className="w-5 h-5 text-red-600" />
@@ -117,14 +129,16 @@ export function CategorySheet({ id, name, description, subdescription, imageUrl 
                       className="p-2.5 bg-gray-100 rounded-full transition-transform active:scale-90 hover:bg-gray-200"
                       onClick={(e) => {
                         e.preventDefault();
-                        addProduct(product.id, product.unitsPerBox);
+                        addToCart(product, product.unitsPerPackage);
                       }}
                     >
                       <Plus className="w-5 h-5 text-green-600" />
                     </button>
                   </div>
                 </div>
-                <span className="text-sm text-gray-500">{product.unitsPerBox} u/c</span>
+                <span className="text-sm text-gray-500">
+                  {product.unitsPerPackage}/p ({product.unitsPerBox} u/caja)
+                </span>
               </div>
             </div>
           ))}

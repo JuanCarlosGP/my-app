@@ -8,7 +8,7 @@ import { useState, useEffect } from 'react'
 import { getAllProducts, Product } from "@/app/data/stores"
 import Image from 'next/image'
 import { Badge } from "@/components/ui/badge"
-import { useCart } from "@/app/context/cart-context"
+import { useCart } from "@/hooks/use-cart"
 import { ProductSheet } from "./product-sheet"
 
 
@@ -21,7 +21,7 @@ export function SearchSheet({ variant = 'icon' }: SearchSheetProps) {
   const storeId = params.id as string
   const [products, setProducts] = useState<Product[]>([])
   const { searchTerm, setSearchTerm } = useSearch()
-  const { productQuantities, addProduct, removeProduct } = useCart()
+  const { items, productQuantities, addToCart, removeFromCart } = useCart()
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null)
 
   useEffect(() => {
@@ -82,63 +82,69 @@ export function SearchSheet({ variant = 'icon' }: SearchSheetProps) {
         </div>
         
         <div className="grid grid-cols-2 gap-2 m-1 mt-4">
-          {filteredProducts.map((product) => (
-            <div 
-              key={product.id} 
-              className="flex flex-col bg-white rounded-lg mb-3"
-              onClick={(e) => handleProductClick(e, product)}
-            >
-              <div className="relative aspect-square mb-2">
-                {productQuantities[product.id] > 0 && (
-                  <Badge 
-                    variant="destructive" 
-                    className="absolute top-2 left-2 z-[2]"
-                  >
-                    {productQuantities[product.id]}
-                  </Badge>
-                )}
-                <Image
-                  src={product.imageUrl}
-                  alt={product.name}
-                  fill
-                  className="rounded-lg object-cover"
-                />
-              </div>
-              <div className="h-[2.8em] overflow-hidden relative px-2">
-                <h3 className="text-sm leading-[1.4em] line-clamp-2">
-                  {product.name}
-                </h3>
-              </div>
-              <div className="flex items-center justify-between pb-2 px-2">
-                <div className="flex items-center gap-2">
-                  <span className="font-bold text-l">{product.price.toFixed(2)}€</span>
+          {filteredProducts.map((product) => {
+            const quantity = productQuantities[product.id] || 0
+            
+            return (
+              <div 
+                key={product.id} 
+                className="flex flex-col bg-white rounded-lg mb-3"
+                onClick={(e) => handleProductClick(e, product)}
+              >
+                <div className="relative aspect-square mb-2">
+                  {quantity > 0 && (
+                    <Badge 
+                      variant="destructive" 
+                      className="absolute top-2 left-2 z-[2]"
+                    >
+                      {quantity}
+                    </Badge>
+                  )}
+                  <Image
+                    src={product.imageUrl}
+                    alt={product.name}
+                    fill
+                    className="rounded-lg object-cover"
+                  />
+                </div>
+                <div className="h-[2.8em] overflow-hidden relative px-2">
+                  <h3 className="text-sm leading-[1.4em] line-clamp-2">
+                    {product.name}
+                  </h3>
+                </div>
+                <div className="flex flex-col pb-2 px-2">
+                  <div className="flex items-center justify-between">
+                    <span className="font-bold text-l">{product.price.toFixed(2)}€</span>
+                    <div className="flex gap-2">
+                      {quantity > 0 && (
+                        <button 
+                          className="p-2.5 bg-gray-100 rounded-full transition-transform active:scale-90 hover:bg-gray-200"
+                          onClick={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            removeFromCart(product, product.unitsPerBox);
+                          }}
+                        >
+                          <Minus className="w-5 h-5 text-red-600" />
+                        </button>
+                      )}
+                      <button 
+                        className="p-2.5 bg-gray-100 rounded-full transition-transform active:scale-90 hover:bg-gray-200"
+                        onClick={(e) => {
+                          e.preventDefault();
+                          e.stopPropagation();
+                          addToCart(product, product.unitsPerBox);
+                        }}
+                      >
+                        <Plus className="w-5 h-5 text-green-600" />
+                      </button>
+                    </div>
+                  </div>
                   <span className="text-sm text-gray-500">{product.unitsPerBox} u/c</span>
                 </div>
-                <div className="flex gap-2">
-                  {productQuantities[product.id] > 0 && (
-                    <button 
-                      className="p-2.5 bg-gray-100 rounded-full transition-transform active:scale-90 hover:bg-gray-200"
-                      onClick={(e) => {
-                        e.preventDefault();
-                        removeProduct(product.id, product.unitsPerBox);
-                      }}
-                    >
-                      <Minus className="w-5 h-5 text-red-600" />
-                    </button>
-                  )}
-                  <button 
-                    className="p-2.5 bg-gray-100 rounded-full transition-transform active:scale-90 hover:bg-gray-200"
-                    onClick={(e) => {
-                      e.preventDefault();
-                      addProduct(product.id, product.unitsPerBox);
-                    }}
-                  >
-                    <Plus className="w-5 h-5 text-green-600" />
-                  </button>
-                </div>
               </div>
-            </div>
-          ))}
+            )
+          })}
         </div>
 
         {selectedProduct && (
