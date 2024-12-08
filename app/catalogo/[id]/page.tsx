@@ -3,12 +3,11 @@
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { Header } from "../../components/header";
-import { StoreCard } from "@/app/components/store-card";
-import { PlusCircle, ThumbsUp, Tag } from "lucide-react";
-import { Input } from '@/components/ui/input';
+import { CategoryCard } from "@/app/components/category-card";
 import { NewProductsSheet } from "../components/new-products-sheet";
 import { SearchSheet } from "../components/search-sheet";
 import { PromotionsSheet } from "../components/promotions-sheet";
+import { CategorySheet } from "../components/category-sheet"
 
 interface Category {
   id: string;
@@ -112,7 +111,7 @@ export default function CatalogoPage({ params }: { params: { id: string } }) {
       {/* Categorías */}
       <div className="max-w-3xl mx-auto pb-20">
         {filteredCategories?.map((category) => (
-          <StoreCard
+          <CategorySheet
             key={category.id}
             id={category.id}
             name={category.name}

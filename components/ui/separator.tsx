@@ -7,24 +7,39 @@ import { cn } from "@/lib/utils"
 
 const Separator = React.forwardRef<
   React.ElementRef<typeof SeparatorPrimitive.Root>,
-  React.ComponentPropsWithoutRef<typeof SeparatorPrimitive.Root>
+  React.ComponentPropsWithoutRef<typeof SeparatorPrimitive.Root> & { thickness?: string; color?: string }
 >(
   (
-    { className, orientation = "horizontal", decorative = true, ...props },
+    { 
+      className, 
+      orientation = "horizontal", 
+      decorative = true, 
+      thickness = "1px", 
+      color = "gray", 
+      ...props 
+    },
     ref
-  ) => (
-    <SeparatorPrimitive.Root
-      ref={ref}
-      decorative={decorative}
-      orientation={orientation}
-      className={cn(
-        "shrink-0 bg-gray-200 dark:bg-gray-300",
-        orientation === "horizontal" ? "h-[1px] w-full" : "h-full w-[1px]",
-        className
-      )}
-      {...props}
-    />
-  )
+  ) => {
+    const dynamicStyles = {
+      height: orientation === "horizontal" ? thickness : undefined,
+      width: orientation === "vertical" ? thickness : undefined,
+      backgroundColor: color,
+    };
+
+    return (
+      <SeparatorPrimitive.Root
+        ref={ref}
+        decorative={decorative}
+        orientation={orientation}
+        style={dynamicStyles}
+        className={cn(
+          "shrink-0",
+          className
+        )}
+        {...props}
+      />
+    )
+  }
 )
 Separator.displayName = SeparatorPrimitive.Root.displayName
 
