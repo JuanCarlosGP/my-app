@@ -8,6 +8,9 @@ export function cn(...inputs: ClassValue[]) {
 export const formatPrice = (price: number) => {
   return new Intl.NumberFormat('es-ES', {
     style: 'currency',
-    currency: 'EUR'
-  }).format(price)
+    currency: 'EUR',
+    currencyDisplay: 'symbol',
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2
+  }).format(price).replace(/\s+/g, '')
 } 

@@ -19,17 +19,17 @@ export default function TiendaPage() {
   return (
     <div>
       <div className="sticky top-0 z-10 bg-white/70 backdrop-blur-md pb-4">
-      <Header 
-        title="Tiendas" 
-        showAddButton 
-        onAddClick={() => setIsAddStoreOpen(true)}
-        onSearchClick={() => alert('Búsqueda de tiendas')}
-      />
-        <Input className='w-full max-w-xl mx-auto'
-          placeholder="Buscar tiendas..." 
-          value={searchTerm} 
-          onChange={(e) => setSearchTerm(e.target.value)}
+        <Header 
+          title="Tiendas" 
+          showAddButton 
+          onAddClick={() => setIsAddStoreOpen(true)}
+          onSearchClick={() => alert('Búsqueda de tiendas')}
         />
+          <Input className='w-full max-w-xs mx-auto'
+            placeholder="Buscar tiendas..." 
+            value={searchTerm} 
+            onChange={(e) => setSearchTerm(e.target.value)}
+          />
       </div>
       <Dialog open={isAddStoreOpen} onOpenChange={setIsAddStoreOpen}>
         <DialogContent>
@@ -43,8 +43,7 @@ export default function TiendaPage() {
           </form>
         </DialogContent>
       </Dialog>
-      <main className="container mx-auto px-4 py-8">
-        <div className="max-w-3xl mx-auto">
+        <div className="mx-auto pt-6 pb-8 max-w-3xl">
         {filteredStores.map((store) => (
           <StoreCard
             key={store.id}
@@ -56,7 +55,6 @@ export default function TiendaPage() {
           />
         ))}
         </div>
-      </main>
     </div>
   )
 }

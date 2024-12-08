@@ -1,5 +1,6 @@
 import Image from 'next/image'
 import Link from 'next/link'
+import { ChevronRight } from 'lucide-react'
 import { Separator } from "@/components/ui/separator"
 
 interface StoreCardProps {
@@ -25,7 +26,10 @@ export function StoreCard({ id, name, description, subdescription, imageUrl }: S
             />
           </div>
           <div className="flex-1 min-w-0 mr-2">
-            <h2 className="text-base font-semibold text-gray-900 mb-3">{name}</h2>
+            <div className="flex items-center justify-between mb-3">
+              <h2 className="text-base font-semibold text-gray-900">{name}</h2>
+              <ChevronRight className="h-7 w-7 text-gray-400" />
+            </div>
             <p className="text-sm text-gray-500 truncate">{description}</p>
             <Separator />
             <p className="text-sm text-gray-600 mt-1 line-clamp-2">{subdescription}</p>
