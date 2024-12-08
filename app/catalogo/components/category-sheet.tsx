@@ -65,22 +65,7 @@ export function CategorySheet({ id, name, description, subdescription, imageUrl 
               {name}
             </h2>
 
-            <Sheet>
-              <SheetTrigger asChild>
-                <button className="p-2 hover:bg-gray-100 rounded-full">
-                  <Search className="h-6 w-6" />
-                </button>
-              </SheetTrigger>
-              <SheetContent side="right" className="w-full sm:max-w-md">
-                <SheetHeader>
-                  <SheetTitle>Buscar productos</SheetTitle>
-                </SheetHeader>
-                <div className="py-4">
-                  {/* Aquí puedes agregar el contenido del buscador */}
-                  <p>Contenido del buscador...</p>
-                </div>
-              </SheetContent>
-            </Sheet>
+            <SearchSheet />
           </div>
         </div>
         
