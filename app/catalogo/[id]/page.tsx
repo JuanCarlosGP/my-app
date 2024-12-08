@@ -5,6 +5,10 @@ import { useEffect, useState } from "react";
 import { Header } from "../../components/header";
 import { StoreCard } from "@/app/components/store-card";
 import { PlusCircle, ThumbsUp, Tag } from "lucide-react";
+import { Input } from '@/components/ui/input';
+import { NewProductsSheet } from "../components/new-products-sheet";
+import { SearchSheet } from "../components/search-sheet";
+import { PromotionsSheet } from "../components/promotions-sheet";
 
 interface Category {
   id: string;
@@ -24,7 +28,7 @@ interface Catalog {
 export default function CatalogoPage({ params }: { params: { id: string } }) {
   const router = useRouter();
   const [catalog, setCatalog] = useState<Catalog | null>(null);
-
+  const [searchTerm, setSearchTerm] = useState('');
 
   useEffect(() => {
     // Simulación de datos de la tienda
@@ -79,6 +83,10 @@ export default function CatalogoPage({ params }: { params: { id: string } }) {
     return <div className="text-center py-20">Cargando...</div>;
   }
 
+  const filteredCategories = catalog?.categories.filter(category =>
+    category.name.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
   return (
     <div>
       <div className="sticky top-0 z-10 bg-white/70 backdrop-blur-md">
@@ -95,32 +103,15 @@ export default function CatalogoPage({ params }: { params: { id: string } }) {
 
         {/* Iconos de categorías */}
         <div className="grid grid-cols-3 gap-4 mb-6 px-4">
-          <div className="flex flex-col items-center bg-white p-4 rounded-lg shadow-sm">
-            <div className="p-2.5 bg-gray-100 rounded-full mb-2">
-              <PlusCircle className="w-5 h-5 text-blue-600" />
-            </div>
-            <span className="text-xs font-medium text-gray-700">Nuevo</span>
-          </div>
-          
-          <div className="flex flex-col items-center bg-white p-4 rounded-lg shadow-sm">
-            <div className="p-2.5 bg-gray-100 rounded-full mb-2">
-              <ThumbsUp className="w-5 h-5 text-green-600" />
-            </div>
-            <span className="text-xs font-medium text-gray-700">Recomendado</span>
-          </div>
-          
-          <div className="flex flex-col items-center bg-white p-4 rounded-lg shadow-sm">
-            <div className="p-2.5 bg-gray-100 rounded-full mb-2">
-              <Tag className="w-5 h-5 text-red-600" />
-            </div>
-            <span className="text-xs font-medium text-gray-700">Promoción</span>
-          </div>
+          <NewProductsSheet />
+          <SearchSheet />
+          <PromotionsSheet />
         </div>
       </div>
-
+      
       {/* Categorías */}
       <div className="max-w-3xl mx-auto pb-20">
-        {catalog.categories.map((category) => (
+        {filteredCategories?.map((category) => (
           <StoreCard
             key={category.id}
             id={category.id}
