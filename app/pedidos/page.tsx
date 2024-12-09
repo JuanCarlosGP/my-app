@@ -6,28 +6,36 @@ import { formatPrice } from "@/lib/utils"
 import { useCart } from "@/hooks/use-cart"
 import { HeaderPedidos } from '@/app/pedidos/components/header-pedidos'
 import { ChevronRight } from 'lucide-react'
+import { useState } from 'react'
 
 export default function PedidosPage() {
   const { items, selectedStoreId } = useCart()
+  const [searchTerm, setSearchTerm] = useState('')
   
-  console.log('Items en carrito:', items)
-  console.log('Tienda seleccionada:', selectedStoreId)
-  
-  const filteredItems = selectedStoreId 
+  // Filtrar por tienda seleccionada
+  const storeItems = selectedStoreId 
     ? items.filter(item => {
         const itemStoreId = item.id.split('-')[1]
         return itemStoreId === selectedStoreId && item.quantity > 0
       })
-    : items.filter(item => item.quantity > 0)
+    : []
+
+  // Filtrar por término de búsqueda
+  const filteredItems = storeItems.filter(item =>
+    item.name.toLowerCase().includes(searchTerm.toLowerCase())
+  )
 
   return (
     <div>
       <div className="sticky top-0 z-10 bg-white/70 backdrop-blur-md pb-4">
-        <HeaderPedidos title="Pedido" />
+        <HeaderPedidos 
+          title="Pedido" 
+          onSearch={setSearchTerm}
+        />
       </div>
-      <div className="container mx-auto px-1 py-8 max-w-3xl">
+      <div className="container mx-auto px-1 py-6 max-w-3xl">
         {filteredItems.map((item) => (
-          <Card key={item.id} className="p-4 relative mb-4">
+          <Card key={item.id} className="p-4 relative mb-1">
             <div className="flex items-center gap-4">
               <div className="relative w-24 h-24">
                 <Image

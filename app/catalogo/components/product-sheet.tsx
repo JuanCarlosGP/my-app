@@ -92,14 +92,14 @@ export function ProductSheet({ isOpen, onClose, product }: ProductSheetProps) {
                     className="w-full py-2 px-4 bg-blue-50 hover:bg-blue-100 rounded-lg flex items-center justify-center gap-2"
                     onClick={() => addToCart(product, product.unitsPerPackage)}
                   >
-                    <Plus className="w-5 h-5 text-blue-600" />
+                    <Plus className="w-5 h-5 text-green-600" />
                     <span className="text-sm">{product.unitsPerPackage} uds.</span>
                   </button>
                   <button 
                     className="w-full py-2 px-4 bg-blue-50 hover:bg-blue-100 rounded-lg flex items-center justify-center gap-2"
                     onClick={() => removeFromCart(product, product.unitsPerPackage)}
                   >
-                    <Minus className="w-5 h-5 text-blue-600" />
+                    <Minus className="w-5 h-5 text-red-600" />
                     <span className="text-sm">{product.unitsPerPackage} uds.</span>
                   </button>
                 </div>
@@ -110,14 +110,14 @@ export function ProductSheet({ isOpen, onClose, product }: ProductSheetProps) {
                     className="w-full py-2 px-4 bg-blue-50 hover:bg-blue-100 rounded-lg flex items-center justify-center gap-2"
                     onClick={() => addToCart(product, product.unitsPerBox)}
                   >
-                    <Plus className="w-5 h-5 text-blue-600" />
+                    <Plus className="w-5 h-5 text-green-600" />
                     <span className="text-sm">{product.unitsPerBox} uds.</span>
                   </button>
                   <button 
                     className="w-full py-2 px-4 bg-blue-50 hover:bg-blue-100 rounded-lg flex items-center justify-center gap-2"
                     onClick={() => removeFromCart(product, product.unitsPerBox)}
                   >
-                    <Minus className="w-5 h-5 text-blue-600" />
+                    <Minus className="w-5 h-5 text-red-600" />
                     <span className="text-sm">{product.unitsPerBox} uds.</span>
                   </button>
                 </div>

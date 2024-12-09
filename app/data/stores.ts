@@ -34,21 +34,21 @@ export interface Product {
   export const stores: Store[] = [
     {
       "id": "1",
-      "name": "Bazar Oriental",
-      "description": "Tu tienda de productos asiáticos de confianza",
-      "subdescription": "Importados directamente desde Asia para tu hogar.",
-      "imageUrl": "https://cataas.com/cat?width=300&height=200&random=17",
-      "bannerImage": "https://images.pexels.com/photos/414171/pexels-photo-414171.jpeg",
+      "name": "Comercial Gutierrez Productos SL",
+      "description": "Importación y venta al por mayor.",
+      "subdescription": "Artículos del hogar de calidad con los precios mas competitivos.",
+      "imageUrl": "https://cdn.discordapp.com/attachments/1033095213255770244/1315571875258306601/Diseno_sin_titulo.jpg?ex=6757e549&is=675693c9&hm=566bafa539dfc53e32970e259193ba1bdbd7830ec50eab99ee8f7456e770fb03&",
+      "bannerImage": "https://cdn.discordapp.com/attachments/1033095213255770244/1315571009784647751/Diseno_sin_titulo.gif?ex=6757e47a&is=675692fa&hm=b17a312af408659456a021b56ace2e94c06fe8344532d58e8f58f46d83a6f3c0&",
       "categories": [
         {
           "id": "cat-1-1",
-          "name": "Utensilios de Cocina",
-          "description": "Importados de China",
-          "subdescription": "Calidad premium para tu cocina",
+          "name": "Menaje",
+          "description": "Fabricación en China",
+          "subdescription": "Utensilios de cocina para tu catálogo.",
           "imageUrl": "https://cataas.com/cat?width=300&height=200&random=1",
           "products": [
             {
-              "id": "prod-1-1-6",
+              "id": "prod-1-1-1",
               "name": "Tetera de cerámica japonesa",
               "price": 34.99,
               "unitsPerBox": 6,
@@ -60,67 +60,80 @@ export interface Product {
               "storeName": "Bazar Oriental",
               "storeId": "1"
             },
-            {
-              "id": "prod-1-1-7",
-              "name": "Juego de palillos de bambú",
-              "price": 9.99,
-              "unitsPerBox": 20,
-              "unitsPerPackage": 10,
-              "reference": "UTN-015",
-              "barcode": "8400000123470",
-              "imageUrl": "https://cataas.com/cat?width=200&height=200&random=31",
-              "image": "https://cataas.com/cat?width=200&height=200&random=31",
-              "storeName": "Bazar Oriental",
-              "storeId": "1"
-            },
-            {
-              "id": "prod-1-1-8",
-              "name": "Set de tazones de porcelana",
-              "price": 24.99,
-              "unitsPerBox": 10,
-              "unitsPerPackage": 5,
-              "reference": "UTN-018",
-              "barcode": "8400000123473",
-              "imageUrl": "https://cataas.com/cat?width=200&height=200&random=39",
-              "image": "https://cataas.com/cat?width=200&height=200&random=39",
-              "storeName": "Bazar Oriental",
-              "storeId": "1"
-            },
-            {
-              "id": "prod-1-1-9",
-              "name": "Rallador multifunción japonés",
-              "price": 12.99,
-              "unitsPerBox": 15,
-              "unitsPerPackage": 6,
-              "reference": "UTN-019",
-              "barcode": "8400000123474",
-              "imageUrl": "https://cataas.com/cat?width=200&height=200&random=40",
-              "image": "https://cataas.com/cat?width=200&height=200&random=40",
-              "storeName": "Bazar Oriental",
-              "storeId": "1"
-            },
-            {
-              "id": "prod-1-1-10",
-              "name": "Cuchara de madera tallada",
-              "price": 5.99,
-              "unitsPerBox": 30,
-              "unitsPerPackage": 15,
-              "reference": "UTN-020",
-              "barcode": "8400000123475",
-              "imageUrl": "https://cataas.com/cat?width=200&height=200&random=41",
-              "image": "https://cataas.com/cat?width=200&height=200&random=41",
-              "storeName": "Bazar Oriental",
-              "storeId": "1"
-            }
           ]
         },
         {
           "id": "cat-1-2",
-          "name": "Productos de Limpieza",
-          "description": "Calidad japonesa",
+          "name": "Perchas",
+          "description": "Fabricación en Italia",
           "subdescription": "Lo mejor para tu hogar",
           "imageUrl": "https://cataas.com/cat?width=300&height=200&random=2",
           "products": [
+            {
+              "id": "prod-1-2-1",
+              "name": "Guantes de limpieza reutilizables",
+              "price": 7.99,
+              "unitsPerBox": 72,
+              "unitsPerPackage": 12,
+              "reference": "UTN-021",
+              "barcode": "8400000123476",
+              "imageUrl": "https://cataas.com/cat?width=200&height=200&random=421",
+              "image": "https://cataas.com/cat?width=200&height=200&random=42",
+              "storeName": "Bazar Oriental",
+              "storeId": "1"
+            },
+            {
+              "id": "prod-1-2-2",
+              "name": "Guantes de limpieza reutilizables",
+              "price": 7.99,
+              "unitsPerBox": 72,
+              "unitsPerPackage": 12,
+              "reference": "UTN-021",
+              "barcode": "8400000123476",
+              "imageUrl": "https://cataas.com/cat?width=200&height=200&random=422",
+              "image": "https://cataas.com/cat?width=200&height=200&random=42",
+              "storeName": "Bazar Oriental",
+              "storeId": "1"
+            },
+            {
+              "id": "prod-1-2-3",
+              "name": "Guantes de limpieza reutilizables",
+              "price": 7.99,
+              "unitsPerBox": 72,
+              "unitsPerPackage": 12,
+              "reference": "UTN-021",
+              "barcode": "8400000123476",
+              "imageUrl": "https://cataas.com/cat?width=200&height=200&random=423",
+              "image": "https://cataas.com/cat?width=200&height=200&random=42",
+              "storeName": "Bazar Oriental",
+              "storeId": "1"
+            },
+            {
+              "id": "prod-1-2-4",
+              "name": "Guantes de limpieza reutilizables",
+              "price": 7.99,
+              "unitsPerBox": 72,
+              "unitsPerPackage": 12,
+              "reference": "UTN-021",
+              "barcode": "8400000123476",
+              "imageUrl": "https://cataas.com/cat?width=200&height=200&random=424",
+              "image": "https://cataas.com/cat?width=200&height=200&random=42",
+              "storeName": "Bazar Oriental",
+              "storeId": "1"
+            },
+            {
+              "id": "prod-1-2-5",
+              "name": "Guantes de limpieza reutilizables",
+              "price": 7.99,
+              "unitsPerBox": 72,
+              "unitsPerPackage": 12,
+              "reference": "UTN-021",
+              "barcode": "8400000123476",
+              "imageUrl": "https://cataas.com/cat?width=200&height=200&random=425",
+              "image": "https://cataas.com/cat?width=200&height=200&random=42",
+              "storeName": "Bazar Oriental",
+              "storeId": "1"
+            },
             {
               "id": "prod-1-2-6",
               "name": "Guantes de limpieza reutilizables",
@@ -129,60 +142,34 @@ export interface Product {
               "unitsPerPackage": 12,
               "reference": "UTN-021",
               "barcode": "8400000123476",
-              "imageUrl": "https://cataas.com/cat?width=200&height=200&random=42",
+              "imageUrl": "https://cataas.com/cat?width=200&height=200&random=426",
               "image": "https://cataas.com/cat?width=200&height=200&random=42",
               "storeName": "Bazar Oriental",
               "storeId": "1"
             },
             {
               "id": "prod-1-2-7",
-              "name": "Esponja ecológica para vajilla",
-              "price": 4.99,
-              "unitsPerBox": 24,
+              "name": "Guantes de limpieza reutilizables",
+              "price": 7.99,
+              "unitsPerBox": 72,
               "unitsPerPackage": 12,
-              "reference": "UTN-022",
-              "barcode": "8400000123477",
-              "imageUrl": "https://cataas.com/cat?width=200&height=200&random=43",
-              "image": "https://cataas.com/cat?width=200&height=200&random=43",
+              "reference": "UTN-021",
+              "barcode": "8400000123476",
+              "imageUrl": "https://cataas.com/cat?width=200&height=200&random=429",
+              "image": "https://cataas.com/cat?width=200&height=200&random=42",
               "storeName": "Bazar Oriental",
               "storeId": "1"
             },
             {
               "id": "prod-1-2-8",
-              "name": "Spray anti grasa concentrado",
-              "price": 10.99,
-              "unitsPerBox": 18,
-              "unitsPerPackage": 9,
-              "reference": "UTN-023",
-              "barcode": "8400000123478",
-              "imageUrl": "https://cataas.com/cat?width=200&height=200&random=44",
-              "image": "https://cataas.com/cat?width=200&height=200&random=44",
-              "storeName": "Bazar Oriental",
-              "storeId": "1"
-            },
-            {
-              "id": "prod-1-2-9",
-              "name": "Trapo multiusos de microfibra",
-              "price": 3.99,
-              "unitsPerBox": 50,
-              "unitsPerPackage": 25,
-              "reference": "UTN-024",
-              "barcode": "8400000123479",
-              "imageUrl": "https://cataas.com/cat?width=200&height=200&random=45",
-              "image": "https://cataas.com/cat?width=200&height=200&random=45",
-              "storeName": "Bazar Oriental",
-              "storeId": "1"
-            },
-            {
-              "id": "prod-1-2-10",
-              "name": "Bolsas de basura biodegradables",
-              "price": 8.99,
-              "unitsPerBox": 10,
-              "unitsPerPackage": 5,
-              "reference": "UTN-025",
-              "barcode": "8400000123480",
-              "imageUrl": "https://cataas.com/cat?width=200&height=200&random=46",
-              "image": "https://cataas.com/cat?width=200&height=200&random=46",
+              "name": "Guantes de limpieza reutilizables",
+              "price": 7.99,
+              "unitsPerBox": 72,
+              "unitsPerPackage": 12,
+              "reference": "UTN-021",
+              "barcode": "8400000123476",
+              "imageUrl": "https://cataas.com/cat?width=200&height=200&random=826",
+              "image": "https://cataas.com/cat?width=200&height=200&random=42",
               "storeName": "Bazar Oriental",
               "storeId": "1"
             }
@@ -190,13 +177,13 @@ export interface Product {
         },
         {
           "id": "cat-1-3",
-          "name": "Decoración",
-          "description": "Estilo oriental para tu hogar",
+          "name": "Perchitas adh y fieltros",
+          "description": "Fabricación en China",
           "subdescription": "Elementos decorativos únicos",
           "imageUrl": "https://cataas.com/cat?width=300&height=200&random=18",
           "products": [
             {
-              "id": "prod-1-3-3",
+              "id": "prod-1-3-1",
               "name": "Cojines con motivos orientales",
               "price": 29.99,
               "unitsPerBox": 8,
@@ -207,31 +194,18 @@ export interface Product {
               "image": "https://cataas.com/cat?width=200&height=200&random=47",
               "storeName": "Bazar Oriental",
               "storeId": "1"
-            },
-            {
-              "id": "prod-1-3-4",
-              "name": "Reloj de pared minimalista",
-              "price": 19.99,
-              "unitsPerBox": 10,
-              "unitsPerPackage": 5,
-              "reference": "UTN-027",
-              "barcode": "8400000123482",
-              "imageUrl": "https://cataas.com/cat?width=200&height=200&random=48",
-              "image": "https://cataas.com/cat?width=200&height=200&random=48",
-              "storeName": "Bazar Oriental",
-              "storeId": "1"
             }
           ]
         },
         {
           "id": "cat-1-4",
-          "name": "Ropa Tradicional",
+          "name": "Kit cuidados personales",
           "description": "Vestimenta oriental auténtica",
           "subdescription": "Kimono y más",
           "imageUrl": "https://cataas.com/cat?width=300&height=200&random=19",
           "products": [
             {
-              "id": "prod-1-4-2",
+              "id": "prod-1-4-1",
               "name": "Zapatos de madera Geta",
               "price": 39.99,
               "unitsPerBox": 6,
@@ -242,17 +216,26 @@ export interface Product {
               "image": "https://cataas.com/cat?width=200&height=200&random=49",
               "storeName": "Bazar Oriental",
               "storeId": "1"
-            },
+            }
+          ]
+        },
+        {
+          "id": "cat-1-5",
+          "name": "Fregonas, Mopas y Bayetas",
+          "description": "Vestimenta oriental auténtica",
+          "subdescription": "Kimono y más",
+          "imageUrl": "https://cataas.com/cat?width=300&height=200&random=19",
+          "products": [
             {
-              "id": "prod-1-4-3",
-              "name": "Obi para kimono",
-              "price": 24.99,
-              "unitsPerBox": 8,
-              "unitsPerPackage": 4,
-              "reference": "UTN-029",
-              "barcode": "8400000123484",
-              "imageUrl": "https://cataas.com/cat?width=200&height=200&random=50",
-              "image": "https://cataas.com/cat?width=200&height=200&random=50",
+              "id": "prod-1-5-1",
+              "name": "Zapatos de madera Geta",
+              "price": 39.99,
+              "unitsPerBox": 6,
+              "unitsPerPackage": 3,
+              "reference": "UTN-028",
+              "barcode": "8400000123483",
+              "imageUrl": "https://cataas.com/cat?width=200&height=200&random=49",
+              "image": "https://cataas.com/cat?width=200&height=200&random=49",
               "storeName": "Bazar Oriental",
               "storeId": "1"
             }
@@ -288,19 +271,6 @@ export interface Product {
               "storeName": "Delicias Mediterráneas",
               "storeId": "2"
             },
-            {
-              "id": "prod-2-1-2",
-              "name": "Vinagre balsámico envejecido",
-              "price": 11.99,
-              "unitsPerBox": 8,
-              "unitsPerPackage": 4,
-              "reference": "MED-002",
-              "barcode": "8500000123472",
-              "imageUrl": "https://cataas.com/cat?width=200&height=200&random=35",
-              "image": "https://cataas.com/cat?width=200&height=200&random=35",
-              "storeName": "Delicias Mediterráneas",
-              "storeId": "2"
-            }
           ]
         },
         {

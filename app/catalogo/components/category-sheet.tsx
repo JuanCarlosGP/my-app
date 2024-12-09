@@ -137,7 +137,7 @@ export function CategorySheet({ id, name, description, subdescription, imageUrl 
                   </div>
                 </div>
                 <span className="text-sm text-gray-500">
-                  {product.unitsPerPackage}/p ({product.unitsPerBox} u/caja)
+                  {product.unitsPerPackage}u/pack ({product.unitsPerBox} u/caja)
                 </span>
               </div>
             </div>
