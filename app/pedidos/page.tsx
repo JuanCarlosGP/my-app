@@ -7,10 +7,18 @@ import { useCart } from "@/hooks/use-cart"
 import { HeaderPedidos } from '@/app/pedidos/components/header-pedidos'
 import { ChevronRight } from 'lucide-react'
 import { useState } from 'react'
+import { ProductSheet } from "@/app/catalogo/components/product-sheet"
+import { Product } from "@/app/data/stores"
+import { getAllProducts } from "@/app/data/stores"
 
 export default function PedidosPage() {
   const { items, selectedStoreId } = useCart()
   const [searchTerm, setSearchTerm] = useState('')
+  const [selectedProduct, setSelectedProduct] = useState<Product | null>(null)
+  const [isSheetOpen, setIsSheetOpen] = useState(false)
+  
+  // Obtener todos los productos de la tienda seleccionada
+  const allStoreProducts = selectedStoreId ? getAllProducts(selectedStoreId) : []
   
   // Filtrar por tienda seleccionada
   const storeItems = selectedStoreId 
@@ -25,6 +33,20 @@ export default function PedidosPage() {
     item.name.toLowerCase().includes(searchTerm.toLowerCase())
   )
 
+  const handleCardClick = (cartItem: typeof items[0]) => {
+    // Buscar el producto completo usando el ID del item del carrito
+    const fullProduct = allStoreProducts.find(p => p.id === cartItem.id)
+    if (fullProduct) {
+      // Combinar la información del producto con la cantidad del carrito
+      const productWithQuantity = {
+        ...fullProduct,
+        quantity: cartItem.quantity
+      }
+      setSelectedProduct(productWithQuantity)
+      setIsSheetOpen(true)
+    }
+  }
+
   return (
     <div>
       <div className="sticky top-0 z-10 bg-white/70 backdrop-blur-md pb-4">
@@ -35,7 +57,11 @@ export default function PedidosPage() {
       </div>
       <div className="container mx-auto px-1 py-6 max-w-3xl">
         {filteredItems.map((item) => (
-          <Card key={item.id} className="p-4 relative mb-1">
+          <Card 
+            key={item.id} 
+            className="p-4 relative mb-1 cursor-pointer hover:bg-gray-50"
+            onClick={() => handleCardClick(item)}
+          >
             <div className="flex items-center gap-4">
               <div className="relative w-24 h-24">
                 <Image
@@ -69,6 +95,14 @@ export default function PedidosPage() {
           </Card>
         ))}
       </div>
+
+      {selectedProduct && (
+        <ProductSheet
+          isOpen={isSheetOpen}
+          onClose={() => setIsSheetOpen(false)}
+          product={selectedProduct}
+        />
+      )}
     </div>
   )
 }

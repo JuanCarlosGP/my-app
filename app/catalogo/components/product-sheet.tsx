@@ -20,11 +20,15 @@ export function ProductSheet({ isOpen, onClose, product }: ProductSheetProps) {
 
   // Cargar comentario guardado al abrir el producto
   useEffect(() => {
-    const savedComment = localStorage.getItem(`comment-${product.id}`)
-    if (savedComment) {
-      setComment(savedComment)
+    if (isOpen) {
+      const savedComment = localStorage.getItem(`comment-${product.id}`)
+      if (savedComment) {
+        setComment(savedComment)
+      } else {
+        setComment('')
+      }
     }
-  }, [product.id])
+  }, [isOpen, product.id])
 
   // Guardar comentario cuando cambie
   const handleCommentChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
@@ -69,7 +73,7 @@ export function ProductSheet({ isOpen, onClose, product }: ProductSheetProps) {
               </Badge>
             )}
             <Image
-              src={product.imageUrl}
+              src={product.image || product.imageUrl}
               alt={product.name}
               fill
               className="rounded-lg object-cover"
