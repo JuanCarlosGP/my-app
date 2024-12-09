@@ -17,7 +17,7 @@ export function HeaderPedidos({ title }: HeaderPedidosProps) {
             <ArrowUpDown className="h-6 w-6" />
           </Button>
         </SheetTrigger>
-        <SheetContent side="bottom" className="h-[96%]">
+        <SheetContent side="bottom" className="h-[100%]">
           <div className="space-y-4 py-4">
             <h2 className="text-lg font-semibold m-auto">Cambiar Tienda</h2>
             {/* Aquí puedes agregar el contenido del Sheet */}

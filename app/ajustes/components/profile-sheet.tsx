@@ -22,10 +22,10 @@ export function ProfileSheet({ isOpen, onOpenChange, phoneNumber }: ProfileSheet
     <Sheet open={isOpen} onOpenChange={onOpenChange}>
       <SheetContent 
         side="right" 
-        className="w-full h-full border-none md:w-[400px] lg:w-[540px] p-0 md:p-6"
+        className="w-full h-full border-none lg:w-[540px] p-0"
       >
         <div className="h-full flex flex-col">
-          <SheetHeader className="p-6 md:p-0">
+          <SheetHeader className="p-6 ">
             <SheetTitle className="text-xl font-bold text-black">
               Editar perfil
             </SheetTitle>
@@ -34,7 +34,7 @@ export function ProfileSheet({ isOpen, onOpenChange, phoneNumber }: ProfileSheet
             </SheetDescription>
           </SheetHeader>
           
-          <div className="flex-1 overflow-y-auto px-6 md:px-0">
+          <div className="flex-1 overflow-y-auto px-6 ">
             <div className="grid gap-4 py-4">
               <div className="grid grid-cols-4 items-center gap-4">
                 <Label htmlFor="name" className="text-right text-gray-700">
@@ -71,11 +71,11 @@ export function ProfileSheet({ isOpen, onOpenChange, phoneNumber }: ProfileSheet
             </div>
           </div>
 
-          <SheetFooter className="p-6 md:p-0">
+          <SheetFooter className="p-6 ">
             <SheetClose asChild>
               <Button 
                 type="submit"
-                className="w-full md:w-auto"
+                className="w-full "
                 variant="default"
               >
                 Guardar perfil
