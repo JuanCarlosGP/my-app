@@ -9,6 +9,7 @@ export interface Product {
     imageUrl: string
     image: string
     storeName: string
+    storeId: string
 }
   
   export interface Category {
@@ -56,7 +57,8 @@ export interface Product {
               "barcode": "8400000123469",
               "imageUrl": "https://cataas.com/cat?width=200&height=200&random=30",
               "image": "https://cataas.com/cat?width=200&height=200&random=30",
-              "storeName": "Bazar Oriental"
+              "storeName": "Bazar Oriental",
+              "storeId": "1"
             },
             {
               "id": "prod-1-1-7",
@@ -68,7 +70,8 @@ export interface Product {
               "barcode": "8400000123470",
               "imageUrl": "https://cataas.com/cat?width=200&height=200&random=31",
               "image": "https://cataas.com/cat?width=200&height=200&random=31",
-              "storeName": "Bazar Oriental"
+              "storeName": "Bazar Oriental",
+              "storeId": "1"
             },
             {
               "id": "prod-1-1-8",
@@ -80,7 +83,8 @@ export interface Product {
               "barcode": "8400000123473",
               "imageUrl": "https://cataas.com/cat?width=200&height=200&random=39",
               "image": "https://cataas.com/cat?width=200&height=200&random=39",
-              "storeName": "Bazar Oriental"
+              "storeName": "Bazar Oriental",
+              "storeId": "1"
             },
             {
               "id": "prod-1-1-9",
@@ -92,7 +96,8 @@ export interface Product {
               "barcode": "8400000123474",
               "imageUrl": "https://cataas.com/cat?width=200&height=200&random=40",
               "image": "https://cataas.com/cat?width=200&height=200&random=40",
-              "storeName": "Bazar Oriental"
+              "storeName": "Bazar Oriental",
+              "storeId": "1"
             },
             {
               "id": "prod-1-1-10",
@@ -104,7 +109,8 @@ export interface Product {
               "barcode": "8400000123475",
               "imageUrl": "https://cataas.com/cat?width=200&height=200&random=41",
               "image": "https://cataas.com/cat?width=200&height=200&random=41",
-              "storeName": "Bazar Oriental"
+              "storeName": "Bazar Oriental",
+              "storeId": "1"
             }
           ]
         },
@@ -125,7 +131,8 @@ export interface Product {
               "barcode": "8400000123476",
               "imageUrl": "https://cataas.com/cat?width=200&height=200&random=42",
               "image": "https://cataas.com/cat?width=200&height=200&random=42",
-              "storeName": "Bazar Oriental"
+              "storeName": "Bazar Oriental",
+              "storeId": "1"
             },
             {
               "id": "prod-1-2-7",
@@ -137,7 +144,8 @@ export interface Product {
               "barcode": "8400000123477",
               "imageUrl": "https://cataas.com/cat?width=200&height=200&random=43",
               "image": "https://cataas.com/cat?width=200&height=200&random=43",
-              "storeName": "Bazar Oriental"
+              "storeName": "Bazar Oriental",
+              "storeId": "1"
             },
             {
               "id": "prod-1-2-8",
@@ -149,7 +157,8 @@ export interface Product {
               "barcode": "8400000123478",
               "imageUrl": "https://cataas.com/cat?width=200&height=200&random=44",
               "image": "https://cataas.com/cat?width=200&height=200&random=44",
-              "storeName": "Bazar Oriental"
+              "storeName": "Bazar Oriental",
+              "storeId": "1"
             },
             {
               "id": "prod-1-2-9",
@@ -161,7 +170,8 @@ export interface Product {
               "barcode": "8400000123479",
               "imageUrl": "https://cataas.com/cat?width=200&height=200&random=45",
               "image": "https://cataas.com/cat?width=200&height=200&random=45",
-              "storeName": "Bazar Oriental"
+              "storeName": "Bazar Oriental",
+              "storeId": "1"
             },
             {
               "id": "prod-1-2-10",
@@ -173,7 +183,8 @@ export interface Product {
               "barcode": "8400000123480",
               "imageUrl": "https://cataas.com/cat?width=200&height=200&random=46",
               "image": "https://cataas.com/cat?width=200&height=200&random=46",
-              "storeName": "Bazar Oriental"
+              "storeName": "Bazar Oriental",
+              "storeId": "1"
             }
           ]
         },
@@ -194,7 +205,8 @@ export interface Product {
               "barcode": "8400000123481",
               "imageUrl": "https://cataas.com/cat?width=200&height=200&random=47",
               "image": "https://cataas.com/cat?width=200&height=200&random=47",
-              "storeName": "Bazar Oriental"
+              "storeName": "Bazar Oriental",
+              "storeId": "1"
             },
             {
               "id": "prod-1-3-4",
@@ -206,7 +218,8 @@ export interface Product {
               "barcode": "8400000123482",
               "imageUrl": "https://cataas.com/cat?width=200&height=200&random=48",
               "image": "https://cataas.com/cat?width=200&height=200&random=48",
-              "storeName": "Bazar Oriental"
+              "storeName": "Bazar Oriental",
+              "storeId": "1"
             }
           ]
         },
@@ -227,7 +240,8 @@ export interface Product {
               "barcode": "8400000123483",
               "imageUrl": "https://cataas.com/cat?width=200&height=200&random=49",
               "image": "https://cataas.com/cat?width=200&height=200&random=49",
-              "storeName": "Bazar Oriental"
+              "storeName": "Bazar Oriental",
+              "storeId": "1"
             },
             {
               "id": "prod-1-4-3",
@@ -239,7 +253,8 @@ export interface Product {
               "barcode": "8400000123484",
               "imageUrl": "https://cataas.com/cat?width=200&height=200&random=50",
               "image": "https://cataas.com/cat?width=200&height=200&random=50",
-              "storeName": "Bazar Oriental"
+              "storeName": "Bazar Oriental",
+              "storeId": "1"
             }
           ]
         }
@@ -270,7 +285,8 @@ export interface Product {
               "barcode": "8500000123471",
               "imageUrl": "https://cataas.com/cat?width=200&height=200&random=34",
               "image": "https://cataas.com/cat?width=200&height=200&random=34",
-              "storeName": "Delicias Mediterráneas"
+              "storeName": "Delicias Mediterráneas",
+              "storeId": "2"
             },
             {
               "id": "prod-2-1-2",
@@ -282,7 +298,8 @@ export interface Product {
               "barcode": "8500000123472",
               "imageUrl": "https://cataas.com/cat?width=200&height=200&random=35",
               "image": "https://cataas.com/cat?width=200&height=200&random=35",
-              "storeName": "Delicias Mediterráneas"
+              "storeName": "Delicias Mediterráneas",
+              "storeId": "2"
             }
           ]
         },
@@ -303,7 +320,8 @@ export interface Product {
               "barcode": "8500000123473",
               "imageUrl": "https://cataas.com/cat?width=200&height=200&random=36",
               "image": "https://cataas.com/cat?width=200&height=200&random=36",
-              "storeName": "Delicias Mediterráneas"
+              "storeName": "Delicias Mediterráneas",
+              "storeId": "2"
             }
           ]
         }
@@ -334,7 +352,8 @@ export interface Product {
               "barcode": "8600000123471",
               "imageUrl": "https://cataas.com/cat?width=200&height=200&random=37",
               "image": "https://cataas.com/cat?width=200&height=200&random=37",
-              "storeName": "Sabores del Norte"
+              "storeName": "Sabores del Norte",
+              "storeId": "3"
             }
           ]
         },
@@ -355,7 +374,8 @@ export interface Product {
               "barcode": "8600000123472",
               "imageUrl": "https://cataas.com/cat?width=200&height=200&random=38",
               "image": "https://cataas.com/cat?width=200&height=200&random=38",
-              "storeName": "Sabores del Norte"
+              "storeName": "Sabores del Norte",
+              "storeId": "3"
             }
           ]
         }

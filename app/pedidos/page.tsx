@@ -8,18 +8,26 @@ import { HeaderPedidos } from '@/app/pedidos/components/header-pedidos'
 import { ChevronRight } from 'lucide-react'
 
 export default function PedidosPage() {
-  const { items } = useCart()
+  const { items, selectedStoreId } = useCart()
   
+  console.log('Items en carrito:', items)
+  console.log('Tienda seleccionada:', selectedStoreId)
+  
+  const filteredItems = selectedStoreId 
+    ? items.filter(item => {
+        const itemStoreId = item.id.split('-')[1]
+        return itemStoreId === selectedStoreId && item.quantity > 0
+      })
+    : items.filter(item => item.quantity > 0)
+
   return (
     <div>
       <div className="sticky top-0 z-10 bg-white/70 backdrop-blur-md pb-4">
-        <HeaderPedidos 
-          title="Pedido"
-        />
+        <HeaderPedidos title="Pedido" />
       </div>
       <div className="container mx-auto px-1 py-8 max-w-3xl">
-        {items.map((item) => (
-          <Card key={item.id} className="p-4 relative">
+        {filteredItems.map((item) => (
+          <Card key={item.id} className="p-4 relative mb-4">
             <div className="flex items-center gap-4">
               <div className="relative w-24 h-24">
                 <Image
