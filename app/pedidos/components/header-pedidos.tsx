@@ -1,10 +1,11 @@
 import React from 'react'
 import { ArrowUpDown, Search } from 'lucide-react'
 import { Button } from '@/components/ui/button'
-import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
+import { SheetTrigger } from "@/components/ui/sheet"
 import { useCart } from "@/hooks/use-cart"
 import { useState } from 'react'
 import { Input } from "@/components/ui/input"
+import { StoreSelectorSheet } from './store-selector-sheet'
 
 interface HeaderPedidosProps {
   title: string
@@ -12,7 +13,7 @@ interface HeaderPedidosProps {
 }
 
 export function HeaderPedidos({ title, onSearch }: HeaderPedidosProps) {
-  const { getUniqueStores, selectedStoreId, setSelectedStoreId } = useCart()
+  const { getUniqueStores, selectedStoreId } = useCart()
   const uniqueStores = getUniqueStores()
   const [isOpen, setIsOpen] = useState(false)
 
@@ -25,36 +26,18 @@ export function HeaderPedidos({ title, onSearch }: HeaderPedidosProps) {
         <div className="text-center">
           <h1 className="text-xl font-bold truncate max-w-[450px]">{title}</h1>
           {selectedStore && (
-            <p className="text-sm text-gray-500 mt-2">{selectedStore.name}</p>
+            <Button 
+              variant="secondary" 
+              onClick={() => setIsOpen(true)}
+              className="mt-2 text-sm font-normal"
+            >
+              {selectedStore.name}
+            </Button>
           )}
         </div>
-        <Sheet open={isOpen} onOpenChange={setIsOpen}>
-          <SheetTrigger asChild>
-            <Button variant="ghost" size="icon">
-              <ArrowUpDown className="h-6 w-6" />
-            </Button>
-          </SheetTrigger>
-          <SheetContent side="bottom" className="h-[100%]">
-            <div className="space-y-4 py-4">
-              <h2 className="text-lg font-semibold text-center">Cambiar Tienda</h2>
-              <div className="space-y-2 px-4">
-                {uniqueStores.map((store) => (
-                  <Button
-                    key={store.id}
-                    variant={selectedStoreId === store.id ? "default" : "ghost"}
-                    className="w-full justify-start text-left"
-                    onClick={() => {
-                      setSelectedStoreId(store.id)
-                      setIsOpen(false)
-                    }}
-                  >
-                    {store.name}
-                  </Button>
-                ))}
-              </div>
-            </div>
-          </SheetContent>
-        </Sheet>
+        <Button variant="ghost" size="icon" onClick={() => setIsOpen(true)}>
+          <ArrowUpDown className="h-6 w-6" />
+        </Button>
       </div>
       {selectedStore && (
         <div className="relative mt-4">
@@ -66,6 +49,11 @@ export function HeaderPedidos({ title, onSearch }: HeaderPedidosProps) {
           />
         </div>
       )}
+
+      <StoreSelectorSheet 
+        isOpen={isOpen}
+        onClose={() => setIsOpen(false)}
+      />
     </header>
   )
 } 

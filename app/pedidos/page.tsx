@@ -56,44 +56,64 @@ export default function PedidosPage() {
         />
       </div>
       <div className="container mx-auto px-1 py-6 max-w-3xl">
-        {filteredItems.map((item) => (
-          <Card 
-            key={item.id} 
-            className="p-4 relative mb-1 cursor-pointer hover:bg-gray-50"
-            onClick={() => handleCardClick(item)}
-          >
-            <div className="flex items-center gap-4">
-              <div className="relative w-24 h-24">
-                <Image
-                  src={item.image}
-                  alt={item.name}
-                  fill
-                  className="object-cover rounded-md"
-                />
-              </div>
-              <div className="flex-1">
-                <div className="flex items-center justify-between mb-2">
-                  <h3 className="font-semibold truncate max-w-[200px]">{item.name}</h3>
-                  <ChevronRight className="h-7 w-7 text-gray-400" />
+        {!selectedStoreId ? (
+          <div className="flex flex-col items-center justify-center min-h-[60vh] p-4 text-center">
+            <p className="text-gray-600 text-lg">
+              Selecciona una tienda para ver tu pedido
+            </p>
+            <p className="text-gray-500 mt-2">
+              Puedes elegir una tienda usando el selector en la parte superior
+            </p>
+          </div>
+        ) : filteredItems.length === 0 ? (
+          <div className="flex flex-col items-center justify-center min-h-[60vh] p-4 text-center">
+            <p className="text-gray-600 text-lg">
+              No hay productos en tu pedido actual
+            </p>
+            <p className="text-gray-500 mt-2">
+              Agrega productos desde el catálogo para comenzar tu pedido
+            </p>
+          </div>
+        ) : (
+          filteredItems.map((item) => (
+            <Card 
+              key={item.id} 
+              className="p-4 relative mb-1 cursor-pointer hover:bg-gray-50"
+              onClick={() => handleCardClick(item)}
+            >
+              <div className="flex items-center gap-4">
+                <div className="relative w-24 h-24">
+                  <Image
+                    src={item.image}
+                    alt={item.name}
+                    fill
+                    className="object-cover rounded-md"
+                  />
                 </div>
-                <div className="grid grid-cols-3 gap-8">
-                  <div>
-                    <p className="text-sm text-gray-500 mb-1">Precio</p>
-                    <p className="font-medium text-blue-600">{formatPrice(item.price)}</p>
+                <div className="flex-1">
+                  <div className="flex items-center justify-between mb-2">
+                    <h3 className="font-semibold truncate max-w-[200px]">{item.name}</h3>
+                    <ChevronRight className="h-7 w-7 text-gray-400" />
                   </div>
-                  <div>
-                    <p className="text-sm text-gray-500 mb-1">Cantidad</p>
-                    <p className="font-medium">{item.quantity}</p>
-                  </div>
-                  <div>
-                    <p className="text-sm text-gray-500 mb-1">Total</p>
-                    <p className="font-medium">{formatPrice(item.price * item.quantity)}</p>
+                  <div className="grid grid-cols-3 gap-8">
+                    <div>
+                      <p className="text-sm text-gray-500 mb-1">Precio</p>
+                      <p className="font-medium text-blue-600">{formatPrice(item.price)}</p>
+                    </div>
+                    <div>
+                      <p className="text-sm text-gray-500 mb-1">Cantidad</p>
+                      <p className="font-medium">{item.quantity}</p>
+                    </div>
+                    <div>
+                      <p className="text-sm text-gray-500 mb-1">Total</p>
+                      <p className="font-medium">{formatPrice(item.price * item.quantity)}</p>
+                    </div>
                   </div>
                 </div>
               </div>
-            </div>
-          </Card>
-        ))}
+            </Card>
+          ))
+        )}
       </div>
 
       {selectedProduct && (
