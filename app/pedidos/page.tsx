@@ -99,11 +99,17 @@ export default function PedidosPage() {
                     <div>
                       <p className="text-sm text-gray-500 mb-1">Precio</p>
                       <p className="font-medium text-blue-600">{formatPrice(item.price)}</p>
+                      <p className="text-sm text-gray-500 mt-2 mb-1">
+                        Pack: <span className="font-medium text-black">{item.packages || 0}</span>
+                      </p>
                     </div>
                     <div>
                       <p className="text-sm text-gray-500 mb-1">Cantidad</p>
                       <p className="font-medium">{item.quantity}</p>
-                    </div>
+                      <p className="text-sm text-gray-500 mt-2 mb-1">
+                        Cajas: <span className="font-medium text-black">{item.boxes || 0}</span>
+                      </p>
+                    </div> 
                     <div>
                       <p className="text-sm text-gray-500 mb-1">Total</p>
                       <p className="font-medium">{formatPrice(item.price * item.quantity)}</p>

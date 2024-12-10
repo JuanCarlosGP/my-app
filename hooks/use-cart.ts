@@ -10,6 +10,10 @@ export interface CartItem {
   image: string
   storeId: string
   storeName: string
+  packages: number
+  boxes: number
+  unitsPerPackage: number
+  unitsPerBox: number
 }
 
 interface CartStore {
@@ -36,18 +40,21 @@ export const useCart = create<CartStore>()(
           const newQuantity = existingQuantity + quantity
           const storeId = product.id.split('-')[1]
 
+          const unitsPerPackage = product.unitsPerPackage
+          const unitsPerBox = product.unitsPerBox
+          
+          const packages = Math.floor(newQuantity / unitsPerPackage)
+          const boxes = Math.floor(newQuantity / unitsPerBox)
+
           console.log('Añadiendo producto:', {
             id: product.id,
             name: product.name,
-            storeId: product.storeId,
-            storeName: product.storeName,
-            fullProduct: product
+            quantity: newQuantity,
+            unitsPerPackage,
+            unitsPerBox,
+            packages,
+            boxes
           })
-
-          const newProductQuantities = {
-            ...state.productQuantities,
-            [product.id]: newQuantity,
-          }
 
           const existingItem = state.items.find(item => item.id === product.id)
           const newItems = existingItem
@@ -56,6 +63,10 @@ export const useCart = create<CartStore>()(
                   ? { 
                       ...item, 
                       quantity: newQuantity,
+                      packages,
+                      boxes,
+                      unitsPerPackage,
+                      unitsPerBox,
                       storeId: item.id.split('-')[1],
                       storeName: product.storeName
                     }
@@ -66,6 +77,10 @@ export const useCart = create<CartStore>()(
                 name: product.name,
                 price: product.price,
                 quantity: newQuantity,
+                packages,
+                boxes,
+                unitsPerPackage,
+                unitsPerBox,
                 image: product.imageUrl,
                 storeId: product.id.split('-')[1],
                 storeName: product.storeName || 'Tienda'
@@ -73,7 +88,10 @@ export const useCart = create<CartStore>()(
 
           return {
             ...state,
-            productQuantities: newProductQuantities,
+            productQuantities: {
+              ...state.productQuantities,
+              [product.id]: newQuantity,
+            },
             items: newItems,
             selectedStoreId: storeId
           }
@@ -83,23 +101,32 @@ export const useCart = create<CartStore>()(
         set((state) => {
           const existingQuantity = state.productQuantities[product.id] || 0
           const newQuantity = Math.max(0, existingQuantity - quantity)
-
-          const newProductQuantities = {
-            ...state.productQuantities,
-            [product.id]: newQuantity,
-          }
+          
+          const unitsPerPackage = product.unitsPerPackage || 12
+          const unitsPerBox = product.unitsPerBox || 48
+          
+          const packages = Math.floor(newQuantity / unitsPerPackage)
+          const boxes = Math.floor(newQuantity / unitsPerBox)
 
           const newItems = newQuantity === 0
             ? state.items.filter(item => item.id !== product.id)
             : state.items.map(item =>
                 item.id === product.id
-                  ? { ...item, quantity: newQuantity }
+                  ? { 
+                      ...item, 
+                      quantity: newQuantity,
+                      packages,
+                      boxes
+                    }
                   : item
               )
 
           return {
             ...state,
-            productQuantities: newProductQuantities,
+            productQuantities: {
+              ...state.productQuantities,
+              [product.id]: newQuantity,
+            },
             items: newItems,
           }
         }),
