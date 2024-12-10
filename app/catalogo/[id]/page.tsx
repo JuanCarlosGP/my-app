@@ -2,7 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import { Header } from "../../components/header";
+import { HeaderCatalogo } from "@/app/catalogo/components/header-catalogo";
 import { CategoryCard } from "@/app/components/category-card";
 import { NewProductsSheet } from "../components/new-products-sheet";
 import { SearchSheet } from "../components/search-sheet";
@@ -36,7 +36,7 @@ export default function CatalogoPage({ params }: { params: { id: string } }) {
     <SearchProvider>
       <div>
         <div className="sticky top-0 z-10 bg-white/70 backdrop-blur-md">
-          <Header title={`${store.name}`} />
+          <HeaderCatalogo title={`${store.name}`} />
         </div>
 
         {/* Banner publicitario */}

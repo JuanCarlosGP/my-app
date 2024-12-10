@@ -7,8 +7,8 @@ import { CartProvider } from "@/app/context/cart-context"
 const inter = Inter({ subsets: ['latin'] })
 
 export const metadata: Metadata = {
-  title: 'Tienda Móvil',
-  description: 'Una aplicación simple de tienda para móviles',
+  title: 'Creador de pedidos para proveedores',
+  description: 'B2B Proveedor-Tienda',
 }
 
 export default function RootLayout({

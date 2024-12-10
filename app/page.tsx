@@ -20,13 +20,13 @@ export default function TiendaPage() {
     <div>
       <div className="sticky top-0 z-10 bg-white/70 backdrop-blur-md pb-4">
         <Header 
-          title="Tiendas" 
+          title="Proveedores" 
           showAddButton 
           onAddClick={() => setIsAddStoreOpen(true)}
-          onSearchClick={() => alert('Búsqueda de tiendas')}
+          onSearchClick={() => alert('Búsqueda de Proveedores')}
         />
           <Input className='w-full max-w-xs mx-auto'
-            placeholder="Buscar tiendas..." 
+            placeholder="Buscar proveedor..." 
             value={searchTerm} 
             onChange={(e) => setSearchTerm(e.target.value)}
           />
@@ -34,12 +34,12 @@ export default function TiendaPage() {
       <Dialog open={isAddStoreOpen} onOpenChange={setIsAddStoreOpen}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Añadir Tienda</DialogTitle>
+            <DialogTitle>Añadir Proveedor</DialogTitle>
           </DialogHeader>
           <form className="space-y-4">
-            <Input placeholder="Código de la tienda" />
+            <Input placeholder="Código de proveedor" />
             <Input placeholder="PIN" type="password" />
-            <Button className="w-full" variant="default">Añadir Tienda</Button>
+            <Button className="w-full" variant="default">Añadir Proveedor</Button>
           </form>
         </DialogContent>
       </Dialog>

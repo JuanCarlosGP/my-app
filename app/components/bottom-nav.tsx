@@ -5,7 +5,7 @@ import { usePathname } from 'next/navigation'
 import { Home, Book, ShoppingCart, Clock, Settings } from 'lucide-react'
 
 const navItems = [
-  { href: '/', icon: Home, label: 'Tienda' },
+  { href: '/', icon: Home, label: 'Proveedor' },
   { href: '/catalogo', icon: Book, label: 'Catálogo' },
   { href: '/pedidos', icon: ShoppingCart, label: 'Pedidos' },
   // { href: '/historial', icon: Clock, label: 'Historial' },

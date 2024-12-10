@@ -19,10 +19,9 @@ interface ProductSheetProps {
 export function ProductSheet({ isOpen, onClose, product }: ProductSheetProps) {
   const { productQuantities, addToCart, removeFromCart, updateItemNote } = useCart()
   const [comment, setComment] = useState('')
-  const [quantity, setQuantity] = useState(product?.quantity || 0)
+  const [quantity, setQuantity] = useState(productQuantities[product.id] || 0)
   const [note, setNote] = useState(product?.note || '')
 
-  // Cargar comentario guardado al abrir el producto
   useEffect(() => {
     if (isOpen) {
       const savedComment = localStorage.getItem(`comment-${product.id}`)
@@ -34,7 +33,6 @@ export function ProductSheet({ isOpen, onClose, product }: ProductSheetProps) {
     }
   }, [isOpen, product.id])
 
-  // Guardar comentario cuando cambie
   const handleCommentChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     const newComment = e.target.value
     setComment(newComment)
@@ -43,13 +41,12 @@ export function ProductSheet({ isOpen, onClose, product }: ProductSheetProps) {
 
   const handleSave = () => {
     if (product) {
-      if (quantity > (product.quantity || 0)) {
-        addToCart(product, quantity - (product.quantity || 0), note)
-      } else if (quantity < (product.quantity || 0)) {
-        removeFromCart(product, (product.quantity || 0) - quantity)
+      if (quantity > productQuantities[product.id]) {
+        addToCart(product, quantity - productQuantities[product.id], note)
+      } else if (quantity < productQuantities[product.id]) {
+        removeFromCart(product, productQuantities[product.id] - quantity)
       }
       
-      // Actualizar la nota si ha cambiado
       if (note !== product.note) {
         updateItemNote(product.id, note)
       }
@@ -104,47 +101,61 @@ export function ProductSheet({ isOpen, onClose, product }: ProductSheetProps) {
           <div className="space-y-4">
             <div className="bg-white rounded-lg p-4">
               <h3 className="text-2xl font-bold mb-2">{product.name}</h3>
-              <span className="text-3xl font-bold text-blue-600">
-                {product.price.toFixed(2)}€
-              </span>
+              <div className="overflow-x-auto whitespace-nowrap">
+                <span className="text-3xl font-bold text-blue-600">
+                  {product.price.toFixed(2)}€
+                </span>
+              </div>
             </div>
 
             <div className="bg-white rounded-lg p-4">
               <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <p className="text-sm text-gray-600 text-center mb-2">Por paquete</p>
-                  <button 
-                    className="w-full py-2 px-4 bg-blue-50 hover:bg-blue-100 rounded-lg flex items-center justify-center gap-2"
-                    onClick={() => addToCart(product, product.unitsPerPackage)}
-                  >
-                    <Plus className="w-5 h-5 text-green-600" />
-                    <span className="text-sm">{product.unitsPerPackage} uds.</span>
-                  </button>
-                  <button 
-                    className="w-full py-2 px-4 bg-blue-50 hover:bg-blue-100 rounded-lg flex items-center justify-center gap-2"
-                    onClick={() => removeFromCart(product, product.unitsPerPackage)}
-                  >
-                    <Minus className="w-5 h-5 text-red-600" />
-                    <span className="text-sm">{product.unitsPerPackage} uds.</span>
-                  </button>
+                <div className="flex flex-col space-y-2">
+                  <p className="text-sm text-gray-600 text-center">Por paquete</p>
+                  <div className="flex flex-col gap-2 w-full">
+                    <button 
+                      className="w-full py-2 px-4 bg-blue-50 hover:bg-blue-100 rounded-lg flex items-center justify-between"
+                      onClick={() => addToCart(product, product.unitsPerPackage)}
+                    >
+                      <Plus className="w-5 h-5 text-green-600" />
+                      <span className="text-sm font-medium min-w-[60px] text-right">
+                        {product.unitsPerPackage} uds.
+                      </span>
+                    </button>
+                    <button 
+                      className="w-full py-2 px-4 bg-blue-50 hover:bg-blue-100 rounded-lg flex items-center justify-between"
+                      onClick={() => removeFromCart(product, product.unitsPerPackage)}
+                    >
+                      <Minus className="w-5 h-5 text-red-600" />
+                      <span className="text-sm font-medium min-w-[60px] text-right">
+                        {product.unitsPerPackage} uds.
+                      </span>
+                    </button>
+                  </div>
                 </div>
 
-                <div className="space-y-2">
-                  <p className="text-sm text-gray-600 text-center mb-2">Por caja</p>
-                  <button 
-                    className="w-full py-2 px-4 bg-blue-50 hover:bg-blue-100 rounded-lg flex items-center justify-center gap-2"
-                    onClick={() => addToCart(product, product.unitsPerBox)}
-                  >
-                    <Plus className="w-5 h-5 text-green-600" />
-                    <span className="text-sm">{product.unitsPerBox} uds.</span>
-                  </button>
-                  <button 
-                    className="w-full py-2 px-4 bg-blue-50 hover:bg-blue-100 rounded-lg flex items-center justify-center gap-2"
-                    onClick={() => removeFromCart(product, product.unitsPerBox)}
-                  >
-                    <Minus className="w-5 h-5 text-red-600" />
-                    <span className="text-sm">{product.unitsPerBox} uds.</span>
-                  </button>
+                <div className="flex flex-col space-y-2">
+                  <p className="text-sm text-gray-600 text-center">Por caja</p>
+                  <div className="flex flex-col gap-2 w-full">
+                    <button 
+                      className="w-full py-2 px-4 bg-blue-50 hover:bg-blue-100 rounded-lg flex items-center justify-between"
+                      onClick={() => addToCart(product, product.unitsPerBox)}
+                    >
+                      <Plus className="w-5 h-5 text-green-600" />
+                      <span className="text-sm font-medium min-w-[60px] text-right">
+                        {product.unitsPerBox} uds.
+                      </span>
+                    </button>
+                    <button 
+                      className="w-full py-2 px-4 bg-blue-50 hover:bg-blue-100 rounded-lg flex items-center justify-between"
+                      onClick={() => removeFromCart(product, product.unitsPerBox)}
+                    >
+                      <Minus className="w-5 h-5 text-red-600" />
+                      <span className="text-sm font-medium min-w-[60px] text-right">
+                        {product.unitsPerBox} uds.
+                      </span>
+                    </button>
+                  </div>
                 </div>
               </div>
             </div>
@@ -162,14 +173,15 @@ export function ProductSheet({ isOpen, onClose, product }: ProductSheetProps) {
 
               <div className="h-px bg-gray-200 my-2" />
 
-              <div className="flex justify-between items-center">
-                <span className="text-gray-600">Unidades por paquete:</span>
-                <span className="font-medium">{product.unitsPerPackage || 'N/A'} uds.</span>
-              </div>
-
-              <div className="flex justify-between items-center">
-                <span className="text-gray-600">Unidades por caja:</span>
-                <span className="font-medium">{product.unitsPerBox} uds.</span>
+              <div className="flex items-center justify-start whitespace-nowrap text-sm overflow-x-auto">
+                <div className="inline-flex items-center mr-4">
+                  <span className="text-gray-600 mr-1">Pack:</span>
+                  <span className="font-medium">{product.unitsPerPackage || 'N/A'}</span>
+                </div>
+                <div className="inline-flex items-center">
+                  <span className="text-gray-600 mr-1">Cajas:</span>
+                  <span className="font-medium">{product.unitsPerBox}</span>
+                </div>
               </div>
             </div>
 
@@ -194,17 +206,6 @@ export function ProductSheet({ isOpen, onClose, product }: ProductSheetProps) {
             </div>
           </div>
         </div>
-
-        <div className="px-4 mb-4">
-          <p className="text-sm text-gray-500 mb-2">Notas especiales</p>
-          <Textarea
-            placeholder="Añade notas especiales para este producto..."
-            value={note}
-            onChange={(e) => setNote(e.target.value)}
-            className="w-full"
-          />
-        </div>
-
         <div className="p-4 mt-auto">
           <Button 
             className="w-full" 

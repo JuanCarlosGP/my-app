@@ -281,7 +281,6 @@ export interface Product {
     const store = getStoreById(storeId);
     if (!store) return [];
     
-    // Obtener todos los productos de todas las categorías
     return store.categories.reduce((allProducts: Product[], category) => {
       const categoryProducts = getCategoryProducts(storeId, category.id);
       return [...allProducts, ...categoryProducts];

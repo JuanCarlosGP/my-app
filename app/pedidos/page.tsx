@@ -20,16 +20,13 @@ export default function PedidosPage() {
   const [isSheetOpen, setIsSheetOpen] = useState(false)
   const [isFacturacionOpen, setIsFacturacionOpen] = useState(false)
   
-  // Obtener todos los productos de la tienda seleccionada
   const allStoreProducts = selectedStoreId ? getAllProducts(selectedStoreId) : []
   
-  // Obtener todas las tiendas que tienen items
   const storesWithItems = Array.from(new Set(items
     .filter(item => item.quantity > 0)
     .map(item => item.id.split('-')[1])
   ))
 
-  // Efecto para manejar la selección de tienda cuando no hay items
   useEffect(() => {
     if (selectedStoreId) {
       const hasItemsInSelectedStore = items.some(item => {
@@ -38,18 +35,15 @@ export default function PedidosPage() {
       })
 
       if (!hasItemsInSelectedStore && storesWithItems.length > 0) {
-        // Si no hay items en la tienda seleccionada pero hay otras tiendas con items,
-        // seleccionar la primera tienda que tenga items
+
         setSelectedStoreId(storesWithItems[0])
       }
     } else if (storesWithItems.length > 0) {
-      // Si no hay tienda seleccionada pero hay tiendas con items,
-      // seleccionar la primera tienda que tenga items
+
       setSelectedStoreId(storesWithItems[0])
     }
   }, [items, selectedStoreId, setSelectedStoreId, storesWithItems])
 
-  // Filtrar por tienda seleccionada
   const storeItems = selectedStoreId 
     ? items.filter(item => {
         const itemStoreId = item.id.split('-')[1]
@@ -57,16 +51,13 @@ export default function PedidosPage() {
       })
     : []
 
-  // Filtrar por término de búsqueda
   const filteredItems = storeItems.filter(item =>
     item.name.toLowerCase().includes(searchTerm.toLowerCase())
   )
 
   const handleCardClick = (cartItem: typeof items[0]) => {
-    // Buscar el producto completo usando el ID del item del carrito
     const fullProduct = allStoreProducts.find(p => p.id === cartItem.id)
     if (fullProduct) {
-      // Combinar la información del producto con la cantidad del carrito
       const productWithQuantity = {
         ...fullProduct,
         quantity: cartItem.quantity
@@ -76,7 +67,6 @@ export default function PedidosPage() {
     }
   }
 
-  // Calcular el total del pedido
   const orderTotal = filteredItems.reduce((total, item) => {
     return total + (item.price * item.quantity)
   }, 0)
@@ -142,20 +132,24 @@ export default function PedidosPage() {
                     <div>
                       <p className="text-sm text-gray-500 mb-1">Precio</p>
                       <p className="font-medium text-blue-600">{formatPrice(item.price)}</p>
-                      <p className="text-sm text-gray-500 mt-2 mb-1">
+                      <p className="text-sm text-gray-500 mt-2 mb-1 whitespace-nowrap">
                         Pack: <span className="font-medium text-black">{item.packages || 0}</span>
                       </p>
                     </div>
                     <div>
                       <p className="text-sm text-gray-500 mb-1">Cantidad</p>
                       <p className="font-medium">{item.quantity}</p>
-                      <p className="text-sm text-gray-500 mt-2 mb-1">
+                      <p className="text-sm text-gray-500 mt-2 mb-1 whitespace-nowrap">
                         Cajas: <span className="font-medium text-black">{item.boxes || 0}</span>
                       </p>
                     </div> 
                     <div>
                       <p className="text-sm text-gray-500 mb-1">Total</p>
-                      <p className="font-medium">{formatPrice(item.price * item.quantity)}</p>
+                      
+                        <p className="font-medium whitespace-nowrap text-sm">
+                          {formatPrice(item.price * item.quantity)}
+                        </p>
+                      
                     </div>
                   </div>
                 </div>
@@ -170,7 +164,7 @@ export default function PedidosPage() {
           <div className="container mx-auto px-4 h-[60px] flex items-center justify-between max-w-3xl">
             <div className="flex flex-col">
               <span className="text-sm text-gray-500">Total</span>
-              <span className="text-lg font-semibold">{formatPrice(orderTotal)}</span>
+              <span className="text-lg font-semibold ml-1">{formatPrice(orderTotal)}</span>
             </div>
             <Button 
               className="bg-blue-600 hover:bg-blue-700 text-white px-8"
