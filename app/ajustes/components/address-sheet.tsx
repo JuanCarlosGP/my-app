@@ -17,7 +17,6 @@ interface AddressSheetProps {
 
 export function AddressSheet({ isOpen, onOpenChange }: AddressSheetProps) {
   const handleAddressSubmit = (data: AddressFormData) => {
-    console.log('Address form submitted:', data)
     onOpenChange(false)
   }
 

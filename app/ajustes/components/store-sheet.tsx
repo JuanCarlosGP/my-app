@@ -49,7 +49,6 @@ export function StoreSheet({ isOpen, onOpenChange }: StoreSheetProps) {
   })
 
   const handleSubmit = (data: z.infer<typeof StoreFormSchema>) => {
-    console.log('Store form submitted:', data)
     onOpenChange(false)
   }
 

@@ -273,7 +273,6 @@ export interface Product {
   export const getCategoryProducts = (storeId: string, categoryId: string) => {
     const store = getStoreById(storeId)
     const products = store?.categories.find(cat => cat.id === categoryId)?.products || []
-    console.log('Products from stores.ts:', products)
     return products
   }
   

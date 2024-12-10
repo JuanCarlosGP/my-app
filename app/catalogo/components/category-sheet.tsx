@@ -30,7 +30,6 @@ export function CategorySheet({ id, name, description, subdescription, imageUrl 
 
   useEffect(() => {
     const categoryProducts = getCategoryProducts(storeId, id)
-    console.log('Category products:', categoryProducts)
     setProducts(categoryProducts)
   }, [storeId, id])
 

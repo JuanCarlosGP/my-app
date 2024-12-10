@@ -55,7 +55,6 @@ export function ProductSheet({ isOpen, onClose, product }: ProductSheetProps) {
     }
   }
 
-  console.log('Product data:', product)
 
   return (
     <Sheet open={isOpen} onOpenChange={onClose}>

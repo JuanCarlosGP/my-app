@@ -11,6 +11,7 @@ export interface CartItem {
   packages?: number
   boxes?: number
   note?: string
+  storeName: string
 }
 
 interface CartStore {
@@ -43,16 +44,6 @@ export const useCart = create<CartStore>()(
           
           const packages = Math.floor(newQuantity / unitsPerPackage)
           const boxes = Math.floor(newQuantity / unitsPerBox)
-
-          console.log('Añadiendo producto:', {
-            id: product.id,
-            name: product.name,
-            quantity: newQuantity,
-            unitsPerPackage,
-            unitsPerBox,
-            packages,
-            boxes
-          })
 
           const existingItem = state.items.find(item => item.id === product.id)
           const newItems = existingItem
@@ -141,22 +132,11 @@ export const useCart = create<CartStore>()(
       
       getUniqueStores: () => {
         const { items } = get()
-        
-        console.log('Items completos:', JSON.stringify(items, null, 2))
-        
         const storesMap = new Map()
         
         items.forEach(item => {
           if (item.quantity > 0) {
             const storeId = item.id.split('-')[1]
-            
-            console.log('Procesando item:', {
-              id: item.id,
-              name: item.name,
-              extractedStoreId: storeId,
-              storeName: item.storeName
-            })
-            
             storesMap.set(storeId, {
               id: storeId,
               name: item.storeName
@@ -164,9 +144,7 @@ export const useCart = create<CartStore>()(
           }
         })
 
-        const stores = Array.from(storesMap.values())
-        console.log('Tiendas únicas encontradas:', stores)
-        return stores
+        return Array.from(storesMap.values())
       },
 
       updateItemNote: (productId: string, note: string) =>
