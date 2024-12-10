@@ -48,7 +48,7 @@ export default function CatalogoPage({ params }: { params: { id: string } }) {
           />
 
           {/* Iconos de categorías */}
-          <div className="grid grid-cols-3 gap-4 mb-6 px-4">
+          <div className="grid grid-cols-3 gap-3 mb-6 px-1">
             <NewProductsSheet />
             <SearchSheet variant="card" />
             <PromotionsSheet />

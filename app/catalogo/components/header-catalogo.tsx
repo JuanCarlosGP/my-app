@@ -10,7 +10,7 @@ interface HeaderProps {
 export function HeaderCatalogo({ title, showAddButton = false, onAddClick, onSearchClick }: HeaderProps) {
   return (
     <header className="flex justify-between items-center mb-4 pt-4 px-4">
-      <h1 className="text-[1.1rem] font-bold truncate max-w-[450px] m-auto">{title}</h1>
+      <h1 className="text-[1.1rem] mb-2 font-bold truncate max-w-[450px] m-auto">{title}</h1>
     </header>
   )
 }
