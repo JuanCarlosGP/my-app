@@ -7,6 +7,8 @@ import { Badge } from "@/components/ui/badge"
 import { useCart } from "@/hooks/use-cart"
 import { Product } from "@/app/data/stores"
 import { useState, useEffect } from 'react'
+import { Textarea } from "@/components/ui/textarea"
+import { Button } from "@/components/ui/button"
 
 interface ProductSheetProps {
   isOpen: boolean
@@ -15,8 +17,10 @@ interface ProductSheetProps {
 }
 
 export function ProductSheet({ isOpen, onClose, product }: ProductSheetProps) {
-  const { productQuantities, addToCart, removeFromCart } = useCart()
+  const { productQuantities, addToCart, removeFromCart, updateItemNote } = useCart()
   const [comment, setComment] = useState('')
+  const [quantity, setQuantity] = useState(product?.quantity || 0)
+  const [note, setNote] = useState(product?.note || '')
 
   // Cargar comentario guardado al abrir el producto
   useEffect(() => {
@@ -35,6 +39,23 @@ export function ProductSheet({ isOpen, onClose, product }: ProductSheetProps) {
     const newComment = e.target.value
     setComment(newComment)
     localStorage.setItem(`comment-${product.id}`, newComment)
+  }
+
+  const handleSave = () => {
+    if (product) {
+      if (quantity > (product.quantity || 0)) {
+        addToCart(product, quantity - (product.quantity || 0), note)
+      } else if (quantity < (product.quantity || 0)) {
+        removeFromCart(product, (product.quantity || 0) - quantity)
+      }
+      
+      // Actualizar la nota si ha cambiado
+      if (note !== product.note) {
+        updateItemNote(product.id, note)
+      }
+      
+      onClose()
+    }
   }
 
   console.log('Product data:', product)
@@ -172,6 +193,25 @@ export function ProductSheet({ isOpen, onClose, product }: ProductSheetProps) {
               </p>
             </div>
           </div>
+        </div>
+
+        <div className="px-4 mb-4">
+          <p className="text-sm text-gray-500 mb-2">Notas especiales</p>
+          <Textarea
+            placeholder="Añade notas especiales para este producto..."
+            value={note}
+            onChange={(e) => setNote(e.target.value)}
+            className="w-full"
+          />
+        </div>
+
+        <div className="p-4 mt-auto">
+          <Button 
+            className="w-full" 
+            onClick={handleSave}
+          >
+            Guardar
+          </Button>
         </div>
       </SheetContent>
     </Sheet>

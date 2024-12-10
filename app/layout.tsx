@@ -20,7 +20,7 @@ export default function RootLayout({
     <html lang="es">
       <body className={inter.className + " bg-[#f5f5f5] min-h-screen"}>
         <CartProvider>
-          <main className="mx-auto mb-10">
+          <main className="mx-auto mb-[120px]">
             {children}
           </main>
         </CartProvider>

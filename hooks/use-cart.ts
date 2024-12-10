@@ -8,23 +8,21 @@ export interface CartItem {
   price: number
   quantity: number
   image: string
-  storeId: string
-  storeName: string
-  packages: number
-  boxes: number
-  unitsPerPackage: number
-  unitsPerBox: number
+  packages?: number
+  boxes?: number
+  note?: string
 }
 
 interface CartStore {
   items: CartItem[]
   productQuantities: { [key: string]: number }
-  addToCart: (product: Product, quantity: number) => void
+  addToCart: (product: Product, quantity: number, note?: string) => void
   removeFromCart: (product: Product, quantity: number) => void
   clearCart: () => void
   selectedStoreId: string | null
   setSelectedStoreId: (id: string | null) => void
   getUniqueStores: () => { id: string, name: string }[]
+  updateItemNote: (productId: string, note: string) => void
 }
 
 export const useCart = create<CartStore>()(
@@ -34,7 +32,7 @@ export const useCart = create<CartStore>()(
       productQuantities: {},
       selectedStoreId: null,
       
-      addToCart: (product, quantity) =>
+      addToCart: (product, quantity, note) =>
         set((state) => {
           const existingQuantity = state.productQuantities[product.id] || 0
           const newQuantity = existingQuantity + quantity
@@ -65,6 +63,7 @@ export const useCart = create<CartStore>()(
                       quantity: newQuantity,
                       packages,
                       boxes,
+                      note: note || item.note,
                       unitsPerPackage,
                       unitsPerBox,
                       storeId: item.id.split('-')[1],
@@ -79,6 +78,7 @@ export const useCart = create<CartStore>()(
                 quantity: newQuantity,
                 packages,
                 boxes,
+                note,
                 unitsPerPackage,
                 unitsPerBox,
                 image: product.imageUrl,
@@ -168,6 +168,15 @@ export const useCart = create<CartStore>()(
         console.log('Tiendas únicas encontradas:', stores)
         return stores
       },
+
+      updateItemNote: (productId: string, note: string) =>
+        set((state) => ({
+          items: state.items.map(item =>
+            item.id === productId
+              ? { ...item, note }
+              : item
+          )
+        })),
     }),
     {
       name: 'cart-storage',
