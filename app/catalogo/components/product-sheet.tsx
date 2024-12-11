@@ -6,7 +6,7 @@ import Image from 'next/image'
 import { Badge } from "@/components/ui/badge"
 import { useCart } from "@/hooks/use-cart"
 import { Product } from "@/app/data/stores"
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { Textarea } from "@/components/ui/textarea"
 import { Button } from "@/components/ui/button"
 
@@ -17,26 +17,17 @@ interface ProductSheetProps {
 }
 
 export function ProductSheet({ isOpen, onClose, product }: ProductSheetProps) {
-  const { productQuantities, addToCart, removeFromCart, updateItemNote } = useCart()
-  const [comment, setComment] = useState('')
+  const { productQuantities, addToCart, removeFromCart, updateItemNote, items } = useCart()
   const [quantity, setQuantity] = useState(productQuantities[product.id] || 0)
-  const [note, setNote] = useState(product?.note || '')
+  
+  // Encontrar la nota existente del producto
+  const existingItem = items.find(item => item.id === product.id)
+  const [note, setNote] = useState(existingItem?.note || '')
 
-  useEffect(() => {
-    if (isOpen) {
-      const savedComment = localStorage.getItem(`comment-${product.id}`)
-      if (savedComment) {
-        setComment(savedComment)
-      } else {
-        setComment('')
-      }
-    }
-  }, [isOpen, product.id])
-
-  const handleCommentChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    const newComment = e.target.value
-    setComment(newComment)
-    localStorage.setItem(`comment-${product.id}`, newComment)
+  const handleNoteChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    const newNote = e.target.value
+    setNote(newNote)
+    updateItemNote(product.id, newNote)
   }
 
   const handleSave = () => {
@@ -196,8 +187,8 @@ export function ProductSheet({ isOpen, onClose, product }: ProductSheetProps) {
                 rows={3}
                 className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 resize-none bg-gray-50"
                 placeholder="Añade aquí tus comentarios o instrucciones especiales..."
-                value={comment}
-                onChange={handleCommentChange}
+                value={note}
+                onChange={handleNoteChange}
               />
               <p className="text-xs text-gray-500 mt-1">
                 El comentario se guardará automáticamente

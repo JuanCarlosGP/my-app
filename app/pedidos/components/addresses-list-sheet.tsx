@@ -1,6 +1,7 @@
 "use client"
 
 import { Sheet, SheetContent, SheetHeader, SheetClose, SheetTitle } from "@/components/ui/sheet"
+import { VisuallyHidden } from '@radix-ui/react-visually-hidden'
 import { ArrowLeft, Plus, MapPin, Trash2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { useState, useEffect } from "react"
@@ -62,7 +63,9 @@ export function AddressesListSheet({ isOpen, onClose, onAddressSelect }: Address
       <Sheet open={isOpen} onOpenChange={onClose}>
         <SheetContent className="w-full sm:max-w-md bg-[#f5f5f5] p-0">
           <SheetHeader>
-            <SheetTitle className="sr-only">Mis Direcciones</SheetTitle>
+            <SheetTitle>
+              <VisuallyHidden>Mis Direcciones</VisuallyHidden>
+            </SheetTitle>
           </SheetHeader>
 
           <div className="sticky top-0 bg-white/70 backdrop-blur-md z-10">
