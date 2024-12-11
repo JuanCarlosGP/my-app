@@ -23,8 +23,14 @@ export function HeaderPedidos({ title, onSearch }: HeaderPedidosProps) {
     <header className="flex flex-col pt-4 px-4">
       <div className="flex justify-between items-center">
         <div className="w-10" />
-        <div className="text-center">
-          <h1 className="text-xl font-bold truncate max-w-[450px]">{title}</h1>
+        <div className="flex flex-col items-center w-full max-w-[500px]">
+          <div className="flex items-center justify-between w-full relative">
+            <div className="w-10" />
+            <h1 className="text-xl font-bold truncate absolute left-1/2 -translate-x-1/2">{title}</h1>
+            <Button variant="ghost" size="icon" onClick={() => setIsOpen(true)}>
+              <ArrowUpDown className="h-6 w-6" />
+            </Button>
+          </div>
           {selectedStore && (
             <Button 
               variant="secondary" 
@@ -35,9 +41,7 @@ export function HeaderPedidos({ title, onSearch }: HeaderPedidosProps) {
             </Button>
           )}
         </div>
-        <Button variant="ghost" size="icon" onClick={() => setIsOpen(true)}>
-          <ArrowUpDown className="h-6 w-6" />
-        </Button>
+        <div className="w-10" />
       </div>
       {selectedStore && (
         <div className="relative mt-4">
