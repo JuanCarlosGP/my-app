@@ -30,19 +30,27 @@ export function AddressesListSheet({ isOpen, onClose, onAddressSelect }: Address
     e.stopPropagation()
     if (window.confirm('¿Estás seguro de que quieres eliminar esta dirección?')) {
       console.log('Deleting address:', addressId)
-      const success = deleteAddress(addressId)
+      const success = await deleteAddress(addressId)
       if (success) {
         console.log('Address deleted successfully')
-        reloadAddresses()
-        onAddressSelect?.(undefined)
-        onClose()
+        await reloadAddresses()
+        setRefreshKey(prev => prev + 1)
+      } else {
+        console.error('Failed to delete address')
       }
     }
   }
 
-  const handleNewAddressComplete = () => {
+  useEffect(() => {
+    if (isOpen) {
+      reloadAddresses()
+    }
+  }, [isOpen, reloadAddresses])
+
+  const handleNewAddressComplete = async () => {
     setIsAddingAddress(false)
-    reloadAddresses()
+    await reloadAddresses()
+    setRefreshKey(prev => prev + 1)
   }
 
   const handlePersonalDataClose = () => {
@@ -95,10 +103,12 @@ export function AddressesListSheet({ isOpen, onClose, onAddressSelect }: Address
                 {addresses.map((address) => (
                   <div
                     key={address.id}
-                    className="bg-white p-4 rounded-lg cursor-pointer hover:bg-gray-50 relative"
-                    onClick={() => handleAddressSelect(address)}
+                    className="bg-white p-4 rounded-lg relative"
                   >
-                    <div className="pr-10">
+                    <div 
+                      className="pr-10 cursor-pointer hover:bg-gray-50"
+                      onClick={() => handleAddressSelect(address)}
+                    >
                       <h3 className="font-medium">{address.name}</h3>
                       <p className="text-sm text-gray-500">{address.address}</p>
                       <p className="text-sm text-gray-500">{address.phone}</p>

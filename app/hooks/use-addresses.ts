@@ -14,22 +14,36 @@ export const useAddresses = () => {
   const [activeAddressId, setActiveAddressId] = useState<string | null>(null)
   const [isLoaded, setIsLoaded] = useState(false)
 
-  const reloadAddresses = useCallback(() => {
-    console.log('Reloading addresses...')
+  // Función auxiliar para obtener direcciones del localStorage
+  const getStoredAddresses = useCallback((): Address[] => {
     const savedAddresses = localStorage.getItem('userAddresses')
-    const activeId = localStorage.getItem('activeAddressId')
-    
-    if (savedAddresses) {
-      const parsedAddresses = JSON.parse(savedAddresses)
-      console.log('Loaded addresses:', parsedAddresses)
-      setAddresses(parsedAddresses)
-    }
-    
-    if (activeId) {
-      console.log('Loaded active ID:', activeId)
-      setActiveAddressId(activeId)
-    }
+    return savedAddresses ? JSON.parse(savedAddresses) : []
   }, [])
+
+  // Función auxiliar para guardar direcciones en localStorage
+  const saveAddressesToStorage = useCallback((newAddresses: Address[]) => {
+    localStorage.setItem('userAddresses', JSON.stringify(newAddresses))
+  }, [])
+
+  const reloadAddresses = useCallback(async () => {
+    console.log('Reloading addresses...')
+    // Cargar direcciones
+    const storedAddresses = getStoredAddresses()
+    setAddresses(storedAddresses)
+    console.log('Loaded addresses:', storedAddresses)
+
+    // Cargar dirección activa
+    const activeId = localStorage.getItem('activeAddressId')
+    console.log('Loaded active ID:', activeId)
+    setActiveAddressId(activeId)
+
+    // Validar que la dirección activa existe
+    if (activeId && !storedAddresses.some(addr => addr.id === activeId)) {
+      console.log('Active address not found, clearing active ID')
+      localStorage.removeItem('activeAddressId')
+      setActiveAddressId(null)
+    }
+  }, [getStoredAddresses])
 
   // Cargar direcciones y dirección activa al iniciar
   useEffect(() => {
@@ -40,72 +54,76 @@ export const useAddresses = () => {
   }, [isLoaded, reloadAddresses])
 
   // Agregar nueva dirección
-  const addAddress = (address: Omit<Address, 'id'>) => {
+  const addAddress = useCallback((address: Omit<Address, 'id'>) => {
     try {
       const newAddress = {
         id: Date.now().toString(),
         ...address
       }
       
-      const updatedAddresses = [...addresses, newAddress]
+      const currentAddresses = getStoredAddresses()
+      const updatedAddresses = [...currentAddresses, newAddress]
+      
+      // Guardar en localStorage y actualizar estado
+      saveAddressesToStorage(updatedAddresses)
       setAddresses(updatedAddresses)
-      localStorage.setItem('userAddresses', JSON.stringify(updatedAddresses))
       
       // Establecer como dirección activa
-      setActiveAddressId(newAddress.id)
       localStorage.setItem('activeAddressId', newAddress.id)
+      setActiveAddressId(newAddress.id)
       
       return newAddress
     } catch (error) {
       console.error('Error adding address:', error)
       return null
     }
-  }
+  }, [getStoredAddresses, saveAddressesToStorage])
 
   // Seleccionar dirección activa
-  const selectAddress = (addressId: string) => {
+  const selectAddress = useCallback((addressId: string) => {
     try {
-      console.log('Setting active address ID:', addressId)
-      setActiveAddressId(addressId)
-      localStorage.setItem('activeAddressId', addressId)
-      // Forzar recarga de direcciones
-      reloadAddresses()
+      const storedAddresses = getStoredAddresses()
+      if (storedAddresses.some(addr => addr.id === addressId)) {
+        localStorage.setItem('activeAddressId', addressId)
+        setActiveAddressId(addressId)
+      }
     } catch (error) {
       console.error('Error selecting address:', error)
     }
-  }
+  }, [getStoredAddresses])
 
   // Obtener dirección activa
   const getActiveAddress = useCallback((): Address | undefined => {
-    console.log('Getting active address. Active ID:', activeAddressId)
-    console.log('Available addresses:', addresses)
-    const address = addresses.find(addr => addr.id === activeAddressId)
-    console.log('Found address:', address)
+    const storedAddresses = getStoredAddresses()
+    const address = storedAddresses.find(addr => addr.id === activeAddressId)
+    console.log('Getting active address:', { activeAddressId, address })
     return address
-  }, [addresses, activeAddressId])
+  }, [activeAddressId, getStoredAddresses])
 
   // Borrar dirección
-  const deleteAddress = (addressId: string) => {
+  const deleteAddress = useCallback(async (addressId: string) => {
     try {
-      setAddresses(currentAddresses => {
-        const updatedAddresses = currentAddresses.filter(addr => addr.id !== addressId)
-        localStorage.setItem('userAddresses', JSON.stringify(updatedAddresses))
-        return updatedAddresses
-      })
+      const currentAddresses = getStoredAddresses()
+      const updatedAddresses = currentAddresses.filter(addr => addr.id !== addressId)
+      
+      // Actualizar localStorage
+      saveAddressesToStorage(updatedAddresses)
+      
+      // Actualizar estado
+      setAddresses(updatedAddresses)
       
       // Si la dirección borrada era la activa, limpiar activeAddressId
       if (activeAddressId === addressId) {
-        setActiveAddressId(null)
         localStorage.removeItem('activeAddressId')
+        setActiveAddressId(null)
       }
       
-      reloadAddresses()
       return true
     } catch (error) {
       console.error('Error deleting address:', error)
       return false
     }
-  }
+  }, [activeAddressId, getStoredAddresses, saveAddressesToStorage])
 
   return {
     addresses,
