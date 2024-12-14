@@ -5,22 +5,32 @@ import { MapPin, User, PackagePlus, MessageSquareHeart, SlidersHorizontal, Scrol
 import { ProfileHeader } from '../components/profile-header'
 import { MenuItem } from '../components/menu-item'
 import { ProfileSheet } from './components/profile-sheet'
-import { AddressSheet } from './components/address-sheet'
 import { StoreSheet } from './components/store-sheet'
 import { FeedbackSheet } from './components/feedback-sheet'
 import { StoreSettingsSheet } from './components/store-settings-sheet'
 import { OrderHistorySheet } from './components/order-history-sheet'
 import { CustomSheet } from './components/custom-sheet'
+import { AddressesListSheet } from '../pedidos/components/addresses-list-sheet'
+import { useAddresses } from '../hooks/use-addresses'
 
 export default function AjustesPage() {
   const phoneNumber = '+34601286447'
   const [isProfileSheetOpen, setIsProfileSheetOpen] = useState(false)
-  const [isAddressSheetOpen, setIsAddressSheetOpen] = useState(false)
+  const [isAddressesListOpen, setIsAddressesListOpen] = useState(false)
   const [isAddStoreOpen, setIsAddStoreOpen] = useState(false)
   const [isFeedbackSheetOpen, setIsFeedbackSheetOpen] = useState(false)
   const [isStoreSettingsOpen, setIsStoreSettingsOpen] = useState(false)
   const [isOrderHistoryOpen, setIsOrderHistoryOpen] = useState(false)
   const [isCustomSheetOpen, setIsCustomSheetOpen] = useState(false)
+
+  const { selectAddress } = useAddresses()
+
+  const handleAddressSelect = (address: any) => {
+    if (address) {
+      selectAddress(address.id)
+    }
+    setIsAddressesListOpen(false)
+  }
 
   return (
     <div className="bg-[#f5f5f5] min-h-screen max-w-3xl m-auto ">
@@ -34,13 +44,15 @@ export default function AjustesPage() {
         />
         <MenuItem 
           icon={MapPin} 
-          label="Mi Dirección"  
-          onClick={() => setIsAddressSheetOpen(true)} 
+          label="Mis Direcciones"  
+          onClick={() => setIsAddressesListOpen(true)} 
         />
         <MenuItem 
           icon={PackagePlus} 
           label="Crear mi Tienda" 
-          onClick={() => setIsAddStoreOpen(true)} 
+          onClick={() => setIsAddStoreOpen(true)}
+          disabled={true} 
+          labelClassName="line-through"
         />
         <MenuItem 
           icon={SlidersHorizontal} 
@@ -58,6 +70,8 @@ export default function AjustesPage() {
           icon={Paintbrush}
           label="Personalizar"
           onClick={() => setIsCustomSheetOpen(true)}
+          disabled={true} 
+          labelClassName="line-through"
         />
         <MenuItem 
           icon={MessageSquareHeart} 
@@ -72,9 +86,10 @@ export default function AjustesPage() {
         phoneNumber={phoneNumber}
       />
 
-      <AddressSheet
-        isOpen={isAddressSheetOpen}
-        onOpenChange={setIsAddressSheetOpen}
+      <AddressesListSheet
+        isOpen={isAddressesListOpen}
+        onClose={() => setIsAddressesListOpen(false)}
+        onAddressSelect={handleAddressSelect}
       />
 
       <StoreSheet
