@@ -39,7 +39,7 @@ export interface Product {
       description: "Importación y venta al por mayor.",
       subdescription: "Artículos del hogar de calidad con los precios más competitivos.",
       imageUrl: "https://cdn.discordapp.com/attachments/1033095213255770244/1315571875258306601/Diseno_sin_titulo.jpg?ex=675936c9&is=6757e549&hm=7c951f16f9d5310a4a706ff1e8e92dc526e47ac16efc28491093ac14b270417a&",
-      bannerImage: "https://cdn.discordapp.com/attachments/1033095213255770244/1315571009784647751/Diseno_sin_titulo.gif?ex=675935fa&is=6757e47a&hm=46a168c36aa388a8b41564193796714958111d6ad66be1d7c5314215566e7c57&",
+      bannerImage: "https://images.pexels.com/photos/3155666/pexels-photo-3155666.jpeg",
       categories: [
         {
           id: "cat-1-1",

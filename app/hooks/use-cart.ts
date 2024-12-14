@@ -1,3 +1,5 @@
+import { useState, useCallback } from 'react'
+
 export interface CartItem {
   id: string
   name: string
@@ -8,7 +10,7 @@ export interface CartItem {
 }
 
 export const useCart = () => {
-  // ... código existente
+  const [items, setItems] = useState<CartItem[]>([])
 
   const updateItemNote = useCallback((productId: string, note: string) => {
     setItems(current => 

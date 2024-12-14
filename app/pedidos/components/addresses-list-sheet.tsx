@@ -17,7 +17,7 @@ interface AddressesListSheetProps {
 export function AddressesListSheet({ isOpen, onClose, onAddressSelect }: AddressesListSheetProps) {
   const [isAddingAddress, setIsAddingAddress] = useState(false)
   const [refreshKey, setRefreshKey] = useState(0)
-  const { addresses, selectAddress, deleteAddress, isLoaded, reloadAddresses } = useAddresses()
+  const { addresses, selectAddress, deleteAddress, isLoaded, reloadAddresses, getActiveAddress } = useAddresses()
 
   const handleAddressSelect = (address: Address) => {
     console.log('Selecting address:', address)
@@ -58,6 +58,12 @@ export function AddressesListSheet({ isOpen, onClose, onAddressSelect }: Address
     setIsAddingAddress(false)
   }
 
+  const handleSheetClose = () => {
+    const activeAddress = getActiveAddress()
+    onAddressSelect?.(activeAddress)
+    onClose()
+  }
+
   return (
     <>
       <Sheet open={isOpen} onOpenChange={onClose}>
@@ -71,7 +77,10 @@ export function AddressesListSheet({ isOpen, onClose, onAddressSelect }: Address
           <div className="sticky top-0 bg-white/70 backdrop-blur-md z-10">
             <div className="flex items-center justify-between p-4">
               <div className="flex items-center gap-2">
-                <SheetClose className="p-2 hover:bg-gray-100 rounded-full">
+                <SheetClose 
+                  className="p-2 hover:bg-gray-100 rounded-full"
+                  onClick={handleSheetClose}
+                >
                   <ArrowLeft className="h-6 w-6" />
                 </SheetClose>
               </div>
