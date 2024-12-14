@@ -61,7 +61,7 @@ export function FacturacionSheet({ isOpen, onClose, items, total }: FacturacionS
             </SheetTitle>
           </SheetHeader>
 
-          <div className="sticky top-0 bg-white/70 backdrop-blur-md z-10">
+          <div className="sticky top-0 bg-white/70 backdrop-blur-md z-10 mt-[-1rem]">
             <div className="flex items-center justify-between p-4">
               <div className="flex items-center gap-2">
                 <SheetClose className="p-2 hover:bg-gray-100 rounded-full">
