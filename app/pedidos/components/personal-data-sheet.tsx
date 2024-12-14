@@ -4,17 +4,18 @@ import { Sheet, SheetContent, SheetHeader, SheetClose, SheetTitle } from "@/comp
 import { ArrowLeft } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { useState } from "react"
-import { useAddresses } from "../../hooks/use-addresses"
+import { useState, useEffect } from "react"
+import { useAddresses, type Address } from "../../hooks/use-addresses"
 
 interface PersonalDataSheetProps {
   isOpen: boolean
   onClose: () => void
   onComplete?: () => void
+  editingAddress?: Address | null
 }
 
-export function PersonalDataSheet({ isOpen, onClose, onComplete }: PersonalDataSheetProps) {
-  const { addAddress } = useAddresses()
+export function PersonalDataSheet({ isOpen, onClose, onComplete, editingAddress }: PersonalDataSheetProps) {
+  const { addAddress, updateAddress } = useAddresses()
   const [formData, setFormData] = useState({
     name: '',
     address: '',
@@ -26,19 +27,40 @@ export function PersonalDataSheet({ isOpen, onClose, onComplete }: PersonalDataS
     email: ''
   })
 
+  useEffect(() => {
+    if (editingAddress) {
+      setFormData({
+        name: editingAddress.name || '',
+        address: editingAddress.address || '',
+        phone: editingAddress.phone || '',
+        nif: editingAddress.nif || '',
+        postalCode: editingAddress.postalCode || '',
+        city: editingAddress.city || '',
+        province: editingAddress.province || '',
+        email: editingAddress.email || ''
+      })
+    }
+  }, [editingAddress])
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    console.log('Intentando guardar nueva dirección:', formData)
+    console.log('Intentando guardar/actualizar dirección:', formData)
     
-    // Validar campos requeridos
-    if (!formData.name || !formData.address || !formData.phone) {
-      alert('Por favor, completa los campos obligatorios')
+    if (!formData.name || !formData.address || !formData.phone || 
+        !formData.nif || !formData.postalCode || !formData.city || 
+        !formData.province || !formData.email) {
+      alert('Por favor, completa todos los campos')
       return
     }
 
     try {
-      const result = addAddress(formData)
-      console.log('Resultado de addAddress:', result)
+      let result
+      if (editingAddress) {
+        result = updateAddress({ ...formData, id: editingAddress.id })
+      } else {
+        result = addAddress(formData)
+      }
+
       if (result) {
         setFormData({ 
           name: '', address: '', phone: '', 
@@ -81,7 +103,7 @@ export function PersonalDataSheet({ isOpen, onClose, onComplete }: PersonalDataS
           <div className="space-y-4">
             <div>
               <label htmlFor="name" className="text-sm font-medium text-gray-700">
-                Nombre Empresa
+                Nombre Empresa *
               </label>
               <Input
                 id="name"
@@ -94,19 +116,20 @@ export function PersonalDataSheet({ isOpen, onClose, onComplete }: PersonalDataS
 
             <div>
               <label htmlFor="nif" className="text-sm font-medium text-gray-700">
-                NIF
+                NIF *
               </label>
               <Input
                 id="nif"
                 placeholder="Ingresa tu NIF"
                 value={formData.nif}
                 onChange={(e) => setFormData({ ...formData, nif: e.target.value })}
+                required
               />
             </div>
 
             <div>
               <label htmlFor="address" className="text-sm font-medium text-gray-700">
-                Dirección
+                Dirección *
               </label>
               <Input
                 id="address"
@@ -119,43 +142,46 @@ export function PersonalDataSheet({ isOpen, onClose, onComplete }: PersonalDataS
 
             <div>
               <label htmlFor="postalCode" className="text-sm font-medium text-gray-700">
-                Código Postal
+                Código Postal *
               </label>
               <Input
                 id="postalCode"
                 placeholder="Ingresa tu código postal"
                 value={formData.postalCode}
                 onChange={(e) => setFormData({ ...formData, postalCode: e.target.value })}
+                required
               />
             </div>
 
             <div>
               <label htmlFor="city" className="text-sm font-medium text-gray-700">
-                Ciudad
+                Ciudad *
               </label>
               <Input
                 id="city"
                 placeholder="Ingresa tu ciudad"
                 value={formData.city}
                 onChange={(e) => setFormData({ ...formData, city: e.target.value })}
+                required
               />
             </div>
 
             <div>
               <label htmlFor="province" className="text-sm font-medium text-gray-700">
-                Provincia
+                Provincia *
               </label>
               <Input
                 id="province"
                 placeholder="Ingresa tu provincia"
                 value={formData.province}
                 onChange={(e) => setFormData({ ...formData, province: e.target.value })}
+                required
               />
             </div>
 
             <div>
               <label htmlFor="phone" className="text-sm font-medium text-gray-700">
-                Teléfono
+                Teléfono *
               </label>
               <Input
                 id="phone"
@@ -169,7 +195,7 @@ export function PersonalDataSheet({ isOpen, onClose, onComplete }: PersonalDataS
 
             <div>
               <label htmlFor="email" className="text-sm font-medium text-gray-700">
-                Email
+                Email *
               </label>
               <Input
                 id="email"
@@ -177,6 +203,7 @@ export function PersonalDataSheet({ isOpen, onClose, onComplete }: PersonalDataS
                 placeholder="Ingresa tu email"
                 value={formData.email}
                 onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                required
               />
             </div>
           </div>

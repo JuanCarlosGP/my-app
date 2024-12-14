@@ -2,7 +2,7 @@
 
 import { Sheet, SheetContent, SheetHeader, SheetClose, SheetTitle } from "@/components/ui/sheet"
 import { VisuallyHidden } from '@radix-ui/react-visually-hidden'
-import { ArrowLeft, Plus, MapPin, Trash2 } from "lucide-react"
+import { ArrowLeft, Plus, MapPin, Trash2, Pencil } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { useState, useEffect } from "react"
 import { PersonalDataSheet } from "./personal-data-sheet"
@@ -16,6 +16,7 @@ interface AddressesListSheetProps {
 
 export function AddressesListSheet({ isOpen, onClose, onAddressSelect }: AddressesListSheetProps) {
   const [isAddingAddress, setIsAddingAddress] = useState(false)
+  const [editingAddress, setEditingAddress] = useState<Address | null>(null)
   const [refreshKey, setRefreshKey] = useState(0)
   const { addresses, selectAddress, deleteAddress, isLoaded, reloadAddresses, getActiveAddress } = useAddresses()
 
@@ -56,12 +57,19 @@ export function AddressesListSheet({ isOpen, onClose, onAddressSelect }: Address
 
   const handlePersonalDataClose = () => {
     setIsAddingAddress(false)
+    setEditingAddress(null)
   }
 
   const handleSheetClose = () => {
     const activeAddress = getActiveAddress()
     onAddressSelect?.(activeAddress)
     onClose()
+  }
+
+  const handleEditAddress = (e: React.MouseEvent, address: Address) => {
+    e.stopPropagation()
+    setEditingAddress(address)
+    setIsAddingAddress(true)
   }
 
   return (
@@ -115,25 +123,33 @@ export function AddressesListSheet({ isOpen, onClose, onAddressSelect }: Address
                 {addresses.map((address) => (
                   <div
                     key={address.id}
-                    className="bg-white p-4 rounded-lg relative"
+                    className="bg-white p-4 rounded-lg relative pr-20 cursor-pointer hover:bg-gray-50"
+                    onClick={() => handleAddressSelect(address)}
                   >
-                    <div 
-                      className="pr-10 cursor-pointer hover:bg-gray-50"
-                      onClick={() => handleAddressSelect(address)}
-                    >
+                    <div>
                       <h3 className="font-medium">{address.name}</h3>
                       <p className="text-sm text-gray-500">{address.address}</p>
                       <p className="text-sm text-gray-500">{address.phone}</p>
                     </div>
                     
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      className="absolute right-2 top-1/2 -translate-y-1/2 text-red-500 hover:text-red-700 hover:bg-red-50"
-                      onClick={(e) => handleDeleteAddress(e, address.id)}
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
+                    <div className="absolute right-2 top-1/2 -translate-y-1/2 flex gap-2">
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="text-blue-500 hover:text-blue-700 hover:bg-blue-50"
+                        onClick={(e) => handleEditAddress(e, address)}
+                      >
+                        <Pencil className="h-4 w-4" />
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="text-red-500 hover:text-red-700 hover:bg-red-50"
+                        onClick={(e) => handleDeleteAddress(e, address.id)}
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    </div>
                   </div>
                 ))}
               </div>
@@ -146,6 +162,7 @@ export function AddressesListSheet({ isOpen, onClose, onAddressSelect }: Address
         isOpen={isAddingAddress}
         onClose={handlePersonalDataClose}
         onComplete={handleNewAddressComplete}
+        editingAddress={editingAddress}
       />
     </>
   )

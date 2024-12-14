@@ -7,6 +7,11 @@ export interface Address {
   name: string
   address: string
   phone: string
+  nif?: string
+  postalCode?: string
+  city?: string
+  province?: string
+  email?: string
 }
 
 export const useAddresses = () => {
@@ -125,6 +130,21 @@ export const useAddresses = () => {
     }
   }, [activeAddressId, getStoredAddresses, saveAddressesToStorage])
 
+  const updateAddress = useCallback((address: Address) => {
+    try {
+      const currentAddresses = getStoredAddresses()
+      const updatedAddresses = currentAddresses.map(addr => 
+        addr.id === address.id ? address : addr
+      )
+      saveAddressesToStorage(updatedAddresses)
+      setAddresses(updatedAddresses)
+      return address
+    } catch (error) {
+      console.error('Error updating address:', error)
+      return null
+    }
+  }, [getStoredAddresses, saveAddressesToStorage])
+
   return {
     addresses,
     addAddress,
@@ -132,6 +152,7 @@ export const useAddresses = () => {
     getActiveAddress,
     deleteAddress,
     isLoaded,
-    reloadAddresses
+    reloadAddresses,
+    updateAddress,
   }
 } 
