@@ -10,9 +10,7 @@ import Link from 'next/link'
 interface RegisterForm {
   email: string
   password: string
-  name: string
-  phone: string
-  wechat_id: string
+  confirmPassword: string
 }
 
 export default function RegisterPage() {
@@ -22,9 +20,7 @@ export default function RegisterPage() {
   const [formData, setFormData] = useState<RegisterForm>({
     email: '',
     password: '',
-    name: '',
-    phone: '',
-    wechat_id: ''
+    confirmPassword: ''
   })
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -40,26 +36,25 @@ export default function RegisterPage() {
     setError(null)
 
     try {
+      if (!formData.email || !formData.password || !formData.confirmPassword) {
+        throw new Error('Todos los campos son obligatorios')
+      }
+
+      if (formData.password !== formData.confirmPassword) {
+        throw new Error('Las contraseñas no coinciden')
+      }
+
       const { data, error } = await supabase.auth.signUp({
         email: formData.email,
         password: formData.password,
         options: {
-          emailRedirectTo: `${window.location.origin}/login`,
-          data: {
-            name: formData.name,
-            phone: formData.phone,
-            wechat_id: formData.wechat_id
-          }
+          emailRedirectTo: `${window.location.origin}/login`
         }
       })
 
-      if (error) {
-        console.error('Error de registro:', error)
-        throw error
-      }
+      if (error) throw error
 
       if (data.user) {
-        console.log('Usuario creado:', data.user)
         alert('Por favor, verifica tu cuenta a través del enlace enviado a tu correo electrónico')
         router.push('/login')
       } else {
@@ -105,27 +100,12 @@ export default function RegisterPage() {
               required
             />
             <Input
-              name="name"
-              type="text"
-              placeholder="Nombre completo"
-              value={formData.name}
+              name="confirmPassword"
+              type="password"
+              placeholder="Confirmar contraseña"
+              value={formData.confirmPassword}
               onChange={handleChange}
               required
-            />
-            <Input
-              name="phone"
-              type="tel"
-              placeholder="Teléfono"
-              value={formData.phone}
-              onChange={handleChange}
-              required
-            />
-            <Input
-              name="wechat_id"
-              type="text"
-              placeholder="WeChat ID (opcional)"
-              value={formData.wechat_id}
-              onChange={handleChange}
             />
           </div>
 

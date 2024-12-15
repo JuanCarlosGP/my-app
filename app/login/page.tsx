@@ -28,14 +28,11 @@ export default function LoginPage() {
       if (error) throw error
 
       if (data.user) {
-        console.log('Login exitoso:', data.user)
-        // Forzar la redirección
         window.location.href = '/'
       } else {
         throw new Error('No se pudo iniciar sesión')
       }
     } catch (err: unknown) {
-      console.error('Error en login:', err)
       setError(err instanceof Error ? err.message : 'Error al iniciar sesión')
     } finally {
       setLoading(false)
