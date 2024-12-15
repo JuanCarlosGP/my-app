@@ -1,52 +1,36 @@
-import { createClientComponentClient } from '@supabase/auth-helpers-nextjs'
+import { createClient } from '@supabase/supabase-js'
+import { type Session } from '@supabase/supabase-js'
 
-export const supabase = createClientComponentClient()
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
+const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
 
-export interface Profile {
-  id: string
-  phone: string
-  name: string
-  wechat_id: string
-  created_at: string
-}
+export const supabase = createClient(supabaseUrl, supabaseKey)
 
-export async function signUp(email: string, password: string, phone: string, name: string, wechat_id: string) {
-  const { data: authData, error: authError } = await supabase.auth.signUp({
-    email,
-    password,
-  })
+export type { Session }
 
-  if (authError) throw authError
-
-  if (authData.user) {
-    const { error: profileError } = await supabase
-      .from('profiles')
-      .insert([
-        {
-          id: authData.user.id,
-          phone,
-          name,
-          wechat_id
-        }
-      ])
-
-    if (profileError) throw profileError
+export async function getSession(): Promise<Session | null> {
+  const { data: { session }, error } = await supabase.auth.getSession()
+  if (error) {
+    console.error('Error getting session:', error)
+    return null
   }
-
-  return authData
-}
-
-export async function signIn(email: string, password: string) {
-  const { data, error } = await supabase.auth.signInWithPassword({
-    email,
-    password
-  })
-  
-  if (error) throw error
-  return data
+  return session
 }
 
 export async function signOut() {
   const { error } = await supabase.auth.signOut()
-  if (error) throw error
+  if (error) {
+    console.error('Error signing out:', error)
+    throw error
+  }
+  window.location.href = '/login'
+}
+
+export async function getUser() {
+  const { data: { user }, error } = await supabase.auth.getUser()
+  if (error) {
+    console.error('Error getting user:', error)
+    return null
+  }
+  return user
 } 

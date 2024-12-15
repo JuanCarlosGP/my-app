@@ -1,6 +1,6 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
-import { Product } from '@/app/data/stores'
+import { Product } from "@/app/lib/db"
 
 export interface CartItem {
   id: string
@@ -37,10 +37,10 @@ export const useCart = create<CartStore>()(
         set((state) => {
           const existingQuantity = state.productQuantities[product.id] || 0
           const newQuantity = existingQuantity + quantity
-          const storeId = product.id.split('-')[1]
+          const storeId = product.store_id
 
-          const unitsPerPackage = product.unitsPerPackage
-          const unitsPerBox = product.unitsPerBox
+          const unitsPerPackage = product.units_per_package
+          const unitsPerBox = product.units_per_box
           
           const packages = Math.floor(newQuantity / unitsPerPackage)
           const boxes = Math.floor(newQuantity / unitsPerBox)
@@ -57,8 +57,8 @@ export const useCart = create<CartStore>()(
                       note: note || item.note,
                       unitsPerPackage,
                       unitsPerBox,
-                      storeId: item.id.split('-')[1],
-                      storeName: product.storeName
+                      storeId: product.store_id,
+                      storeName: product.store_id
                     }
                   : item
               )
@@ -72,9 +72,9 @@ export const useCart = create<CartStore>()(
                 note,
                 unitsPerPackage,
                 unitsPerBox,
-                image: product.imageUrl,
-                storeId: product.id.split('-')[1],
-                storeName: product.storeName || 'Tienda'
+                image: product.image_url || '',
+                storeId: product.store_id,
+                storeName: product.store_id || 'Tienda'
               }]
 
           return {
@@ -93,8 +93,8 @@ export const useCart = create<CartStore>()(
           const existingQuantity = state.productQuantities[product.id] || 0
           const newQuantity = Math.max(0, existingQuantity - quantity)
           
-          const unitsPerPackage = product.unitsPerPackage || 12
-          const unitsPerBox = product.unitsPerBox || 48
+          const unitsPerPackage = product.units_per_package || 12
+          const unitsPerBox = product.units_per_box || 48
           
           const packages = Math.floor(newQuantity / unitsPerPackage)
           const boxes = Math.floor(newQuantity / unitsPerBox)

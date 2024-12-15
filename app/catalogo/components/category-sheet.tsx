@@ -7,7 +7,7 @@ import { ArrowLeft, Search, Plus, Minus } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
 import Image from 'next/image'
 import { useState, useEffect } from 'react'
-import { getCategoryProducts, Product } from "@/app/data/stores"
+import { getCategoryProducts, type Product } from "@/app/lib/db"
 import { useParams } from 'next/navigation'
 import { useCart } from "@/hooks/use-cart"
 import { ProductSheet } from "./product-sheet"
@@ -27,10 +27,22 @@ export function CategorySheet({ id, name, description, subdescription, imageUrl 
   const [products, setProducts] = useState<Product[]>([])
   const { productQuantities, addToCart, removeFromCart } = useCart()
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null)
+  const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    const categoryProducts = getCategoryProducts(storeId, id)
-    setProducts(categoryProducts)
+    async function loadProducts() {
+      try {
+        const categoryProducts = await getCategoryProducts(storeId, id)
+        setProducts(categoryProducts)
+      } catch (error) {
+        console.error('Error loading products:', error)
+        toast.error('Error al cargar los productos')
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    loadProducts()
   }, [storeId, id])
 
   const handleProductClick = (e: React.MouseEvent, product: Product) => {
@@ -82,7 +94,11 @@ export function CategorySheet({ id, name, description, subdescription, imageUrl 
         </div>
         
         <div className="grid grid-cols-2 gap-2 m-1 mt-4">
-          {products.map((product) => (
+          {loading ? (
+            <div className="col-span-2 text-center py-10">Cargando productos...</div>
+          ) : products.length === 0 ? (
+            <div className="col-span-2 text-center py-10">No hay productos en esta categoría</div>
+          ) : products.map((product) => (
             <div 
               key={product.id} 
               className="flex flex-col bg-white rounded-lg mb-3"
@@ -98,7 +114,7 @@ export function CategorySheet({ id, name, description, subdescription, imageUrl 
                   </Badge>
                 )}
                 <Image
-                  src={product.imageUrl}
+                  src={product.image_url || ''}
                   alt={product.name}
                   fill
                   className="rounded-lg object-cover"
@@ -118,7 +134,7 @@ export function CategorySheet({ id, name, description, subdescription, imageUrl 
                         className="p-2.5 bg-gray-100 rounded-full transition-transform active:scale-90 hover:bg-gray-200"
                         onClick={(e) => {
                           e.preventDefault();
-                          removeFromCart(product, product.unitsPerPackage);
+                          removeFromCart(product, product.units_per_package);
                         }}
                       >
                         <Minus className="w-5 h-5 text-red-600" />
@@ -128,7 +144,7 @@ export function CategorySheet({ id, name, description, subdescription, imageUrl 
                       className="p-2.5 bg-gray-100 rounded-full transition-transform active:scale-90 hover:bg-gray-200"
                       onClick={(e) => {
                         e.preventDefault();
-                        addToCart(product, product.unitsPerPackage);
+                        addToCart(product, product.units_per_package);
                       }}
                     >
                       <Plus className="w-5 h-5 text-green-600" />
@@ -136,7 +152,7 @@ export function CategorySheet({ id, name, description, subdescription, imageUrl 
                   </div>
                 </div>
                 <span className="text-sm text-gray-500">
-                  {product.unitsPerPackage}u/pack ({product.unitsPerBox} u/caja)
+                  {product.units_per_package}u/pack ({product.units_per_box} u/caja)
                 </span>
               </div>
             </div>

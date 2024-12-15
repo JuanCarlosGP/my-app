@@ -5,7 +5,7 @@ import { ArrowLeft, Plus, Minus } from "lucide-react"
 import Image from 'next/image'
 import { Badge } from "@/components/ui/badge"
 import { useCart } from "@/hooks/use-cart"
-import { Product } from "@/app/data/stores"
+import { Product } from "@/app/lib/db"
 import { useState } from 'react'
 import { Textarea } from "@/components/ui/textarea"
 import { Button } from "@/components/ui/button"
@@ -81,7 +81,7 @@ export function ProductSheet({ isOpen, onClose, product }: ProductSheetProps) {
               </Badge>
             )}
             <Image
-              src={product.image || product.imageUrl}
+              src={product.image_url || ''}
               alt={product.name}
               fill
               className="rounded-lg object-cover"
@@ -105,20 +105,20 @@ export function ProductSheet({ isOpen, onClose, product }: ProductSheetProps) {
                   <div className="flex flex-col gap-2 w-full">
                     <button 
                       className="w-full py-2 px-4 bg-blue-50 hover:bg-blue-100 rounded-lg flex items-center justify-between"
-                      onClick={() => addToCart(product, product.unitsPerPackage)}
+                      onClick={() => addToCart(product, product.units_per_package)}
                     >
                       <Plus className="w-5 h-5 text-green-600" />
                       <span className="text-sm font-medium min-w-[60px] text-right">
-                        {product.unitsPerPackage} uds.
+                        {product.units_per_package} uds.
                       </span>
                     </button>
                     <button 
                       className="w-full py-2 px-4 bg-blue-50 hover:bg-blue-100 rounded-lg flex items-center justify-between"
-                      onClick={() => removeFromCart(product, product.unitsPerPackage)}
+                      onClick={() => removeFromCart(product, product.units_per_package)}
                     >
                       <Minus className="w-5 h-5 text-red-600" />
                       <span className="text-sm font-medium min-w-[60px] text-right">
-                        {product.unitsPerPackage} uds.
+                        {product.units_per_package} uds.
                       </span>
                     </button>
                   </div>
@@ -129,20 +129,20 @@ export function ProductSheet({ isOpen, onClose, product }: ProductSheetProps) {
                   <div className="flex flex-col gap-2 w-full">
                     <button 
                       className="w-full py-2 px-4 bg-blue-50 hover:bg-blue-100 rounded-lg flex items-center justify-between"
-                      onClick={() => addToCart(product, product.unitsPerBox)}
+                      onClick={() => addToCart(product, product.units_per_box)}
                     >
                       <Plus className="w-5 h-5 text-green-600" />
                       <span className="text-sm font-medium min-w-[60px] text-right">
-                        {product.unitsPerBox} uds.
+                        {product.units_per_box} uds.
                       </span>
                     </button>
                     <button 
                       className="w-full py-2 px-4 bg-blue-50 hover:bg-blue-100 rounded-lg flex items-center justify-between"
-                      onClick={() => removeFromCart(product, product.unitsPerBox)}
+                      onClick={() => removeFromCart(product, product.units_per_box)}
                     >
                       <Minus className="w-5 h-5 text-red-600" />
                       <span className="text-sm font-medium min-w-[60px] text-right">
-                        {product.unitsPerBox} uds.
+                        {product.units_per_box} uds.
                       </span>
                     </button>
                   </div>
@@ -166,11 +166,11 @@ export function ProductSheet({ isOpen, onClose, product }: ProductSheetProps) {
               <div className="flex items-center justify-start whitespace-nowrap text-sm overflow-x-auto">
                 <div className="inline-flex items-center mr-4">
                   <span className="text-gray-600 mr-1">Pack:</span>
-                  <span className="font-medium">{product.unitsPerPackage || 'N/A'}</span>
+                  <span className="font-medium">{product.units_per_package || 'N/A'}</span>
                 </div>
                 <div className="inline-flex items-center">
                   <span className="text-gray-600 mr-1">Cajas:</span>
-                  <span className="font-medium">{product.unitsPerBox}</span>
+                  <span className="font-medium">{product.units_per_box}</span>
                 </div>
               </div>
             </div>

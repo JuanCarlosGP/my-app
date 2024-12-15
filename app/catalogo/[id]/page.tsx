@@ -8,7 +8,7 @@ import { NewProductsSheet } from "../components/new-products-sheet";
 import { SearchSheet } from "../components/search-sheet";
 import { PromotionsSheet } from "../components/promotions-sheet";
 import { CategorySheet } from "../components/category-sheet";
-import { getStoreById, Store } from "@/app/data/stores";
+import { getStoreById, type Store } from "@/app/lib/db";
 import { SearchProvider } from '@/app/context/search-context'
 
 export default function CatalogoPage({ params }: { params: { id: string } }) {
@@ -16,16 +16,20 @@ export default function CatalogoPage({ params }: { params: { id: string } }) {
   const [store, setStore] = useState<Store | null>(null);
 
   useEffect(() => {
-    const storeData = getStoreById(params.id);
-    if (storeData) {
-      setStore(storeData);
-      localStorage.setItem("lastViewedCatalog", JSON.stringify({
-        ...storeData,
-        storeId: params.id
-      }));
-    } else {
-      router.push('/catalogo');
+    async function loadStore() {
+      const storeData = await getStoreById(params.id);
+      if (storeData) {
+        setStore(storeData);
+        localStorage.setItem("lastViewedCatalog", JSON.stringify({
+          ...storeData,
+          storeId: params.id
+        }));
+      } else {
+        router.push('/catalogo');
+      }
     }
+
+    loadStore();
   }, [params.id, router]);
 
   if (!store) {
@@ -42,7 +46,7 @@ export default function CatalogoPage({ params }: { params: { id: string } }) {
         {/* Banner publicitario */}
         <div className="px-4 mx-auto max-w-5xl">
           <img
-            src={store.bannerImage}
+            src={store.banner_image || ''}
             alt="Banner publicitario"
             className="w-full h-[48vw] md:h-60 object-cover rounded-lg mb-6"
           />
@@ -57,14 +61,14 @@ export default function CatalogoPage({ params }: { params: { id: string } }) {
         
         {/* Categorías */}
         <div className="max-w-3xl mx-auto pb-20">
-          {store.categories.map((category) => (
+          {store.categories?.map((category) => (
             <CategorySheet
               key={category.id}
               id={category.id}
               name={category.name}
-              description={category.description}
-              subdescription={category.subdescription}
-              imageUrl={category.imageUrl}
+              description={category.description || ''}
+              subdescription={category.subdescription || ''}
+              imageUrl={category.image_url || ''}
             />
           ))}
         </div>

@@ -18,6 +18,7 @@ export default function TiendaPage() {
     async function loadStores() {
       try {
         const storesData = await getStores()
+        console.log('Stores data:', storesData)
         setStores(storesData)
       } catch (error) {
         console.error('Error loading stores:', error)
@@ -71,9 +72,9 @@ export default function TiendaPage() {
             key={store.id}
             id={store.id}
             name={store.name}
-            description={store.description}
-            subdescription={store.subdescription}
-            imageUrl={store.image_url}
+            description={store.description || ''}
+            subdescription={store.subdescription || ''}
+            imageUrl={store.image_url || ''}
           />
         ))}
       </div>
