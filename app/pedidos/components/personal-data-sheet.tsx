@@ -5,252 +5,300 @@ import { ArrowLeft } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { useState, useEffect } from "react"
-import { useAddresses, type Address } from "../../hooks/use-addresses"
 import { supabase } from '@/app/lib/supabase'
+import { useAuth } from '@/app/providers/auth-provider'
+import { toast } from "react-hot-toast"
+import { z } from "zod"
+import { useForm } from "react-hook-form"
+import { zodResolver } from "@hookform/resolvers/zod"
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
+
+const addressFormSchema = z.object({
+  company_name: z.string().min(2, "El nombre de la empresa debe tener al menos 2 caracteres"),
+  address: z.string().min(5, "La dirección debe tener al menos 5 caracteres"),
+  phone: z.string().min(9, "El teléfono debe tener al menos 9 dígitos"),
+  nif: z.string().min(9, "El NIF debe tener 9 caracteres"),
+  postal_code: z.string().min(5, "El código postal debe tener 5 dígitos"),
+  city: z.string().min(2, "La ciudad debe tener al menos 2 caracteres"),
+  province: z.string().min(2, "La provincia debe tener al menos 2 caracteres"),
+  email: z.string().email("Email no válido")
+})
+
+type AddressFormValues = z.infer<typeof addressFormSchema>
 
 interface PersonalDataSheetProps {
   isOpen: boolean
   onClose: () => void
   onComplete?: () => void
-  editingAddress?: Address | null
+  editingAddressId?: string | null
 }
 
-export function PersonalDataSheet({ isOpen, onClose, onComplete, editingAddress }: PersonalDataSheetProps) {
-  const { addAddress, updateAddress } = useAddresses()
-  const [formData, setFormData] = useState({
-    name: '',
-    address: '',
-    phone: '',
-    nif: '',
-    postalCode: '',
-    city: '',
-    province: '',
-    email: ''
+export function PersonalDataSheet({ isOpen, onClose, onComplete, editingAddressId }: PersonalDataSheetProps) {
+  const { session } = useAuth()
+  const [loading, setLoading] = useState(true)
+
+  const form = useForm<AddressFormValues>({
+    resolver: zodResolver(addressFormSchema),
+    defaultValues: {
+      company_name: "",
+      address: "",
+      phone: "",
+      nif: "",
+      postal_code: "",
+      city: "",
+      province: "",
+      email: ""
+    }
   })
 
+  // Cargar datos si estamos editando una dirección existente
   useEffect(() => {
-    if (editingAddress) {
-      setFormData({
-        name: editingAddress.name || '',
-        address: editingAddress.address || '',
-        phone: editingAddress.phone || '',
-        nif: editingAddress.nif || '',
-        postalCode: editingAddress.postalCode || '',
-        city: editingAddress.city || '',
-        province: editingAddress.province || '',
-        email: editingAddress.email || ''
-      })
-    }
-  }, [editingAddress])
+    async function loadAddress() {
+      if (session?.user?.id && editingAddressId) {
+        setLoading(true)
+        try {
+          const { data, error } = await supabase
+            .from('addresses')
+            .select('*')
+            .eq('id', editingAddressId)
+            .eq('profile_id', session.user.id)
+            .single()
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    
-    if (!formData.name || !formData.address || !formData.phone || 
-        !formData.nif || !formData.postalCode || !formData.city || 
-        !formData.province || !formData.email) {
-      alert('Por favor, completa todos los campos')
+          if (error) throw error
+
+          if (data) {
+            form.reset({
+              company_name: data.company_name || "",
+              address: data.address || "",
+              phone: data.phone || "",
+              nif: data.nif || "",
+              postal_code: data.postal_code || "",
+              city: data.city || "",
+              province: data.province || "",
+              email: data.email || ""
+            })
+          }
+        } catch (error) {
+          console.error('Error cargando dirección:', error)
+          toast.error('Error al cargar la dirección')
+        } finally {
+          setLoading(false)
+        }
+      } else {
+        setLoading(false)
+      }
+    }
+
+    if (isOpen) {
+      loadAddress()
+    }
+  }, [session?.user?.id, editingAddressId, form, isOpen])
+
+  async function onSubmit(data: AddressFormValues) {
+    if (!session?.user?.id) {
+      toast.error('Debes iniciar sesión')
       return
     }
 
     try {
-      if (editingAddress) {
+      if (editingAddressId) {
         // Actualizar dirección existente
         const { error } = await supabase
           .from('addresses')
           .update({
-            name: formData.name,
-            address: formData.address,
-            phone: formData.phone,
-            nif: formData.nif,
-            postal_code: formData.postalCode,
-            city: formData.city,
-            province: formData.province,
-            email: formData.email
+            company_name: data.company_name,
+            address: data.address,
+            phone: data.phone,
+            nif: data.nif,
+            postal_code: data.postal_code,
+            city: data.city,
+            province: data.province,
+            email: data.email
           })
-          .eq('id', editingAddress.id)
+          .eq('id', editingAddressId)
+          .eq('profile_id', session.user.id)
 
         if (error) throw error
+        toast.success('Dirección actualizada correctamente')
       } else {
-        // Insertar nueva dirección
+        // Crear nueva dirección
         const { error } = await supabase
           .from('addresses')
-          .insert([{
-            name: formData.name,
-            address: formData.address,
-            phone: formData.phone,
-            nif: formData.nif,
-            postal_code: formData.postalCode,
-            city: formData.city,
-            province: formData.province,
-            email: formData.email
-          }])
+          .insert({
+            profile_id: session.user.id,
+            company_name: data.company_name,
+            address: data.address,
+            phone: data.phone,
+            nif: data.nif,
+            postal_code: data.postal_code,
+            city: data.city,
+            province: data.province,
+            email: data.email
+          })
 
         if (error) throw error
+        toast.success('Dirección guardada correctamente')
       }
 
-      setFormData({ 
-        name: '', address: '', phone: '', 
-        nif: '', postalCode: '', city: '', 
-        province: '', email: '' 
-      })
       onComplete?.()
       onClose()
     } catch (error) {
       console.error('Error al guardar la dirección:', error)
-      alert('Ocurrió un error al guardar la dirección')
-    }
-  }
-
-  const saveData = async (data: any) => {
-    try {
-      const { data: result, error } = await supabase
-        .from('your_table_name')
-        .insert([data])
-        
-      if (error) throw error
-      
-      return result
-    } catch (error) {
-      console.error('Error:', error)
-      throw error
+      toast.error('Error al guardar la dirección')
     }
   }
 
   return (
     <Sheet open={isOpen} onOpenChange={onClose}>
       <SheetContent className="w-full sm:max-w-md bg-[#f5f5f5] p-0">
-        <SheetHeader>
-          <SheetTitle className="sr-only">Datos Personales</SheetTitle>
-        </SheetHeader>
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(onSubmit)} className="h-full flex flex-col">
+            <SheetHeader>
+              <div className="sticky top-0 bg-white/70 backdrop-blur-md z-10">
+                <div className="flex items-center justify-between p-4">
+                  <div className="flex items-center gap-2">
+                    <SheetClose className="p-2 hover:bg-gray-100 rounded-full">
+                      <ArrowLeft className="h-6 w-6" />
+                    </SheetClose>
+                  </div>
+                  
+                  <SheetTitle className="font-semibold text-lg absolute left-1/2 -translate-x-1/2">
+                    {editingAddressId ? 'Editar Dirección' : 'Nueva Dirección'}
+                  </SheetTitle>
+                </div>
+              </div>
+            </SheetHeader>
 
-        <div className="sticky top-0 bg-white/70 backdrop-blur-md z-10">
-          <div className="flex items-center justify-between p-4">
-            <div className="flex items-center gap-2">
-              <SheetClose className="p-2 hover:bg-gray-100 rounded-full">
-                <ArrowLeft className="h-6 w-6" />
-              </SheetClose>
+            {loading ? (
+              <div className="flex-1 flex items-center justify-center">
+                <div className="w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full animate-spin" />
+              </div>
+            ) : (
+              <div className="flex-1 overflow-y-auto">
+                <div className="p-4 space-y-4">
+                  {/* Campos del formulario */}
+                  <FormField
+                    control={form.control}
+                    name="company_name"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Nombre Empresa *</FormLabel>
+                        <FormControl>
+                          <Input {...field} placeholder="Nombre de la empresa" />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={form.control}
+                    name="nif"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>NIF *</FormLabel>
+                        <FormControl>
+                          <Input {...field} placeholder="NIF de la empresa" />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={form.control}
+                    name="address"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Dirección *</FormLabel>
+                        <FormControl>
+                          <Input {...field} placeholder="Dirección completa" />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={form.control}
+                    name="postal_code"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Código Postal *</FormLabel>
+                        <FormControl>
+                          <Input {...field} placeholder="Código postal" />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={form.control}
+                    name="city"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Ciudad *</FormLabel>
+                        <FormControl>
+                          <Input {...field} placeholder="Ciudad" />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={form.control}
+                    name="province"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Provincia *</FormLabel>
+                        <FormControl>
+                          <Input {...field} placeholder="Provincia" />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={form.control}
+                    name="phone"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Teléfono *</FormLabel>
+                        <FormControl>
+                          <Input {...field} type="tel" placeholder="Número de teléfono" />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={form.control}
+                    name="email"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Email *</FormLabel>
+                        <FormControl>
+                          <Input {...field} type="email" placeholder="Email de contacto" />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+              </div>
+            )}
+
+            <div className="p-4 mt-auto">
+              <Button type="submit" className="w-full" disabled={loading}>
+                {editingAddressId ? 'Guardar cambios' : 'Añadir dirección'}
+              </Button>
             </div>
-            
-            <h2 className="font-semibold text-lg absolute left-1/2 -translate-x-1/2">
-              Datos Personales
-            </h2>
-          </div>
-        </div>
-
-        <form onSubmit={handleSubmit} className="p-4 space-y-6">
-          <div className="space-y-4">
-            <div>
-              <label htmlFor="name" className="text-sm font-medium text-gray-700">
-                Nombre Empresa *
-              </label>
-              <Input
-                id="name"
-                placeholder="Ingresa tu nombre de empresa" 
-                value={formData.name}
-                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                required
-              />
-            </div>
-
-            <div>
-              <label htmlFor="nif" className="text-sm font-medium text-gray-700">
-                NIF *
-              </label>
-              <Input
-                id="nif"
-                placeholder="Ingresa tu NIF"
-                value={formData.nif}
-                onChange={(e) => setFormData({ ...formData, nif: e.target.value })}
-                required
-              />
-            </div>
-
-            <div>
-              <label htmlFor="address" className="text-sm font-medium text-gray-700">
-                Dirección *
-              </label>
-              <Input
-                id="address"
-                placeholder="Ingresa tu dirección"
-                value={formData.address}
-                onChange={(e) => setFormData({ ...formData, address: e.target.value })}
-                required
-              />
-            </div>
-
-            <div>
-              <label htmlFor="postalCode" className="text-sm font-medium text-gray-700">
-                Código Postal *
-              </label>
-              <Input
-                id="postalCode"
-                placeholder="Ingresa tu código postal"
-                value={formData.postalCode}
-                onChange={(e) => setFormData({ ...formData, postalCode: e.target.value })}
-                required
-              />
-            </div>
-
-            <div>
-              <label htmlFor="city" className="text-sm font-medium text-gray-700">
-                Ciudad *
-              </label>
-              <Input
-                id="city"
-                placeholder="Ingresa tu ciudad"
-                value={formData.city}
-                onChange={(e) => setFormData({ ...formData, city: e.target.value })}
-                required
-              />
-            </div>
-
-            <div>
-              <label htmlFor="province" className="text-sm font-medium text-gray-700">
-                Provincia *
-              </label>
-              <Input
-                id="province"
-                placeholder="Ingresa tu provincia"
-                value={formData.province}
-                onChange={(e) => setFormData({ ...formData, province: e.target.value })}
-                required
-              />
-            </div>
-
-            <div>
-              <label htmlFor="phone" className="text-sm font-medium text-gray-700">
-                Teléfono *
-              </label>
-              <Input
-                id="phone"
-                type="tel"
-                placeholder="Ingresa tu número de teléfono"
-                value={formData.phone}
-                onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                required
-              />
-            </div>
-
-            <div>
-              <label htmlFor="email" className="text-sm font-medium text-gray-700">
-                Email *
-              </label>
-              <Input
-                id="email"
-                type="email"
-                placeholder="Ingresa tu email"
-                value={formData.email}
-                onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                required
-              />
-            </div>
-          </div>
-
-          <Button type="submit" className="w-full">
-            Guardar cambios
-          </Button>
-        </form>
+          </form>
+        </Form>
       </SheetContent>
     </Sheet>
   )
