@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { useState, useEffect } from "react"
 import { useAddresses, type Address } from "../../hooks/use-addresses"
+import { supabase } from '@/app/lib/supabase'
 
 interface PersonalDataSheetProps {
   isOpen: boolean
@@ -44,7 +45,6 @@ export function PersonalDataSheet({ isOpen, onClose, onComplete, editingAddress 
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    console.log('Intentando guardar/actualizar dirección:', formData)
     
     if (!formData.name || !formData.address || !formData.phone || 
         !formData.nif || !formData.postalCode || !formData.city || 
@@ -54,27 +54,66 @@ export function PersonalDataSheet({ isOpen, onClose, onComplete, editingAddress 
     }
 
     try {
-      let result
       if (editingAddress) {
-        result = updateAddress({ ...formData, id: editingAddress.id })
+        // Actualizar dirección existente
+        const { error } = await supabase
+          .from('addresses')
+          .update({
+            name: formData.name,
+            address: formData.address,
+            phone: formData.phone,
+            nif: formData.nif,
+            postal_code: formData.postalCode,
+            city: formData.city,
+            province: formData.province,
+            email: formData.email
+          })
+          .eq('id', editingAddress.id)
+
+        if (error) throw error
       } else {
-        result = addAddress(formData)
+        // Insertar nueva dirección
+        const { error } = await supabase
+          .from('addresses')
+          .insert([{
+            name: formData.name,
+            address: formData.address,
+            phone: formData.phone,
+            nif: formData.nif,
+            postal_code: formData.postalCode,
+            city: formData.city,
+            province: formData.province,
+            email: formData.email
+          }])
+
+        if (error) throw error
       }
 
-      if (result) {
-        setFormData({ 
-          name: '', address: '', phone: '', 
-          nif: '', postalCode: '', city: '', 
-          province: '', email: '' 
-        })
-        onComplete?.()
-        onClose()
-      } else {
-        alert('Error al guardar la dirección')
-      }
+      setFormData({ 
+        name: '', address: '', phone: '', 
+        nif: '', postalCode: '', city: '', 
+        province: '', email: '' 
+      })
+      onComplete?.()
+      onClose()
     } catch (error) {
       console.error('Error al guardar la dirección:', error)
       alert('Ocurrió un error al guardar la dirección')
+    }
+  }
+
+  const saveData = async (data: any) => {
+    try {
+      const { data: result, error } = await supabase
+        .from('your_table_name')
+        .insert([data])
+        
+      if (error) throw error
+      
+      return result
+    } catch (error) {
+      console.error('Error:', error)
+      throw error
     }
   }
 

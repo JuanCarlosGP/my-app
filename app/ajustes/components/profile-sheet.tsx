@@ -28,6 +28,7 @@ const profileFormSchema = z.object({
   password: z.string().min(6, {
     message: "La contraseña debe tener al menos 6 caracteres.",
   }),
+  wechat_id: z.string().optional(),
 })
 
 type ProfileFormValues = z.infer<typeof profileFormSchema>
@@ -44,6 +45,7 @@ export function ProfileSheet({ isOpen, onOpenChange, phoneNumber }: ProfileSheet
     defaultValues: {
       name: "",
       password: "",
+      wechat_id: "",
     },
   })
 
@@ -83,6 +85,28 @@ export function ProfileSheet({ isOpen, onOpenChange, phoneNumber }: ProfileSheet
                         <FormControl>
                           <Input 
                             placeholder="Tu nombre"
+                            className="bg-white border-gray-200"
+                            {...field}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </div>
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="wechat_id"
+                  render={({ field }) => (
+                    <FormItem className="grid grid-cols-4 items-center gap-4">
+                      <FormLabel className="text-right text-gray-700">
+                        WeChat ID
+                      </FormLabel>
+                      <div className="col-span-3">
+                        <FormControl>
+                          <Input 
+                            placeholder="Tu WeChat ID"
                             className="bg-white border-gray-200"
                             {...field}
                           />
