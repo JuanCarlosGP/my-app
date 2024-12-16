@@ -41,9 +41,10 @@ interface ProfileSheetProps {
   isOpen: boolean
   onOpenChange: (open: boolean) => void
   phoneNumber: string
+  onProfileUpdate: () => Promise<void>
 }
 
-export function ProfileSheet({ isOpen, onOpenChange, phoneNumber }: ProfileSheetProps) {
+export function ProfileSheet({ isOpen, onOpenChange, phoneNumber, onProfileUpdate }: ProfileSheetProps) {
   const { session } = useAuth()
   const [loading, setLoading] = useState(true)
   const form = useForm<ProfileFormValues>({
@@ -112,6 +113,7 @@ export function ProfileSheet({ isOpen, onOpenChange, phoneNumber }: ProfileSheet
         throw error
       }
 
+      await onProfileUpdate()
       toast.success('Perfil actualizado correctamente')
       onOpenChange(false)
     } catch (error) {

@@ -105,14 +105,33 @@ export default function AjustesPage() {
         const { data: { user } } = await supabase.auth.getUser()
         
         if (user) {
-          const { data: profile, error } = await supabase
+          const { data: existingProfile, error: fetchError } = await supabase
             .from('profiles')
             .select('*')
             .eq('id', user.id)
-            .single()
+            .maybeSingle()
 
-          if (error) throw error
-          setProfile(profile)
+          if (fetchError) throw fetchError
+
+          if (!existingProfile) {
+            const { data: newProfile, error: createError } = await supabase
+              .from('profiles')
+              .insert([
+                { 
+                  id: user.id,
+                  name: user.email?.split('@')[0] || 'Usuario',
+                  phone: null,
+                  wechat_id: null
+                }
+              ])
+              .select()
+              .single()
+
+            if (createError) throw createError
+            setProfile(newProfile)
+          } else {
+            setProfile(existingProfile)
+          }
         }
       } catch (error) {
         console.error('Error loading profile:', error)
@@ -123,6 +142,25 @@ export default function AjustesPage() {
 
     loadProfile()
   }, [])
+
+  const refreshProfile = async () => {
+    try {
+      const { data: { user } } = await supabase.auth.getUser()
+      
+      if (user) {
+        const { data: profile, error } = await supabase
+          .from('profiles')
+          .select('*')
+          .eq('id', user.id)
+          .single()
+
+        if (error) throw error
+        setProfile(profile)
+      }
+    } catch (error) {
+      console.error('Error refreshing profile:', error)
+    }
+  }
 
   if (loading) return <LoadingSpinner />
 
@@ -241,6 +279,7 @@ export default function AjustesPage() {
         isOpen={isProfileSheetOpen}
         onOpenChange={setIsProfileSheetOpen}
         phoneNumber={profile?.phone || 'No disponible'}
+        onProfileUpdate={refreshProfile}
       />
 
       <AddressesListSheet
