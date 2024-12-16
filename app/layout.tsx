@@ -19,16 +19,15 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="es">
-      <body className={inter.className + " bg-[#f5f5f5] min-h-screen"}>
-        <Toaster position="top-center" />
+    <html lang="en">
+      <body className={inter.className}>
         <AuthProvider>
           <CartProvider>
-            <main className="mx-auto mb-[120px]">
+            <main className="pb-[3.75rem]">
               {children}
             </main>
+            <BottomNav />
           </CartProvider>
-          <BottomNav />
         </AuthProvider>
       </body>
     </html>

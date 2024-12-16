@@ -142,7 +142,7 @@ export default function AjustesPage() {
   }
 
   return (
-    <div className="bg-gray-50 min-h-screen pb-20">
+    <div className="bg-gray-50 min-h-screen pb-10">
       <div className="max-w-2xl mx-auto">
         <div className="bg-white p-6 mb-6 flex items-center gap-4">
           <Avatar className="w-16 h-16">
@@ -224,7 +224,7 @@ export default function AjustesPage() {
             />
           </MenuSection>
 
-          <Card className="mt-6">
+          <Card>
             <CardContent className="p-0">
               <MenuItem
                 icon={LogOut}
