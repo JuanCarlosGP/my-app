@@ -38,21 +38,31 @@ export function StoreAccessForm() {
 
     setIsLoading(true)
     try {
+      console.log('Enviando datos:', {
+        userId: session.user.id,
+        code: values.code,
+        pin: values.pin
+      })
+
       const result = await linkStoreToProfile(
         session.user.id,
         values.code,
         values.pin
       )
 
+      console.log('Resultado:', result)
+
       if (result.success) {
         toast.success(result.message)
         form.reset()
-        // Opcional: recargar la lista de tiendas
-        window.location.reload()
+        setTimeout(() => {
+          window.location.reload()
+        }, 1000)
       } else {
         toast.error(result.message)
       }
     } catch (error) {
+      console.error('Error en formulario:', error)
       toast.error('Error al vincular la tienda')
     } finally {
       setIsLoading(false)
@@ -74,7 +84,7 @@ export function StoreAccessForm() {
           <SheetTitle className="text-center">Acceder a proveedor</SheetTitle>
         </SheetHeader>
         <Form {...form}>
-          <form className="space-y-4 mt-4">
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 mt-4">
             <FormField
               control={form.control}
               name="code"

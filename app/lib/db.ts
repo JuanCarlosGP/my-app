@@ -38,8 +38,12 @@ interface ProfileStore {
   store: Store
 }
 
+interface StoreResponse {
+  store: Store
+}
+
 export async function getStores(): Promise<Store[]> {
-  const { data: profileStores, error: profileStoresError } = await supabase
+  const { data, error } = await supabase
     .from('profile_stores')
     .select(`
       store:stores (
@@ -48,18 +52,33 @@ export async function getStores(): Promise<Store[]> {
         description,
         subdescription,
         image_url,
-        banner_image,
-        categories (*)
+        banner_image
       )
     `)
-    .eq('profile_id', (await supabase.auth.getUser()).data.user?.id) as { data: ProfileStore[] | null, error: any }
+    .eq('profile_id', (await supabase.auth.getUser()).data.user?.id)
 
-  if (profileStoresError) {
-    console.error('Error fetching stores:', profileStoresError)
+  if (error) {
+    console.error('Error fetching stores:', error)
     return []
   }
 
-  return (profileStores || []).map(ps => ps.store)
+  const stores = data?.map(item => item.store as unknown as Store) || []
+  
+  const storesWithCategories = await Promise.all(
+    stores.map(async (store) => {
+      const { data: categories } = await supabase
+        .from('categories')
+        .select('*')
+        .eq('store_id', store.id)
+
+      return {
+        ...store,
+        categories: categories || []
+      }
+    })
+  )
+
+  return storesWithCategories
 }
 
 export async function getStoreById(storeId: string) {
@@ -129,31 +148,47 @@ export async function linkStoreToProfile(
   profileId: string,
   accessCode: string,
   accessPin: string
-) {
+): Promise<{ success: boolean; message: string }> {
   try {
-    // 1. Buscar la tienda con el código y PIN proporcionados
-    const { data: store, error: storeError } = await supabase
+    // 1. Verificar el usuario actual
+    const { data: { user }, error: userError } = await supabase.auth.getUser()
+    console.log('Usuario actual:', { user, userError })
+
+    if (!user) throw new Error('No hay usuario autenticado')
+
+    // 2. Buscar la tienda
+    const { data: stores, error: storeError } = await supabase
       .from('stores')
-      .select('id')
+      .select('*')
       .eq('access_code', accessCode)
       .eq('access_pin', accessPin)
-      .single()
 
-    if (storeError || !store) {
+    console.log('Búsqueda de tienda:', { stores, storeError })
+
+    if (storeError) throw storeError
+    if (!stores || stores.length === 0) {
       throw new Error('Código o PIN incorrectos')
     }
 
-    // 2. Crear la relación en profile_stores
-    const { error: linkError } = await supabase
+    const store = stores[0]
+    console.log('Tienda encontrada:', store)
+
+    // 3. Intentar crear la vinculación
+    const insertData = {
+      profile_id: user.id,
+      store_id: store.id
+    }
+    console.log('Datos a insertar:', insertData)
+
+    const { data: linkData, error: linkError } = await supabase
       .from('profile_stores')
-      .insert({
-        profile_id: profileId,
-        store_id: store.id
-      })
+      .insert([insertData])
+      .select()
+
+    console.log('Resultado de inserción:', { linkData, linkError })
 
     if (linkError) {
-      // Si el error es por duplicado, no es realmente un error
-      if (linkError.code === '23505') { // código de error único de PostgreSQL
+      if (linkError.code === '23505') {
         return { success: true, message: 'Ya tienes acceso a esta tienda' }
       }
       throw linkError
@@ -161,8 +196,8 @@ export async function linkStoreToProfile(
 
     return { success: true, message: 'Tienda añadida correctamente' }
   } catch (err: unknown) {
-    const error = err as Error
-    console.error('Error linking store:', error)
+    const error = err as { message?: string }
+    console.error('Error completo:', error)
     return { 
       success: false, 
       message: error.message || 'Error al vincular la tienda' 

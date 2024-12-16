@@ -7,6 +7,7 @@ import { getStores, type Store } from '@/app/lib/db'
 import { LoadingSpinner } from '@/app/components/loading'
 import { StoreAccessForm } from '@/app/components/store-access-form'
 import { Input } from '@/components/ui/input'
+import { Store as StoreIcon } from "lucide-react"
 
 export default function HomePage() {
   const [stores, setStores] = useState<Store[]>([])
@@ -50,16 +51,24 @@ export default function HomePage() {
       </div>
 
       <div className="mx-auto pt-6 pb-8 max-w-3xl">
-        {filteredStores.map((store) => (
-          <StoreCard
-            key={store.id}
-            id={store.id}
-            name={store.name}
-            description={store.description || ''}
-            subdescription={store.subdescription || ''}
-            imageUrl={store.image_url || ''}
-          />
-        ))}
+        {filteredStores.length === 0 ? (
+          <div className="text-center py-8 text-gray-500">
+            <StoreIcon className="h-12 w-12 mx-auto mb-2 opacity-50" />
+            <p>No tienes proveedores guardados</p>
+            <p className="text-sm mt-1">Usa el botón + para añadir un proveedor</p>
+          </div>
+        ) : (
+          filteredStores.map((store) => (
+            <StoreCard
+              key={store.id}
+              id={store.id}
+              name={store.name}
+              description={store.description || ''}
+              subdescription={store.subdescription || ''}
+              imageUrl={store.image_url || ''}
+            />
+          ))
+        )}
       </div>
 
       <StoreAccessForm />
