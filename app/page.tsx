@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import { Header } from '@/app/components/header'
 import { StoreCard } from "@/app/components/store-card"
 import { getStores, type Store } from '@/app/lib/db'
+import { LoadingSpinner } from '@/app/components/loading'
 
 export default function HomePage() {
   const [stores, setStores] = useState<Store[]>([])
@@ -24,7 +25,7 @@ export default function HomePage() {
     loadStores()
   }, [])
 
-  if (loading) return <div>Cargando...</div>
+  if (loading) return <LoadingSpinner />
 
   return (
     <div>

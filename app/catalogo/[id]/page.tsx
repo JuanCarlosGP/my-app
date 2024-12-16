@@ -33,7 +33,7 @@ export default function CatalogoPage({ params }: { params: { id: string } }) {
   }, [params.id, router]);
 
   if (!store) {
-    return <div className="text-center py-20">Cargando...</div>;
+    return <div className="text-center py-20"></div>;
   }
 
   return (

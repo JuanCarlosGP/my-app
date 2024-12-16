@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
+import { LoadingSpinner } from '@/app/components/loading'
 
 export default function CatalogoPage() {
   const router = useRouter();
@@ -23,9 +24,7 @@ export default function CatalogoPage() {
     }
   }, [router]);
 
-  if (isLoading) {
-    return <div className="flex items-center justify-center h-screen">Cargando...</div>;
-  }
+  if (isLoading) return <LoadingSpinner />
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen p-4 text-center">

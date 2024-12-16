@@ -29,6 +29,7 @@ import { OrderHistorySheet } from './components/order-history-sheet'
 import { CustomSheet } from './components/custom-sheet'
 import { AddressesListSheet } from '../pedidos/components/addresses-list-sheet'
 import { useAddresses } from '../hooks/use-addresses'
+import { LoadingSpinner } from '@/app/components/loading'
 
 interface MenuSectionProps {
   title: string
@@ -120,7 +121,7 @@ export default function AjustesPage() {
     loadProfile()
   }, [])
 
-  if (loading) return <div>Cargando...</div>
+  if (loading) return <LoadingSpinner />
 
   const handleAddressSelect = (address: any) => {
     if (address) {
