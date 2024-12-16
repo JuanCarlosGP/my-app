@@ -10,37 +10,64 @@ import { PromotionsSheet } from "../components/promotions-sheet";
 import { CategorySheet } from "../components/category-sheet";
 import { getStoreById, type Store } from "@/app/lib/db";
 import { SearchProvider } from '@/app/context/search-context'
+import { supabase } from '@/app/lib/supabase'
+import { useAuth } from '@/app/providers/auth-provider'
+import { toast } from "react-hot-toast"
+import { LoadingSpinner } from '@/app/components/loading'
 
 export default function CatalogoPage({ params }: { params: { id: string } }) {
   const router = useRouter();
+  const { session } = useAuth();
   const [store, setStore] = useState<Store | null>(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    async function loadStore() {
-      const storeData = await getStoreById(params.id);
-      if (storeData) {
-        setStore(storeData);
-        localStorage.setItem("lastViewedCatalog", JSON.stringify({
-          ...storeData,
-          storeId: params.id
-        }));
-      } else {
-        router.push('/catalogo');
+    async function checkAccess() {
+      if (!session?.user?.id) {
+        router.push('/login')
+        return
+      }
+
+      try {
+        // Verificar si el usuario tiene acceso a la tienda
+        const { data: access, error: accessError } = await supabase
+          .from('profile_stores')
+          .select('store_id')
+          .eq('profile_id', session.user.id)
+          .eq('store_id', params.id)
+          .single()
+
+        if (accessError || !access) {
+          router.push('/')
+          return
+        }
+
+        // Si tiene acceso, cargar los datos de la tienda
+        const storeData = await getStoreById(params.id)
+        if (storeData) {
+          setStore(storeData)
+        } else {
+          router.push('/')
+        }
+      } catch (error) {
+        console.error('Error loading store:', error)
+        router.push('/')
+      } finally {
+        setLoading(false)
       }
     }
 
-    loadStore();
-  }, [params.id, router]);
+    checkAccess()
+  }, [params.id, router, session?.user?.id])
 
-  if (!store) {
-    return <div className="text-center py-20"></div>;
-  }
+  if (loading) return <LoadingSpinner />
+  if (!store) return null
 
   return (
     <SearchProvider>
       <div>
         <div className="sticky top-0 z-10 bg-white/70 backdrop-blur-md">
-          <HeaderCatalogo title={`${store.name}`} />
+          <HeaderCatalogo title={store.name} />
         </div>
 
         {/* Banner publicitario */}

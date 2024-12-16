@@ -38,11 +38,11 @@ export default function HomePage() {
   return (
     <div>
       <div className="sticky top-0 z-10 bg-white/70 backdrop-blur-md">
-        <Header title="Proveedores" />
+        <Header title="Tiendas" />
         <div className="px-4 pb-4">
           <Input
             type="text"
-            placeholder="Buscar proveedores..."
+            placeholder="Buscar tiendas..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             className="bg-gray-50 border-gray-200"
@@ -52,10 +52,10 @@ export default function HomePage() {
 
       <div className="mx-auto pt-6 pb-8 max-w-3xl">
         {filteredStores.length === 0 ? (
-          <div className="text-center py-8 text-gray-500">
-            <StoreIcon className="h-12 w-12 mx-auto mb-2 opacity-50" />
-            <p>No tienes proveedores guardados</p>
-            <p className="text-sm mt-1">Usa el botón + para añadir un proveedor</p>
+          <div className="text-center py-8">
+            <StoreIcon className="h-12 w-12 mb-4 text-gray-400 mx-auto" />
+            <h1 className="text-xl font-semibold mb-2 text-gray-600">No tienes tiendas guardadas</h1>
+            <p className="text-gray-500">Usa el botón + para añadir una tienda</p>
           </div>
         ) : (
           filteredStores.map((store) => (

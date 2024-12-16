@@ -12,7 +12,8 @@ import {
   ScrollText, 
   Paintbrush, 
   LogOut,
-  ChevronRight
+  ChevronRight,
+  Store
 } from 'lucide-react'
 import { ProfileHeader } from '../components/profile-header'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog"
@@ -30,6 +31,7 @@ import { CustomSheet } from './components/custom-sheet'
 import { AddressesListSheet } from '../pedidos/components/addresses-list-sheet'
 import { useAddresses } from '../hooks/use-addresses'
 import { LoadingSpinner } from '@/app/components/loading'
+import { MyStoresSheet } from './components/my-stores-sheet'
 
 interface MenuSectionProps {
   title: string
@@ -93,6 +95,7 @@ export default function AjustesPage() {
   const [isOrderHistoryOpen, setIsOrderHistoryOpen] = useState(false)
   const [isCustomSheetOpen, setIsCustomSheetOpen] = useState(false)
   const [showLogoutDialog, setShowLogoutDialog] = useState(false)
+  const [isMyStoresOpen, setIsMyStoresOpen] = useState(false)
 
   const { selectAddress } = useAddresses()
 
@@ -181,6 +184,13 @@ export default function AjustesPage() {
 
           <MenuSection title="Personalización">
             <MenuItem
+              icon={Store}
+              label="Mis Tiendas"
+              description="Gestionar tiendas guardadas"
+              onClick={() => setIsMyStoresOpen(true)}
+            />
+            <Separator />
+            <MenuItem
               icon={Paintbrush}
               label="Personalizar"
               description="Próximamente"
@@ -262,6 +272,11 @@ export default function AjustesPage() {
       <CustomSheet
         isOpen={isCustomSheetOpen}
         onOpenChange={setIsCustomSheetOpen}
+      />
+
+      <MyStoresSheet
+        isOpen={isMyStoresOpen}
+        onOpenChange={setIsMyStoresOpen}
       />
 
       <Dialog open={showLogoutDialog} onOpenChange={setShowLogoutDialog}>

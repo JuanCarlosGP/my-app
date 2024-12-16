@@ -5,7 +5,7 @@ import Image from "next/image"
 import { formatPrice } from "@/lib/utils"
 import { useCart } from "@/hooks/use-cart"
 import { HeaderPedidos } from '@/app/pedidos/components/header-pedidos'
-import { ChevronRight } from 'lucide-react'
+import { ChevronRight, ShoppingCart } from 'lucide-react'
 import { useState, useEffect } from 'react'
 import { ProductSheet } from "@/app/catalogo/components/product-sheet"
 import { Product } from "@/app/data/stores"
@@ -81,29 +81,26 @@ export default function PedidosPage() {
       </div>
       <div className="container mx-auto px-1 py-6 max-w-3xl">
         {storesWithItems.length === 0 ? (
-          <div className="flex flex-col items-center justify-center min-h-[60vh] p-4 text-center">
-            <p className="text-gray-600 text-lg">
-              No hay productos en ningún pedido
-            </p>
-            <p className="text-gray-500 mt-2">
-              Agrega productos desde el catálogo para comenzar tu pedido
+          <div className="flex flex-col items-center justify-center min-h-screen p-4 text-center">
+            <ShoppingCart className="h-12 w-12 mb-4 text-gray-400 mx-auto" />
+            <h1 className="text-xl font-semibold mb-2 text-gray-600">No hay productos en el pedido</h1>
+            <p className="text-gray-500">
+              Añade productos desde el catálogo para comenzar tu pedido
             </p>
           </div>
         ) : !selectedStoreId ? (
-          <div className="flex flex-col items-center justify-center min-h-[60vh] p-4 text-center">
-            <p className="text-gray-600 text-lg">
-              Selecciona una tienda para ver tu pedido
-            </p>
-            <p className="text-gray-500 mt-2">
+          <div className="flex flex-col items-center justify-center min-h-screen p-4 text-center">
+            <ShoppingCart className="h-12 w-12 mb-4 text-gray-400" />
+            <h2 className="text-xl font-semibold mb-2">Selecciona una tienda</h2>
+            <p className="text-gray-600">
               Puedes elegir una tienda usando el selector en la parte superior
             </p>
           </div>
         ) : filteredItems.length === 0 ? (
-          <div className="flex flex-col items-center justify-center min-h-[60vh] p-4 text-center">
-            <p className="text-gray-600 text-lg">
-              No hay productos en tu pedido actual
-            </p>
-            <p className="text-gray-500 mt-2">
+          <div className="flex flex-col items-center justify-center min-h-screen p-4 text-center">
+            <ShoppingCart className="h-12 w-12 mb-4 text-gray-400" />
+            <h2 className="text-xl font-semibold mb-2">Pedido vacío</h2>
+            <p className="text-gray-600">
               Agrega productos desde el catálogo para comenzar tu pedido
             </p>
           </div>

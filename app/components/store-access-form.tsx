@@ -81,7 +81,7 @@ export function StoreAccessForm() {
       </SheetTrigger>
       <SheetContent side="bottom" className="h-[300px]">
         <SheetHeader>
-          <SheetTitle className="text-center">Acceder a proveedor</SheetTitle>
+          <SheetTitle className="text-center">Acceder a tiendas</SheetTitle>
         </SheetHeader>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 mt-4">
@@ -90,7 +90,7 @@ export function StoreAccessForm() {
               name="code"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Código de proveedor</FormLabel>
+                  <FormLabel>Código de tienda</FormLabel>
                   <FormControl>
                     <Input placeholder="Introduce el código" {...field} />
                   </FormControl>

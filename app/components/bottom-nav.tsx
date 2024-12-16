@@ -2,10 +2,10 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { Home, Book, ShoppingCart, Clock, Settings } from 'lucide-react'
+import { Book, ShoppingCart, Settings, Store } from 'lucide-react'
 
 const navItems = [
-  { href: '/', icon: Home, label: 'Proveedor' },
+  { href: '/', icon: Store, label: 'Tienda' },
   { href: '/catalogo', icon: Book, label: 'Catálogo' },
   { href: '/pedidos', icon: ShoppingCart, label: 'Pedidos' },
   // { href: '/historial', icon: Clock, label: 'Historial' },

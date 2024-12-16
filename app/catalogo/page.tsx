@@ -3,38 +3,61 @@
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { LoadingSpinner } from '@/app/components/loading'
+import { supabase } from '@/app/lib/supabase'
+import { useAuth } from '@/app/providers/auth-provider'
+import { Store as StoreIcon } from "lucide-react"
 
 export default function CatalogoPage() {
-  const router = useRouter();
-  const [isLoading, setIsLoading] = useState(true);
+  const router = useRouter()
+  const { session } = useAuth()
+  const [loading, setLoading] = useState(true)
+  const [hasStores, setHasStores] = useState(true)
 
   useEffect(() => {
-    try {
-      const savedCatalog = localStorage.getItem('lastViewedCatalog');
-      
-      if (savedCatalog) {
-        const parsedCatalog = JSON.parse(savedCatalog);
-        router.push(`/catalogo/${parsedCatalog.storeId}`);
-      } else {
-        setIsLoading(false);
+    async function checkStores() {
+      if (!session?.user?.id) {
+        router.push('/login')
+        return
       }
-    } catch (error) {
-      console.error('Error al cargar el último catálogo:', error);
-      setIsLoading(false);
+
+      try {
+        const { data: stores, error } = await supabase
+          .from('profile_stores')
+          .select('store_id')
+          .eq('profile_id', session.user.id)
+          .limit(1)
+          .single()
+
+        if (error || !stores) {
+          setHasStores(false)
+        } else {
+          router.push(`/catalogo/${stores.store_id}`)
+        }
+      } catch (error) {
+        console.error('Error checking stores:', error)
+        setHasStores(false)
+      } finally {
+        setLoading(false)
+      }
     }
-  }, [router]);
 
-  if (isLoading) return <LoadingSpinner />
+    checkStores()
+  }, [router, session?.user?.id])
 
-  return (
-    <div className="flex flex-col items-center justify-center min-h-screen p-4 text-center">
-      <p className="text-gray-600 text-lg">
-        Aquí se mostrarán las categorías de tus tiendas guardadas.
-      </p>
-      <p className="text-gray-500 mt-2">
-        Guarda algunas tiendas para empezar a ver sus categorías.
-      </p>
-    </div>
-  );
+  if (loading) return <LoadingSpinner />
+
+  if (!hasStores) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-screen p-4 text-center">
+        <StoreIcon className="h-12 w-12 mb-4 text-gray-400" />
+        <h1 className="text-xl font-semibold mb-2 text-gray-600">No hay tiendas disponibles</h1>
+        <p className="text-gray-500">
+          Añade una tienda desde la página principal para ver su catálogo
+        </p>
+      </div>
+    )
+  }
+
+  return null
 }
 
