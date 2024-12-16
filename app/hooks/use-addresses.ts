@@ -2,18 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { supabase } from '@/app/lib/supabase'
-
-export interface Address {
-  id: string
-  name: string
-  address: string
-  phone: string
-  nif: string
-  postalCode: string
-  city: string
-  province: string
-  email: string
-}
+import { type Address } from '@/app/lib/types'
 
 export function useAddresses() {
   const [addresses, setAddresses] = useState<Address[]>([])

@@ -6,10 +6,11 @@ export interface Profile {
   created_at: string
 }
 
-export interface Address {
+export type Address = {
   id: string
   profile_id: string
-  name: string
+  created_at: string
+  company_name: string
   address: string
   phone: string
   nif: string
@@ -17,5 +18,4 @@ export interface Address {
   city: string
   province: string
   email: string
-  created_at: string
 } 

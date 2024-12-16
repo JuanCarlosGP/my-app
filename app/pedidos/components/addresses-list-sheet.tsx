@@ -6,7 +6,10 @@ import { ArrowLeft, Plus, MapPin, Trash2, Pencil } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { useState, useEffect } from "react"
 import { PersonalDataSheet } from "./personal-data-sheet"
-import { useAddresses, type Address } from "../../hooks/use-addresses"
+import { useAddresses } from "../../hooks/use-addresses"
+import { type Address } from "@/app/lib/types"
+import { supabase } from "../../lib/supabase"
+import { toast } from "react-hot-toast"
 
 interface AddressesListSheetProps {
   isOpen: boolean
@@ -66,10 +69,24 @@ export function AddressesListSheet({ isOpen, onClose, onAddressSelect }: Address
     onClose()
   }
 
-  const handleEditAddress = (e: React.MouseEvent, address: Address) => {
+  const handleEditAddress = async (e: React.MouseEvent, address: Address) => {
     e.stopPropagation()
-    setEditingAddress(address)
-    setIsAddingAddress(true)
+    try {
+      // Hacer una consulta para obtener los datos más recientes de la dirección
+      const { data: freshAddress, error } = await supabase
+        .from('addresses')
+        .select('*')
+        .eq('id', address.id)
+        .single()
+
+      if (error) throw error
+
+      setEditingAddress(freshAddress)
+      setIsAddingAddress(true)
+    } catch (error) {
+      console.error('Error al cargar la dirección:', error)
+      toast.error('Error al cargar la dirección')
+    }
   }
 
   return (
@@ -127,7 +144,7 @@ export function AddressesListSheet({ isOpen, onClose, onAddressSelect }: Address
                     onClick={() => handleAddressSelect(address)}
                   >
                     <div>
-                      <h3 className="font-medium">{address.name}</h3>
+                      <h3 className="font-medium">{address.company_name}</h3>
                       <p className="text-sm text-gray-500">{address.address}</p>
                       <p className="text-sm text-gray-500">{address.phone}</p>
                     </div>

@@ -12,6 +12,7 @@ import { z } from "zod"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
+import { type Address } from '@/app/lib/types'
 
 const addressFormSchema = z.object({
   company_name: z.string().min(2, "El nombre de la empresa debe tener al menos 2 caracteres"),
@@ -30,10 +31,10 @@ interface PersonalDataSheetProps {
   isOpen: boolean
   onClose: () => void
   onComplete?: () => void
-  editingAddressId?: string | null
+  editingAddress?: Address | null
 }
 
-export function PersonalDataSheet({ isOpen, onClose, onComplete, editingAddressId }: PersonalDataSheetProps) {
+export function PersonalDataSheet({ isOpen, onClose, onComplete, editingAddress }: PersonalDataSheetProps) {
   const { session } = useAuth()
   const [loading, setLoading] = useState(true)
 
@@ -51,33 +52,21 @@ export function PersonalDataSheet({ isOpen, onClose, onComplete, editingAddressI
     }
   })
 
-  // Cargar datos si estamos editando una dirección existente
   useEffect(() => {
     async function loadAddress() {
-      if (session?.user?.id && editingAddressId) {
+      if (editingAddress) {
         setLoading(true)
         try {
-          const { data, error } = await supabase
-            .from('addresses')
-            .select('*')
-            .eq('id', editingAddressId)
-            .eq('profile_id', session.user.id)
-            .single()
-
-          if (error) throw error
-
-          if (data) {
-            form.reset({
-              company_name: data.company_name || "",
-              address: data.address || "",
-              phone: data.phone || "",
-              nif: data.nif || "",
-              postal_code: data.postal_code || "",
-              city: data.city || "",
-              province: data.province || "",
-              email: data.email || ""
-            })
-          }
+          form.reset({
+            company_name: editingAddress.company_name || "",
+            address: editingAddress.address || "",
+            phone: editingAddress.phone || "",
+            nif: editingAddress.nif || "",
+            postal_code: editingAddress.postal_code || "",
+            city: editingAddress.city || "",
+            province: editingAddress.province || "",
+            email: editingAddress.email || ""
+          })
         } catch (error) {
           console.error('Error cargando dirección:', error)
           toast.error('Error al cargar la dirección')
@@ -85,6 +74,16 @@ export function PersonalDataSheet({ isOpen, onClose, onComplete, editingAddressI
           setLoading(false)
         }
       } else {
+        form.reset({
+          company_name: "",
+          address: "",
+          phone: "",
+          nif: "",
+          postal_code: "",
+          city: "",
+          province: "",
+          email: ""
+        })
         setLoading(false)
       }
     }
@@ -92,7 +91,7 @@ export function PersonalDataSheet({ isOpen, onClose, onComplete, editingAddressI
     if (isOpen) {
       loadAddress()
     }
-  }, [session?.user?.id, editingAddressId, form, isOpen])
+  }, [editingAddress, form, isOpen])
 
   async function onSubmit(data: AddressFormValues) {
     if (!session?.user?.id) {
@@ -101,8 +100,7 @@ export function PersonalDataSheet({ isOpen, onClose, onComplete, editingAddressI
     }
 
     try {
-      if (editingAddressId) {
-        // Actualizar dirección existente
+      if (editingAddress) {
         const { error } = await supabase
           .from('addresses')
           .update({
@@ -115,13 +113,12 @@ export function PersonalDataSheet({ isOpen, onClose, onComplete, editingAddressI
             province: data.province,
             email: data.email
           })
-          .eq('id', editingAddressId)
+          .eq('id', editingAddress.id)
           .eq('profile_id', session.user.id)
 
         if (error) throw error
         toast.success('Dirección actualizada correctamente')
       } else {
-        // Crear nueva dirección
         const { error } = await supabase
           .from('addresses')
           .insert({
@@ -163,7 +160,7 @@ export function PersonalDataSheet({ isOpen, onClose, onComplete, editingAddressI
                   </div>
                   
                   <SheetTitle className="font-semibold text-lg absolute left-1/2 -translate-x-1/2">
-                    {editingAddressId ? 'Editar Dirección' : 'Nueva Dirección'}
+                    {editingAddress ? 'Editar Dirección' : 'Nueva Dirección'}
                   </SheetTitle>
                 </div>
               </div>
@@ -294,7 +291,7 @@ export function PersonalDataSheet({ isOpen, onClose, onComplete, editingAddressI
 
             <div className="p-4 mt-auto">
               <Button type="submit" className="w-full" disabled={loading}>
-                {editingAddressId ? 'Guardar cambios' : 'Añadir dirección'}
+                {editingAddress ? 'Guardar cambios' : 'Añadir dirección'}
               </Button>
             </div>
           </form>
