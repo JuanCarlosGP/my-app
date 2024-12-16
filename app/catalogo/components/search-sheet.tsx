@@ -5,11 +5,12 @@ import { Search, ArrowLeft, Plus, Minus } from "lucide-react"
 import { useSearch } from '@/app/context/search-context'
 import { useParams } from 'next/navigation'
 import { useState, useEffect } from 'react'
-import { getAllProducts, Product } from "@/app/data/stores"
+import { getAllProducts, type Product } from "@/app/lib/db"
 import Image from 'next/image'
 import { Badge } from "@/components/ui/badge"
 import { useCart } from "@/hooks/use-cart"
 import { ProductSheet } from "./product-sheet"
+
 
 
 interface SearchSheetProps {
@@ -25,8 +26,11 @@ export function SearchSheet({ variant = 'icon' }: SearchSheetProps) {
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null)
 
   useEffect(() => {
-    const allProducts = getAllProducts(storeId)
-    setProducts(allProducts)
+    async function loadProducts() {
+      const allProducts = await getAllProducts(storeId)
+      setProducts(allProducts)
+    }
+    loadProducts()
   }, [storeId])
 
   const filteredProducts = products.filter(product =>
@@ -101,7 +105,7 @@ export function SearchSheet({ variant = 'icon' }: SearchSheetProps) {
                     </Badge>
                   )}
                   <Image
-                    src={product.imageUrl}
+                    src={product.image_url || '/placeholder.jpg'}
                     alt={product.name}
                     fill
                     className="rounded-lg object-cover"
@@ -122,7 +126,7 @@ export function SearchSheet({ variant = 'icon' }: SearchSheetProps) {
                           onClick={(e) => {
                             e.preventDefault();
                             e.stopPropagation();
-                            removeFromCart(product, product.unitsPerBox);
+                            removeFromCart(product, product.units_per_box);
                           }}
                         >
                           <Minus className="w-5 h-5 text-red-600" />
@@ -133,14 +137,14 @@ export function SearchSheet({ variant = 'icon' }: SearchSheetProps) {
                         onClick={(e) => {
                           e.preventDefault();
                           e.stopPropagation();
-                          addToCart(product, product.unitsPerBox);
+                          addToCart(product, product.units_per_box);
                         }}
                       >
                         <Plus className="w-5 h-5 text-green-600" />
                       </button>
                     </div>
                   </div>
-                  <span className="text-sm text-gray-500">{product.unitsPerBox} u/c</span>
+                  <span className="text-sm text-gray-500">{product.units_per_box} u/c</span>
                 </div>
               </div>
             )

@@ -3,9 +3,24 @@
 import { useState, useEffect } from 'react'
 import { supabase } from '@/app/lib/supabase'
 import { type Profile } from '@/app/lib/types'
-import { MapPin, User, PackagePlus, MessageSquareHeart, SlidersHorizontal, ScrollText, Paintbrush, LogOut } from 'lucide-react'
+import { 
+  MapPin, 
+  User, 
+  PackagePlus, 
+  MessageSquareHeart, 
+  SlidersHorizontal, 
+  ScrollText, 
+  Paintbrush, 
+  LogOut,
+  ChevronRight
+} from 'lucide-react'
 import { ProfileHeader } from '../components/profile-header'
-import { MenuItem } from '../components/menu-item'
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog"
+import { Button } from "@/components/ui/button"
+import { signOut } from '@/app/lib/auth'
+import { Card, CardContent } from "@/components/ui/card"
+import { Separator } from "@/components/ui/separator"
+import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { ProfileSheet } from './components/profile-sheet'
 import { StoreSheet } from './components/store-sheet'
 import { FeedbackSheet } from './components/feedback-sheet'
@@ -14,9 +29,57 @@ import { OrderHistorySheet } from './components/order-history-sheet'
 import { CustomSheet } from './components/custom-sheet'
 import { AddressesListSheet } from '../pedidos/components/addresses-list-sheet'
 import { useAddresses } from '../hooks/use-addresses'
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog"
-import { Button } from "@/components/ui/button"
-import { signOut } from '@/app/lib/auth'
+
+interface MenuSectionProps {
+  title: string
+  children: React.ReactNode
+}
+
+function MenuSection({ title, children }: MenuSectionProps) {
+  return (
+    <div className="space-y-3">
+      <h2 className="text-sm font-medium text-gray-500 px-4">{title}</h2>
+      <Card>
+        <CardContent className="p-0">
+          {children}
+        </CardContent>
+      </Card>
+    </div>
+  )
+}
+
+interface MenuItemProps {
+  icon: React.ElementType
+  label: string
+  onClick?: () => void
+  disabled?: boolean
+  labelClassName?: string
+  className?: string
+  description?: string
+}
+
+function MenuItem({ icon: Icon, label, onClick, disabled, labelClassName, className, description }: MenuItemProps) {
+  return (
+    <button
+      className={`w-full px-4 py-3 flex items-center justify-between hover:bg-gray-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed ${className}`}
+      onClick={onClick}
+      disabled={disabled}
+    >
+      <div className="flex items-center gap-3">
+        <div className="flex items-center justify-center w-8 h-8 rounded-full bg-gray-100">
+          <Icon className="w-4 h-4" />
+        </div>
+        <div className="text-left">
+          <span className={`block text-sm font-medium ${labelClassName}`}>{label}</span>
+          {description && (
+            <span className="text-xs text-gray-500">{description}</span>
+          )}
+        </div>
+      </div>
+      <ChevronRight className="w-4 h-4 text-gray-400" />
+    </button>
+  )
+}
 
 export default function AjustesPage() {
   const [profile, setProfile] = useState<Profile | null>(null)
@@ -75,59 +138,91 @@ export default function AjustesPage() {
   }
 
   return (
-    <div className="bg-[#f5f5f5] min-h-screen max-w-3xl m-auto ">
-      <ProfileHeader phoneNumber={profile?.phone || 'No disponible'} />
-    
-      <div className="space-y-2 divide-y mt-4">
-        <MenuItem 
-          icon={User}
-          label="Editar Perfil"
-          onClick={() => setIsProfileSheetOpen(true)}
-        />
-        <MenuItem 
-          icon={MapPin} 
-          label="Mis Direcciones"  
-          onClick={() => setIsAddressesListOpen(true)} 
-        />
-        <MenuItem 
-          icon={PackagePlus} 
-          label="Crear mi Tienda" 
-          onClick={() => setIsAddStoreOpen(true)}
-          disabled={true} 
-          labelClassName="line-through"
-        />
-        <MenuItem 
-          icon={SlidersHorizontal} 
-          label="Configuración de mi tienda" 
-          onClick={() => setIsStoreSettingsOpen(true)}
-          disabled={true}
-          labelClassName="line-through"
-        />
-        <MenuItem 
-          icon={ScrollText}
-          label="Historial de compras"
-          onClick={() => setIsOrderHistoryOpen(true)}
-        />
-        <MenuItem 
-          icon={Paintbrush}
-          label="Personalizar"
-          onClick={() => setIsCustomSheetOpen(true)}
-          disabled={true} 
-          labelClassName="line-through"
-        />
-        <MenuItem 
-          icon={MessageSquareHeart} 
-          label="Enviar opiniones" 
-          onClick={() => setIsFeedbackSheetOpen(true)}
-        />
+    <div className="bg-gray-50 min-h-screen pb-20">
+      <div className="max-w-2xl mx-auto">
+        <div className="bg-white p-6 mb-6 flex items-center gap-4">
+          <Avatar className="w-16 h-16">
+            <AvatarFallback className="bg-blue-100 text-blue-600 text-xl">
+              {profile?.name?.charAt(0) || 'U'}
+            </AvatarFallback>
+          </Avatar>
+          <div>
+            <h1 className="text-xl font-semibold">{profile?.name || 'Usuario'}</h1>
+            <p className="text-sm text-gray-500">{profile?.phone || 'Sin teléfono'}</p>
+          </div>
+        </div>
 
-        <div className="pt-2">
-          <MenuItem 
-            icon={LogOut} 
-            label="Cerrar sesión" 
-            onClick={() => setShowLogoutDialog(true)}
-            className="text-red-600"
-          />
+        <div className="space-y-6 px-4">
+          <MenuSection title="Cuenta">
+            <MenuItem
+              icon={User}
+              label="Editar Perfil"
+              description="Modifica tus datos personales"
+              onClick={() => setIsProfileSheetOpen(true)}
+            />
+            <Separator />
+            <MenuItem
+              icon={MapPin}
+              label="Mis Direcciones"
+              description="Gestiona tus direcciones de envío"
+              onClick={() => setIsAddressesListOpen(true)}
+            />
+          </MenuSection>
+
+          <MenuSection title="Actividad">
+            <MenuItem
+              icon={ScrollText}
+              label="Historial de compras"
+              description="Ver pedidos anteriores"
+              onClick={() => setIsOrderHistoryOpen(true)}
+            />
+          </MenuSection>
+
+          <MenuSection title="Personalización">
+            <MenuItem
+              icon={Paintbrush}
+              label="Personalizar"
+              description="Próximamente"
+              disabled={true}
+              labelClassName="line-through"
+            />
+            <Separator />
+            <MenuItem
+              icon={MessageSquareHeart}
+              label="Enviar opiniones"
+              description="Ayúdanos a mejorar"
+              onClick={() => setIsFeedbackSheetOpen(true)}
+            />
+          </MenuSection>
+
+          <MenuSection title="Negocio">
+            <MenuItem
+              icon={PackagePlus}
+              label="Crear mi Tienda"
+              description="Próximamente"
+              disabled={true}
+              labelClassName="line-through"
+            />
+            <Separator />
+            <MenuItem
+              icon={SlidersHorizontal}
+              label="Configuración de mi tienda"
+              description="Próximamente"
+              disabled={true}
+              labelClassName="line-through"
+            />
+          </MenuSection>
+
+          <Card className="mt-6">
+            <CardContent className="p-0">
+              <MenuItem
+                icon={LogOut}
+                label="Cerrar sesión"
+                onClick={() => setShowLogoutDialog(true)}
+                className="text-red-600 hover:bg-red-50"
+              />
+            </CardContent>
+          </Card>
         </div>
       </div>
 
