@@ -1,5 +1,6 @@
 "use client"
 
+import { useState } from 'react'
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -8,6 +9,9 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import * as z from "zod"
+import { linkStoreToProfile } from '@/app/lib/db'
+import { useAuth } from '@/app/providers/auth-provider'
+import { toast } from 'react-hot-toast'
 
 const formSchema = z.object({
   code: z.string().min(1, "El código es requerido"),
@@ -15,6 +19,9 @@ const formSchema = z.object({
 })
 
 export function StoreAccessForm() {
+  const { session } = useAuth()
+  const [isLoading, setIsLoading] = useState(false)
+  
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -22,6 +29,35 @@ export function StoreAccessForm() {
       pin: ""
     }
   })
+
+  async function onSubmit(values: z.infer<typeof formSchema>) {
+    if (!session?.user?.id) {
+      toast.error('Debes iniciar sesión')
+      return
+    }
+
+    setIsLoading(true)
+    try {
+      const result = await linkStoreToProfile(
+        session.user.id,
+        values.code,
+        values.pin
+      )
+
+      if (result.success) {
+        toast.success(result.message)
+        form.reset()
+        // Opcional: recargar la lista de tiendas
+        window.location.reload()
+      } else {
+        toast.error(result.message)
+      }
+    } catch (error) {
+      toast.error('Error al vincular la tienda')
+    } finally {
+      setIsLoading(false)
+    }
+  }
 
   return (
     <Sheet>
@@ -69,8 +105,8 @@ export function StoreAccessForm() {
                 </FormItem>
               )}
             />
-            <Button type="submit" className="w-full">
-              Acceder
+            <Button type="submit" className="w-full" disabled={isLoading}>
+              {isLoading ? 'Cargando...' : 'Acceder'}
             </Button>
           </form>
         </Form>

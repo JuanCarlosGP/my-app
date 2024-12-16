@@ -34,22 +34,32 @@ export interface Product {
   note: string | null
 }
 
-export async function getStores() {
-  const { data, error } = await supabase
-    .from('stores')
+interface ProfileStore {
+  store: Store
+}
+
+export async function getStores(): Promise<Store[]> {
+  const { data: profileStores, error: profileStoresError } = await supabase
+    .from('profile_stores')
     .select(`
-      *,
-      categories (
-        *
+      store:stores (
+        id,
+        name,
+        description,
+        subdescription,
+        image_url,
+        banner_image,
+        categories (*)
       )
     `)
-  
-  if (error) {
-    console.error('Error fetching stores:', error)
+    .eq('profile_id', (await supabase.auth.getUser()).data.user?.id) as { data: ProfileStore[] | null, error: any }
+
+  if (profileStoresError) {
+    console.error('Error fetching stores:', profileStoresError)
     return []
   }
-  
-  return data
+
+  return (profileStores || []).map(ps => ps.store)
 }
 
 export async function getStoreById(storeId: string) {
@@ -113,4 +123,49 @@ export async function getCategories(storeId: string) {
   }
   
   return data
+}
+
+export async function linkStoreToProfile(
+  profileId: string,
+  accessCode: string,
+  accessPin: string
+) {
+  try {
+    // 1. Buscar la tienda con el código y PIN proporcionados
+    const { data: store, error: storeError } = await supabase
+      .from('stores')
+      .select('id')
+      .eq('access_code', accessCode)
+      .eq('access_pin', accessPin)
+      .single()
+
+    if (storeError || !store) {
+      throw new Error('Código o PIN incorrectos')
+    }
+
+    // 2. Crear la relación en profile_stores
+    const { error: linkError } = await supabase
+      .from('profile_stores')
+      .insert({
+        profile_id: profileId,
+        store_id: store.id
+      })
+
+    if (linkError) {
+      // Si el error es por duplicado, no es realmente un error
+      if (linkError.code === '23505') { // código de error único de PostgreSQL
+        return { success: true, message: 'Ya tienes acceso a esta tienda' }
+      }
+      throw linkError
+    }
+
+    return { success: true, message: 'Tienda añadida correctamente' }
+  } catch (err: unknown) {
+    const error = err as Error
+    console.error('Error linking store:', error)
+    return { 
+      success: false, 
+      message: error.message || 'Error al vincular la tienda' 
+    }
+  }
 } 
