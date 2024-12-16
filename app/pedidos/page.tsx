@@ -5,13 +5,14 @@ import Image from "next/image"
 import { formatPrice } from "@/lib/utils"
 import { useCart } from "@/hooks/use-cart"
 import { HeaderPedidos } from '@/app/pedidos/components/header-pedidos'
-import { ChevronRight, ShoppingCart } from 'lucide-react'
+import { ChevronRight, ShoppingCart, ArrowUpDown } from 'lucide-react'
 import { useState, useEffect } from 'react'
 import { ProductSheet } from "@/app/catalogo/components/product-sheet"
 import { Product } from "@/app/data/stores"
 import { getAllProducts } from "@/app/data/stores"
 import { Button } from "@/components/ui/button"
 import { FacturacionSheet } from './components/facturacion-sheet'
+import { StoreSelectorSheet } from './components/store-selector-sheet'
 
 export default function PedidosPage() {
   const { items, selectedStoreId, setSelectedStoreId } = useCart()
@@ -19,6 +20,7 @@ export default function PedidosPage() {
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null)
   const [isSheetOpen, setIsSheetOpen] = useState(false)
   const [isFacturacionOpen, setIsFacturacionOpen] = useState(false)
+  const [isStoreSelectorOpen, setIsStoreSelectorOpen] = useState(false)
   
   const allStoreProducts = selectedStoreId ? getAllProducts(selectedStoreId) : []
   
@@ -72,89 +74,105 @@ export default function PedidosPage() {
   }, 0)
 
   return (
-    <div className="min-h-[calc(100vh-3.75rem)]">
-      <div className="sticky top-0 z-10 bg-white/70 backdrop-blur-md pb-4">
-        <HeaderPedidos 
-          title="Pedido" 
-          onSearch={setSearchTerm}
-        />
-      </div>
-      <div className="container mx-auto px-1 py-6 max-w-3xl">
-        {storesWithItems.length === 0 ? (
-          <div className="flex flex-col items-center justify-center h-[calc(100vh-15rem)] text-center px-4">
-            <ShoppingCart className="h-12 w-12 mb-4 text-gray-400 mx-auto" />
-            <h1 className="text-xl font-semibold mb-2 text-gray-600">No hay productos en el pedido</h1>
-            <p className="text-gray-500">
-              Añade productos desde el catálogo para comenzar tu pedido
-            </p>
-          </div>
-        ) : !selectedStoreId ? (
-          <div className="flex flex-col items-center justify-center h-[calc(100vh-15rem)] text-center px-4">
-            <ShoppingCart className="h-12 w-12 mb-4 text-gray-400" />
-            <h2 className="text-xl font-semibold mb-2">Selecciona una tienda</h2>
-            <p className="text-gray-600">
-              Puedes elegir una tienda usando el selector en la parte superior
-            </p>
-          </div>
-        ) : filteredItems.length === 0 ? (
-          <div className="flex flex-col items-center justify-center h-[calc(100vh-15rem)] text-center px-4">
-            <ShoppingCart className="h-12 w-12 mb-4 text-gray-400" />
-            <h2 className="text-xl font-semibold mb-2">Pedido vacío</h2>
-            <p className="text-gray-600">
-              Agrega productos desde el catálogo para comenzar tu pedido
-            </p>
-          </div>
-        ) : (
-          filteredItems.map((item) => (
-            <Card 
-              key={item.id} 
-              className="p-4 relative mb-1 cursor-pointer hover:bg-gray-50"
-              onClick={() => handleCardClick(item)}
-            >
-              <div className="flex items-center gap-4">
-                <div className="relative w-24 h-24">
-                  <Image
-                    src={item.image}
-                    alt={item.name}
-                    fill
-                    className="object-cover rounded-md"
-                  />
-                </div>
-                <div className="flex-1">
-                  <div className="flex items-center justify-between mb-2">
-                    <h3 className="font-semibold truncate max-w-[200px]">{item.name}</h3>
-                    <ChevronRight className="h-7 w-7 text-gray-400" />
+    <div className="bg-gray-50 min-h-screen">
+      <div className="max-w-2xl mx-auto">
+        <div className="sticky top-0 z-10 bg-white/70 backdrop-blur-md pb-4">
+          <HeaderPedidos 
+            title="Pedido" 
+            onSearch={setSearchTerm}
+          />
+        </div>
+
+        <div className="container mx-auto px-1 py-6 max-w-3xl">
+          {storesWithItems.length === 0 ? (
+            <div className="flex flex-col items-center justify-center h-[calc(100vh-15rem)] text-center px-4">
+              <ShoppingCart className="h-12 w-12 mb-4 text-gray-400 mx-auto" />
+              <h1 className="text-xl font-semibold mb-2 text-gray-600">No hay productos en el pedido</h1>
+              <p className="text-gray-500">
+                Añade productos desde el catálogo para comenzar tu pedido
+              </p>
+            </div>
+          ) : !selectedStoreId ? (
+            <div className="flex flex-col items-center justify-center h-[calc(100vh-15rem)] text-center px-4">
+              <ShoppingCart className="h-12 w-12 mb-4 text-gray-400" />
+              <h2 className="text-xl font-semibold mb-2">Selecciona una tienda</h2>
+              <p className="text-gray-600">
+                Puedes elegir una tienda usando el selector en la parte superior
+              </p>
+            </div>
+          ) : filteredItems.length === 0 ? (
+            <div className="flex flex-col items-center justify-center h-[calc(100vh-15rem)] text-center px-4">
+              <ShoppingCart className="h-12 w-12 mb-4 text-gray-400" />
+              <h2 className="text-xl font-semibold mb-2">Pedido vacío</h2>
+              <p className="text-gray-600">
+                Agrega productos desde el catálogo para comenzar tu pedido
+              </p>
+            </div>
+          ) : (
+            filteredItems.map((item) => (
+              <Card 
+                key={item.id} 
+                className="p-4 relative mb-1 cursor-pointer hover:bg-gray-50"
+                onClick={() => handleCardClick(item)}
+              >
+                <div className="flex items-center gap-4">
+                  <div className="relative w-24 h-24">
+                    <Image
+                      src={item.image}
+                      alt={item.name}
+                      fill
+                      className="object-cover rounded-md"
+                    />
                   </div>
-                  <div className="grid grid-cols-3 gap-8">
-                    <div>
-                      <p className="text-sm text-gray-500 mb-1">Precio</p>
-                      <p className="font-medium text-blue-600">{formatPrice(item.price)}</p>
-                      <p className="text-sm text-gray-500 mt-2 mb-1 whitespace-nowrap">
-                        Pack: <span className="font-medium text-black">{item.packages || 0}</span>
-                      </p>
+                  <div className="flex-1">
+                    <div className="flex items-center justify-between mb-2">
+                      <h3 className="font-semibold truncate max-w-[200px]">{item.name}</h3>
+                      <ChevronRight className="h-7 w-7 text-gray-400" />
                     </div>
-                    <div>
-                      <p className="text-sm text-gray-500 mb-1">Cantidad</p>
-                      <p className="font-medium">{item.quantity}</p>
-                      <p className="text-sm text-gray-500 mt-2 mb-1 whitespace-nowrap">
-                        Cajas: <span className="font-medium text-black">{item.boxes || 0}</span>
-                      </p>
-                    </div> 
-                    <div>
-                      <p className="text-sm text-gray-500 mb-1">Total</p>
-                      
-                        <p className="font-medium whitespace-nowrap text-sm">
-                          {formatPrice(item.price * item.quantity)}
+                    <div className="grid grid-cols-3 gap-8">
+                      <div>
+                        <p className="text-sm text-gray-500 mb-1">Precio</p>
+                        <p className="font-medium text-blue-600">{formatPrice(item.price)}</p>
+                        <p className="text-sm text-gray-500 mt-2 mb-1 whitespace-nowrap">
+                          Pack: <span className="font-medium text-black">{item.packages || 0}</span>
                         </p>
-                      
+                      </div>
+                      <div>
+                        <p className="text-sm text-gray-500 mb-1">Cantidad</p>
+                        <p className="font-medium">{item.quantity}</p>
+                        <p className="text-sm text-gray-500 mt-2 mb-1 whitespace-nowrap">
+                          Cajas: <span className="font-medium text-black">{item.boxes || 0}</span>
+                        </p>
+                      </div> 
+                      <div>
+                        <p className="text-sm text-gray-500 mb-1">Total</p>
+                        
+                          <p className="font-medium whitespace-nowrap text-sm">
+                            {formatPrice(item.price * item.quantity)}
+                          </p>
+                        
+                      </div>
                     </div>
                   </div>
                 </div>
-              </div>
-            </Card>
-          ))
-        )}
+              </Card>
+            ))
+          )}
+        </div>
       </div>
+
+      <Button 
+        size="icon"
+        className="fixed bottom-24 right-4 h-14 w-14 rounded-full shadow-lg"
+        onClick={() => setIsStoreSelectorOpen(true)}
+      >
+        <ArrowUpDown className="h-6 w-6" />
+      </Button>
+
+      <StoreSelectorSheet 
+        isOpen={isStoreSelectorOpen}
+        onClose={() => setIsStoreSelectorOpen(false)}
+      />
 
       {filteredItems.length > 0 && selectedStoreId && (
         <div className="fixed bottom-[60px] left-0 right-0 bg-white border-t shadow-lg mb-[-1vw]">

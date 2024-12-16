@@ -38,26 +38,16 @@ export function StoreAccessForm() {
 
     setIsLoading(true)
     try {
-      console.log('Enviando datos:', {
-        userId: session.user.id,
-        code: values.code,
-        pin: values.pin
-      })
-
       const result = await linkStoreToProfile(
         session.user.id,
         values.code,
         values.pin
       )
 
-      console.log('Resultado:', result)
-
       if (result.success) {
         toast.success(result.message)
         form.reset()
-        setTimeout(() => {
-          window.location.reload()
-        }, 1000)
+        window.location.reload()
       } else {
         toast.error(result.message)
       }
