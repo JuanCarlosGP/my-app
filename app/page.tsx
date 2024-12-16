@@ -36,7 +36,7 @@ export default function HomePage() {
   if (loading) return <LoadingSpinner />
 
   return (
-    <div>
+    <div className="min-h-[calc(100vh-3.75rem)]">
       <div className="sticky top-0 z-10 bg-white/70 backdrop-blur-md">
         <Header title="Tiendas" />
         <div className="px-4 pb-4">
@@ -52,7 +52,7 @@ export default function HomePage() {
 
       <div className="mx-auto pt-6 pb-8 max-w-3xl">
         {filteredStores.length === 0 ? (
-          <div className="text-center py-8">
+          <div className="flex flex-col items-center justify-center h-[calc(100vh-17.5rem)] text-center px-4">
             <StoreIcon className="h-12 w-12 mb-4 text-gray-400 mx-auto" />
             <h1 className="text-xl font-semibold mb-2 text-gray-600">No tienes tiendas guardadas</h1>
             <p className="text-gray-500">Usa el botón + para añadir una tienda</p>

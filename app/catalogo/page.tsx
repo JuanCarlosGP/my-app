@@ -48,12 +48,14 @@ export default function CatalogoPage() {
 
   if (!hasStores) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-screen p-4 text-center">
-        <StoreIcon className="h-12 w-12 mb-4 text-gray-400" />
-        <h1 className="text-xl font-semibold mb-2 text-gray-600">No hay tiendas disponibles</h1>
-        <p className="text-gray-500">
-          Añade una tienda desde la página principal para ver su catálogo
-        </p>
+      <div className="min-h-[calc(100vh-3.75rem)]">
+        <div className="flex flex-col items-center justify-center h-[calc(100vh-3.75rem)] text-center px-4">
+          <StoreIcon className="h-12 w-12 mb-4 text-gray-400" />
+          <h1 className="text-xl font-semibold mb-2 text-gray-600">No hay tiendas disponibles</h1>
+          <p className="text-gray-500">
+            Añade una tienda desde la página principal para ver su catálogo
+          </p>
+        </div>
       </div>
     )
   }

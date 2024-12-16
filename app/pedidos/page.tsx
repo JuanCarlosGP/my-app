@@ -72,7 +72,7 @@ export default function PedidosPage() {
   }, 0)
 
   return (
-    <div>
+    <div className="min-h-[calc(100vh-3.75rem)]">
       <div className="sticky top-0 z-10 bg-white/70 backdrop-blur-md pb-4">
         <HeaderPedidos 
           title="Pedido" 
@@ -81,7 +81,7 @@ export default function PedidosPage() {
       </div>
       <div className="container mx-auto px-1 py-6 max-w-3xl">
         {storesWithItems.length === 0 ? (
-          <div className="flex flex-col items-center justify-center min-h-screen p-4 text-center">
+          <div className="flex flex-col items-center justify-center h-[calc(100vh-15rem)] text-center px-4">
             <ShoppingCart className="h-12 w-12 mb-4 text-gray-400 mx-auto" />
             <h1 className="text-xl font-semibold mb-2 text-gray-600">No hay productos en el pedido</h1>
             <p className="text-gray-500">
@@ -89,7 +89,7 @@ export default function PedidosPage() {
             </p>
           </div>
         ) : !selectedStoreId ? (
-          <div className="flex flex-col items-center justify-center min-h-screen p-4 text-center">
+          <div className="flex flex-col items-center justify-center h-[calc(100vh-15rem)] text-center px-4">
             <ShoppingCart className="h-12 w-12 mb-4 text-gray-400" />
             <h2 className="text-xl font-semibold mb-2">Selecciona una tienda</h2>
             <p className="text-gray-600">
@@ -97,7 +97,7 @@ export default function PedidosPage() {
             </p>
           </div>
         ) : filteredItems.length === 0 ? (
-          <div className="flex flex-col items-center justify-center min-h-screen p-4 text-center">
+          <div className="flex flex-col items-center justify-center h-[calc(100vh-15rem)] text-center px-4">
             <ShoppingCart className="h-12 w-12 mb-4 text-gray-400" />
             <h2 className="text-xl font-semibold mb-2">Pedido vacío</h2>
             <p className="text-gray-600">
