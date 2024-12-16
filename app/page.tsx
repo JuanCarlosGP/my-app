@@ -29,46 +29,48 @@ export default function HomePage() {
     loadStores()
   }, [])
 
+  if (loading) return <LoadingSpinner />
+
   const filteredStores = stores.filter(store =>
     store.name.toLowerCase().includes(searchTerm.toLowerCase())
   )
 
-  if (loading) return <LoadingSpinner />
-
   return (
-    <div className="min-h-[calc(100vh-3.75rem)]">
-      <div className="sticky top-0 z-10 bg-white/70 backdrop-blur-md">
-        <Header title="Tiendas" />
-        <div className="px-4 pb-4">
-          <Input
-            type="text"
-            placeholder="Buscar tiendas..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="bg-gray-50 border-gray-200"
-          />
-        </div>
-      </div>
-
-      <div className="mx-auto pt-6 pb-8 max-w-3xl">
-        {filteredStores.length === 0 ? (
-          <div className="flex flex-col items-center justify-center h-[calc(100vh-17.5rem)] text-center px-4">
-            <StoreIcon className="h-12 w-12 mb-4 text-gray-400 mx-auto" />
-            <h1 className="text-xl font-semibold mb-2 text-gray-600">No tienes tiendas guardadas</h1>
-            <p className="text-gray-500">Usa el botón + para añadir una tienda</p>
-          </div>
-        ) : (
-          filteredStores.map((store) => (
-            <StoreCard
-              key={store.id}
-              id={store.id}
-              name={store.name}
-              description={store.description || ''}
-              subdescription={store.subdescription || ''}
-              imageUrl={store.image_url || ''}
+    <div className="bg-gray-50 min-h-screen">
+      <div className="max-w-2xl mx-auto">
+        <div className="sticky top-0 z-10 bg-white/70 backdrop-blur-md">
+          <Header title="Tiendas" />
+          <div className="px-4 pb-4">
+            <Input
+              type="text"
+              placeholder="Buscar tiendas..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="bg-gray-50 border-gray-200"
             />
-          ))
-        )}
+          </div>
+        </div>
+
+        <div className="px-4 space-y-4 pb-10">
+          {filteredStores.length === 0 ? (
+            <div className="flex flex-col items-center justify-center h-[calc(100vh-17.5rem)] text-center">
+              <StoreIcon className="h-12 w-12 mb-4 text-gray-400 mx-auto" />
+              <h1 className="text-xl font-semibold mb-2 text-gray-600">No tienes tiendas guardadas</h1>
+              <p className="text-gray-500">Usa el botón + para añadir una tienda</p>
+            </div>
+          ) : (
+            filteredStores.map((store) => (
+              <StoreCard
+                key={store.id}
+                id={store.id}
+                name={store.name}
+                description={store.description || ''}
+                subdescription={store.subdescription || ''}
+                imageUrl={store.image_url || ''}
+              />
+            ))
+          )}
+        </div>
       </div>
 
       <StoreAccessForm />
