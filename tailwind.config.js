@@ -67,11 +67,42 @@ module.exports = {
             transform: 'scale(1.05)',
           },
         },
+        shimmer: {
+          '0%': { transform: 'translateX(-100%)' },
+          '100%': { transform: 'translateX(100%)' }
+        },
+        'bounce-subtle': {
+          '0%, 100%': { transform: 'translateY(-2px)' },
+          '50%': { transform: 'translateY(2px)' }
+        },
+        'gradient-x': {
+          '0%, 100%': {
+            'background-size': '1000% 1000%',
+            'background-position': '0% 50%'
+          },
+          '50%': {
+            'background-size': '1000% 1000%',
+            'background-position': '100% 50%'
+          }
+        },
+        'border-flow': {
+          '0%, 100%': {
+            'transform': 'translateX(-100%)'
+          },
+          '50%': {
+            'transform': 'translateX(100%)'
+          }
+        }
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
         glow: 'glow 2s ease-in-out infinite',
+        'shimmer': 'shimmer 2.5s infinite',
+        'bounce-subtle': 'bounce-subtle 3s ease-in-out infinite',
+        'seller-badge': 'glow 3s ease-in-out infinite',
+        'gradient-x': 'gradient-x 15s linear infinite',
+        'border-flow': 'border-flow 4s linear infinite'
       },
     },
   },

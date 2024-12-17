@@ -106,6 +106,24 @@ function isProfileIncomplete(profile: Profile | null): boolean {
   return !profile?.phone || !profile?.name || !profile?.wechat_id
 }
 
+function SellerBadge({ isSeller }: { isSeller: boolean }) {
+  if (!isSeller) return null;
+  
+  return (
+    <div className="px-4 mb-6 mt-[-0.8rem]">
+      <div className="relative flex items-center gap-2 bg-blue-50 text-blue-700 px-3 py-2 rounded-lg border border-blue-200 shadow-sm overflow-hidden">
+        <div className="absolute inset-0 rounded-lg overflow-hidden">
+          <div className="absolute inset-0 rounded-lg border-2 border-transparent overflow-hidden">
+            <div className="absolute inset-0 rounded-lg bg-gradient-to-r from-transparent via-blue-400/30 to-transparent w-[100%] animate-border-flow" />
+          </div>
+        </div>
+        <Store className="w-4 h-4 relative z-10" />
+        <span className="text-sm font-medium relative z-10">Cuenta de Vendedor</span>
+      </div>
+    </div>
+  );
+}
+
 export default function AjustesPage() {
   const [profile, setProfile] = useState<Profile | null>(null)
   const [loading, setLoading] = useState(true)
@@ -217,6 +235,8 @@ export default function AjustesPage() {
             <p className="text-sm text-gray-500">{profile?.phone || 'Sin teléfono'}</p>
           </div>
         </div>
+
+        <SellerBadge isSeller={!!profile?.is_seller} />
 
         <div className="space-y-6 px-4">
           <MenuSection title="Cuenta">

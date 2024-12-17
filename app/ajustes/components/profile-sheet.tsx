@@ -24,6 +24,7 @@ import { supabase } from '@/app/lib/supabase'
 import { toast } from "react-hot-toast"
 import { useAuth } from '@/app/providers/auth-provider'
 import { useEffect, useState } from "react"
+import { Check, X } from "lucide-react"
 
 const profileFormSchema = z.object({
   name: z.string().min(2, {
@@ -106,8 +107,6 @@ export function ProfileSheet({ isOpen, onOpenChange, phoneNumber, onProfileUpdat
         throw new Error('No hay sesión de usuario')
       }
 
-      console.log('Enviando datos:', data)
-
       const { error } = await supabase
         .from('profiles')
         .update({
@@ -124,11 +123,35 @@ export function ProfileSheet({ isOpen, onOpenChange, phoneNumber, onProfileUpdat
 
       checkFormCompleteness(data)
       await onProfileUpdate()
-      toast.success('Perfil actualizado correctamente')
+      toast.success('¡Perfil actualizado correctamente!', {
+        duration: 3000,
+        position: 'top-center',
+        style: {
+          background: 'hsl(142.1 76.2% 97.3%)',
+          color: 'hsl(0 0% 0%)',
+          padding: '16px',
+          borderRadius: '8px',
+          border: '1px solid hsl(142.1 76.2% 90.3%)',
+          boxShadow: 'rgba(0, 0, 0, 0.12) 0px 4px 6px -1px, rgba(0, 0, 0, 0.07) 0px 2px 4px -1px',
+        },
+        icon: <Check className="w-4 h-4 text-emerald-600" />,
+      })
       onOpenChange(false)
     } catch (error) {
       console.error('Error al guardar el perfil:', error)
-      toast.error('Error al guardar el perfil')
+      toast.error('Error al guardar el perfil', {
+        duration: 3000,
+        position: 'top-center',
+        style: {
+          background: 'hsl(0 84.2% 97.3%)',
+          color: 'hsl(0 0% 0%)',
+          padding: '16px',
+          borderRadius: '8px',
+          border: '1px solid hsl(0 84.2% 90.3%)',
+          boxShadow: 'rgba(0, 0, 0, 0.12) 0px 4px 6px -1px, rgba(0, 0, 0, 0.07) 0px 2px 4px -1px',
+        },
+        icon: <X className="w-4 h-4 text-red-600" />,
+      })
     }
   }
 

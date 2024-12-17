@@ -4,6 +4,7 @@ export interface Profile {
   name: string | null
   wechat_id: string | null
   created_at: string
+  is_seller: boolean
 }
 
 export type Address = {

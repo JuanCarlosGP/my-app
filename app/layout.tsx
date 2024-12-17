@@ -29,6 +29,16 @@ export default function RootLayout({
             <BottomNav />
           </CartProvider>
         </AuthProvider>
+        <Toaster 
+          position="top-center"
+          toastOptions={{
+            duration: 3000,
+            style: {
+              maxWidth: '420px',
+              padding: '12px 16px',
+            },
+          }}
+        />
       </body>
     </html>
   )
