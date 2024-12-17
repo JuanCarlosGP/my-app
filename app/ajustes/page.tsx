@@ -32,6 +32,7 @@ import { AddressesListSheet } from '../pedidos/components/addresses-list-sheet'
 import { useAddresses } from '../hooks/use-addresses'
 import { LoadingSpinner } from '@/app/components/loading'
 import { MyStoresSheet } from './components/my-stores-sheet'
+import { cn } from "@/lib/utils"
 
 interface MenuSectionProps {
   title: string
@@ -59,29 +60,50 @@ interface MenuItemProps {
   labelClassName?: string
   className?: string
   description?: string
+  highlight?: boolean
 }
 
-function MenuItem({ icon: Icon, label, onClick, disabled, labelClassName, className, description }: MenuItemProps) {
+function MenuItem({ icon: Icon, label, onClick, disabled, labelClassName, className, description, highlight }: MenuItemProps) {
   return (
     <button
-      className={`w-full px-4 py-3 flex items-center justify-between hover:bg-gray-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed ${className}`}
+      className={cn(
+        "w-full px-4 py-3 flex items-center justify-between hover:bg-gray-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed",
+        className
+      )}
       onClick={onClick}
       disabled={disabled}
     >
       <div className="flex items-center gap-3">
-        <div className="flex items-center justify-center w-8 h-8 rounded-full bg-gray-100">
-          <Icon className="w-4 h-4" />
+        <div className={cn(
+          "flex items-center justify-center w-8 h-8 rounded-full relative",
+          highlight ? "bg-blue-100 ring-2 ring-blue-600 ring-offset-2 animate-glow" : "bg-gray-100"
+        )}>
+          <Icon className={cn("w-4 h-4", highlight && "text-blue-600")} />
+          {highlight && (
+            <div className="absolute inset-0 bg-blue-300/20 rounded-full animate-pulse" />
+          )}
         </div>
         <div className="text-left">
-          <span className={`block text-sm font-medium ${labelClassName}`}>{label}</span>
+          <span className={cn(
+            "block text-sm font-medium",
+            labelClassName
+          )}>
+            {label}
+          </span>
           {description && (
-            <span className="text-xs text-gray-500">{description}</span>
+            <span className="text-xs text-gray-500">
+              {description}
+            </span>
           )}
         </div>
       </div>
       <ChevronRight className="w-4 h-4 text-gray-400" />
     </button>
   )
+}
+
+function isProfileIncomplete(profile: Profile | null): boolean {
+  return !profile?.phone || !profile?.name || !profile?.wechat_id
 }
 
 export default function AjustesPage() {
@@ -179,6 +201,8 @@ export default function AjustesPage() {
     }
   }
 
+  const profileNeedsCompletion = isProfileIncomplete(profile)
+
   return (
     <div className="bg-gray-50 min-h-screen pb-10">
       <div className="max-w-2xl mx-auto">
@@ -199,8 +223,9 @@ export default function AjustesPage() {
             <MenuItem
               icon={User}
               label="Editar Perfil"
-              description="Modifica tus datos personales"
+              description={profileNeedsCompletion ? "¡Completa tu perfil!" : "Modifica tus datos personales"}
               onClick={() => setIsProfileSheetOpen(true)}
+              highlight={profileNeedsCompletion}
             />
             <Separator />
             <MenuItem

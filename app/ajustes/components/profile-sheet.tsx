@@ -47,6 +47,8 @@ interface ProfileSheetProps {
 export function ProfileSheet({ isOpen, onOpenChange, phoneNumber, onProfileUpdate }: ProfileSheetProps) {
   const { session } = useAuth()
   const [loading, setLoading] = useState(true)
+  const [isComplete, setIsComplete] = useState(true)
+  
   const form = useForm<ProfileFormValues>({
     resolver: zodResolver(profileFormSchema),
     defaultValues: {
@@ -55,6 +57,12 @@ export function ProfileSheet({ isOpen, onOpenChange, phoneNumber, onProfileUpdat
       phone: phoneNumber || "",
     },
   })
+
+  const checkFormCompleteness = (data: any) => {
+    const complete = !!(data.name && data.phone && data.wechat_id)
+    setIsComplete(complete)
+    return complete
+  }
 
   useEffect(() => {
     async function loadProfile() {
@@ -76,6 +84,7 @@ export function ProfileSheet({ isOpen, onOpenChange, phoneNumber, onProfileUpdat
               wechat_id: data.wechat_id || "",
               phone: data.phone || ""
             })
+            checkFormCompleteness(data)
           }
         } catch (error) {
           console.error('Error cargando perfil:', error)
@@ -113,6 +122,7 @@ export function ProfileSheet({ isOpen, onOpenChange, phoneNumber, onProfileUpdat
         throw error
       }
 
+      checkFormCompleteness(data)
       await onProfileUpdate()
       toast.success('Perfil actualizado correctamente')
       onOpenChange(false)
@@ -121,6 +131,13 @@ export function ProfileSheet({ isOpen, onOpenChange, phoneNumber, onProfileUpdat
       toast.error('Error al guardar el perfil')
     }
   }
+
+  useEffect(() => {
+    const subscription = form.watch((data) => {
+      checkFormCompleteness(data)
+    })
+    return () => subscription.unsubscribe()
+  }, [form.watch])
 
   return (
     <Sheet open={isOpen} onOpenChange={onOpenChange}>

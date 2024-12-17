@@ -1,6 +1,7 @@
 import { Button } from "@/components/ui/button"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
+import { useState } from "react"
 import {
   Sheet,
   SheetClose,
@@ -17,8 +18,22 @@ interface FeedbackSheetProps {
 }
 
 export function FeedbackSheet({ isOpen, onOpenChange }: FeedbackSheetProps) {
+  const [isFirstFocus, setIsFirstFocus] = useState(true)
+
+  const handleFocus = (e: React.FocusEvent<HTMLTextAreaElement>) => {
+    if (isFirstFocus) {
+      e.target.blur()
+      setIsFirstFocus(false)
+    }
+  }
+
   return (
-    <Sheet open={isOpen} onOpenChange={onOpenChange}>
+    <Sheet open={isOpen} onOpenChange={(open) => {
+      if (open) {
+        setIsFirstFocus(true)
+      }
+      onOpenChange(open)
+    }}>
       <SheetContent 
         side="right" 
         className="w-full h-full border-none md:w-[400px] lg:w-[540px] p-0 md:p-6"
@@ -42,7 +57,10 @@ export function FeedbackSheet({ isOpen, onOpenChange }: FeedbackSheetProps) {
                 <Textarea 
                   id="feedback" 
                   placeholder="Cuéntanos qué podemos mejorar..." 
-                  className="min-h-[150px] bg-white border-gray-200" 
+                  className="min-h-[150px] bg-white border-gray-200"
+                  autoFocus={false}
+                  autoComplete="off"
+                  onFocus={handleFocus}
                 />
               </div>
             </div>
