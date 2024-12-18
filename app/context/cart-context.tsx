@@ -6,6 +6,11 @@ import { supabase } from '@/app/lib/supabase'
 import { useAuth } from '@/app/providers/auth-provider'
 import { toast } from 'react-hot-toast'
 
+export interface Store {
+  id: string
+  name: string
+}
+
 export interface CartItem extends Product {
   quantity: number
   note: string | null
@@ -21,7 +26,7 @@ interface CartContextType {
   clearCart: () => Promise<void>
   selectedStoreId: string | null
   setSelectedStoreId: (storeId: string | null) => void
-  getUniqueStores: () => { id: string; name: string }[]
+  getUniqueStores: () => Promise<Store[]>
 }
 
 export const CartContext = createContext<CartContextType>({} as CartContextType)
@@ -297,16 +302,30 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     return acc
   }, {} as { [key: string]: number })
 
-  const getUniqueStores = () => {
-    const storeIds = new Set(items
+  const getUniqueStores = async () => {
+    const storeIds = Array.from(new Set(items
       .filter(item => item.store_id && item.quantity > 0)
       .map(item => item.store_id)
-    )
+    ))
     
-    return Array.from(storeIds).map(id => ({
-      id,
-      name: 'Tienda ' + id.slice(0, 4)
-    }))
+    if (storeIds.length === 0) return []
+
+    try {
+      const { data: stores, error } = await supabase
+        .from('stores')
+        .select('id, name')
+        .in('id', storeIds)
+
+      if (error) {
+        console.error('Error fetching store names:', error)
+        return []
+      }
+
+      return stores as Store[]
+    } catch (error) {
+      console.error('Error in getUniqueStores:', error)
+      return []
+    }
   }
 
   return (

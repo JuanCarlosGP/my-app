@@ -207,7 +207,7 @@ export function CategorySheet({ id, name, description, subdescription, imageUrl 
                     <div className="flex items-center justify-between">
                       <div className="flex flex-col text-sm text-gray-500">
                         <span>{product.units_per_package} uds/pack</span>
-                        <span className="text-gray-400">{product.units_per_box} uds/caja (info)</span>
+                        <span className="text-gray-400">{product.units_per_box} uds/caja</span>
                       </div>
                     </div>
                   </div>
