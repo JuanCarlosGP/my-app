@@ -13,7 +13,8 @@ import {
   Paintbrush, 
   LogOut,
   ChevronRight,
-  Store
+  Store,
+  HelpCircle
 } from 'lucide-react'
 import { ProfileHeader } from '../components/profile-header'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog"
@@ -34,6 +35,7 @@ import { LoadingSpinner } from '@/app/components/loading'
 import { MyStoresSheet } from './components/my-stores-sheet'
 import { cn } from "@/lib/utils"
 import confetti from 'canvas-confetti'
+import { SupportSheet } from './components/support-sheet'
 
 interface MenuSectionProps {
   title: string
@@ -162,6 +164,7 @@ export default function AjustesPage() {
   const [isCustomSheetOpen, setIsCustomSheetOpen] = useState(false)
   const [showLogoutDialog, setShowLogoutDialog] = useState(false)
   const [isMyStoresOpen, setIsMyStoresOpen] = useState(false)
+  const [isSupportOpen, setIsSupportOpen] = useState(false)
 
   const { selectAddress } = useAddresses()
 
@@ -333,6 +336,13 @@ export default function AjustesPage() {
               labelClassName={!profile?.is_seller ? "line-through" : ""}
               onClick={() => setIsStoreSettingsOpen(true)}
             />
+            <Separator />
+            <MenuItem
+              icon={HelpCircle}
+              label="Soporte"
+              description={profile?.is_seller ? "Centro de ayuda" : "¿Quieres ser vendedor?"}
+              onClick={() => setIsSupportOpen(true)}
+            />
           </MenuSection>
 
           <Card>
@@ -389,6 +399,11 @@ export default function AjustesPage() {
       <MyStoresSheet
         isOpen={isMyStoresOpen}
         onOpenChange={setIsMyStoresOpen}
+      />
+
+      <SupportSheet
+        isOpen={isSupportOpen}
+        onOpenChange={setIsSupportOpen}
       />
 
       <Dialog open={showLogoutDialog} onOpenChange={setShowLogoutDialog}>
