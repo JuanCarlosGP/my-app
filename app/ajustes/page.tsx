@@ -33,6 +33,7 @@ import { useAddresses } from '../hooks/use-addresses'
 import { LoadingSpinner } from '@/app/components/loading'
 import { MyStoresSheet } from './components/my-stores-sheet'
 import { cn } from "@/lib/utils"
+import confetti from 'canvas-confetti'
 
 interface MenuSectionProps {
   title: string
@@ -109,9 +110,34 @@ function isProfileIncomplete(profile: Profile | null): boolean {
 function SellerBadge({ isSeller }: { isSeller: boolean }) {
   if (!isSeller) return null;
   
+  const shootConfetti = (event: React.MouseEvent) => {
+    const { clientX, clientY } = event;
+    const { innerWidth, innerHeight } = window;
+    
+    // Convertir las coordenadas del click a porcentajes
+    const x = clientX / innerWidth;
+    const y = clientY / innerHeight;
+    
+    confetti({
+      origin: { x, y },
+      angle: 270 + (Math.random() * 90 - 45), // Ángulo aleatorio
+      spread: 90, // Dispersión amplia
+      startVelocity: 30,
+      particleCount: 100, // Cantidad de partículas
+      decay: 0.90,
+      colors: ['#FF6B6B', '#4ECDC4', '#45B7D1', '#96CEB4', '#FFEEAD', '#D4A5A5', '#9B59B6'], // Colores variados
+      gravity: 0.2,
+      scalar: 1,
+      ticks: 200
+    });
+  };
+  
   return (
     <div className="px-4 mb-6 mt-[-0.8rem]">
-      <div className="relative flex items-center gap-2 bg-blue-50 text-blue-700 px-3 py-2 rounded-lg border border-blue-200 shadow-sm overflow-hidden">
+      <div 
+        onClick={shootConfetti}
+        className="relative flex items-center gap-2 bg-blue-50 text-blue-700 px-3 py-2 rounded-lg border border-blue-200 shadow-sm overflow-hidden cursor-pointer hover:bg-blue-100 transition-colors"
+      >
         <div className="absolute inset-0 rounded-lg overflow-hidden">
           <div className="absolute inset-0 rounded-lg border-2 border-transparent overflow-hidden">
             <div className="absolute inset-0 rounded-lg bg-gradient-to-r from-transparent via-blue-400/30 to-transparent w-[100%] animate-border-flow" />
@@ -293,17 +319,19 @@ export default function AjustesPage() {
             <MenuItem
               icon={PackagePlus}
               label="Crear mi Tienda"
-              description="Próximamente"
-              disabled={true}
-              labelClassName="line-through"
+              description={profile?.is_seller ? "Crea una nueva tienda" : "Próximamente"}
+              disabled={!profile?.is_seller}
+              labelClassName={!profile?.is_seller ? "line-through" : ""}
+              onClick={() => setIsAddStoreOpen(true)}
             />
             <Separator />
             <MenuItem
               icon={SlidersHorizontal}
               label="Configuración de mi tienda"
-              description="Próximamente"
-              disabled={true}
-              labelClassName="line-through"
+              description={profile?.is_seller ? "Gestiona tu tienda" : "Próximamente"}
+              disabled={!profile?.is_seller}
+              labelClassName={!profile?.is_seller ? "line-through" : ""}
+              onClick={() => setIsStoreSettingsOpen(true)}
             />
           </MenuSection>
 
