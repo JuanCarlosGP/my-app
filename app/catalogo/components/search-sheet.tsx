@@ -115,7 +115,7 @@ export function SearchSheet({ variant = 'icon' }: SearchSheetProps) {
               filteredProducts.map((product) => (
                 <div 
                   key={product.id} 
-                  className="flex flex-col bg-white rounded-lg border border-gray-200/50 overflow-hidden"
+                  className="flex flex-col bg-white rounded-lg border border overflow-hidden w-full"
                   onClick={(e) => handleProductClick(e, product)}
                 >
                   <div className={cn(
@@ -137,13 +137,30 @@ export function SearchSheet({ variant = 'icon' }: SearchSheetProps) {
                       className="object-cover"
                     />
                   </div>
-                  <div className="p-4">
-                    <h3 className="text-base font-medium line-clamp-2 mb-3">
+                  <div className="p-2">
+                    <h3 className="text-base font-medium line-clamp-2 mb-2">
                       {product.name}
                     </h3>
-                    <div className="flex items-center justify-between">
-                      <span className="font-bold text-xl">{product.price.toFixed(2)}€</span>
-                      <div className="flex gap-2">
+                    <div className="flex flex-col gap-1">
+                      <div className="flex items-center justify-between">
+                        <span className="font-bold text-xl text-blue-600">
+                          {product.price.toFixed(2)}€
+                        </span>
+                        <button 
+                          className="p-2.5 bg-gray-50 rounded-full transition-colors hover:bg-gray-100"
+                          onClick={(e) => {
+                            e.preventDefault();
+                            addToCart(product, product.units_per_package);
+                          }}
+                        >
+                          <Plus className="w-5 h-5 text-green-600" />
+                        </button>
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <div className="flex flex-col text-sm text-gray-500">
+                          <span>{product.units_per_package}u/pack</span>
+                          <span>{product.units_per_box}u/caja</span>
+                        </div>
                         {productQuantities[product.id] > 0 && (
                           <button 
                             className="p-2.5 bg-gray-50 rounded-full transition-colors hover:bg-gray-100"
@@ -155,20 +172,8 @@ export function SearchSheet({ variant = 'icon' }: SearchSheetProps) {
                             <Minus className="w-5 h-5 text-red-600" />
                           </button>
                         )}
-                        <button 
-                          className="p-2.5 bg-gray-50 rounded-full transition-colors hover:bg-gray-100"
-                          onClick={(e) => {
-                            e.preventDefault();
-                            addToCart(product, product.units_per_package);
-                          }}
-                        >
-                          <Plus className="w-5 h-5 text-green-600" />
-                        </button>
                       </div>
                     </div>
-                    <span className="text-sm text-gray-500 block mt-2">
-                      {product.units_per_package}u/pack ({product.units_per_box} u/caja)
-                    </span>
                   </div>
                 </div>
               ))

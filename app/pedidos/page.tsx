@@ -8,7 +8,7 @@ import { HeaderPedidos } from '@/app/pedidos/components/header-pedidos'
 import { ChevronRight, ShoppingCart, ArrowUpDown } from 'lucide-react'
 import { useState, useEffect } from 'react'
 import { ProductSheet } from "@/app/catalogo/components/product-sheet"
-import { Product } from "@/app/data/stores"
+import { Product } from "@/app/lib/db"
 import { getAllProducts } from "@/app/data/stores"
 import { Button } from "@/components/ui/button"
 import { FacturacionSheet } from './components/facturacion-sheet'
@@ -60,11 +60,10 @@ export default function PedidosPage() {
   const handleCardClick = (cartItem: typeof items[0]) => {
     const fullProduct = allStoreProducts.find(p => p.id === cartItem.id)
     if (fullProduct) {
-      const productWithQuantity = {
+      setSelectedProduct({
         ...fullProduct,
         quantity: cartItem.quantity
-      }
-      setSelectedProduct(productWithQuantity)
+      } as Product & { quantity: number })
       setIsSheetOpen(true)
     }
   }
@@ -118,7 +117,7 @@ export default function PedidosPage() {
                 <div className="flex items-center gap-4">
                   <div className="relative w-24 h-24">
                     <Image
-                      src={item.image}
+                      src={item.image || '/placeholder.jpg'}
                       alt={item.name}
                       fill
                       className="object-cover rounded-md"
@@ -134,14 +133,14 @@ export default function PedidosPage() {
                         <p className="text-sm text-gray-500 mb-1">Precio</p>
                         <p className="font-medium text-blue-600">{formatPrice(item.price)}</p>
                         <p className="text-sm text-gray-500 mt-2 mb-1 whitespace-nowrap">
-                          Pack: <span className="font-medium text-black">{item.packages || 0}</span>
+                          Pack: <span className="font-medium text-black">{item.units_per_package || 0}</span>
                         </p>
                       </div>
                       <div>
                         <p className="text-sm text-gray-500 mb-1">Cantidad</p>
                         <p className="font-medium">{item.quantity}</p>
                         <p className="text-sm text-gray-500 mt-2 mb-1 whitespace-nowrap">
-                          Cajas: <span className="font-medium text-black">{item.boxes || 0}</span>
+                          Cajas: <span className="font-medium text-black">{item.units_per_box || 0}</span>
                         </p>
                       </div> 
                       <div>

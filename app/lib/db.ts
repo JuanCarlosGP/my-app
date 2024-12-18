@@ -22,14 +22,14 @@ export interface Category {
 export interface Product {
   id: string
   category_id: string
-  store_id: string
   name: string
   price: number
   units_per_box: number
   units_per_package: number
+  image_url: string | null
+  store_id: string
   reference: string | null
   barcode: string | null
-  image_url: string | null
   image: string | null
   note: string | null
 }
@@ -101,30 +101,28 @@ export async function getStoreById(storeId: string) {
   return data
 }
 
-export async function getCategoryProducts(storeId: string, categoryId: string): Promise<Product[]> {
-  try {
-    const { data, error } = await supabase
-      .from('products')
-      .select(`
+export async function getCategoryProducts(storeId: string, categoryId: string) {
+  const { data, error } = await supabase
+    .from('products')
+    .select(`
+      *,
+      category:categories(
         *,
-        category:categories(
-          id,
-          store_id
-        )
-      `)
-      .eq('category_id', categoryId)
-      .filter('category.store_id', 'eq', storeId)
+        store:stores(*)
+      )
+    `)
+    .eq('category_id', categoryId)
 
-    if (error) {
-      console.error('Error fetching products:', error)
-      throw error
-    }
-
-    return data || []
-  } catch (error) {
-    console.error('Error in getCategoryProducts:', error)
-    return []
+  if (error) {
+    console.error('Error fetching products:', error)
+    throw error
   }
+
+  // Añadir store_id a cada producto
+  return data.map(product => ({
+    ...product,
+    store_id: storeId
+  }))
 }
 
 export async function getAllProducts(storeId: string) {

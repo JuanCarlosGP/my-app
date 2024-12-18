@@ -31,6 +31,7 @@ export function CategorySheet({ id, name, description, subdescription, imageUrl 
   const { productQuantities, addToCart, removeFromCart } = useCart()
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null)
   const [isGridView, setIsGridView] = useState(true)
+  const { id: categoryId } = useParams()
 
   useEffect(() => {
     async function loadProducts() {
@@ -60,9 +61,42 @@ export function CategorySheet({ id, name, description, subdescription, imageUrl 
     setSelectedProduct(product);
   };
 
-  const handleAddToCart = (product: Product, quantity: number) => {
-    addToCart(product, quantity)
-    toast.success(`Se han añadido ${quantity} unidades al pedido`)
+  const handleAddToCart = async (e: React.MouseEvent, product: Product) => {
+    e.preventDefault()
+    e.stopPropagation()
+    
+    const storeId = Array.isArray(params.id) ? params.id[0] : params.id
+    console.log('handleAddToCart called with:', {
+      product,
+      storeId,
+      addToCartFunction: !!addToCart
+    })
+    
+    const productToAdd: Product = {
+      ...product,
+      store_id: storeId
+    }
+
+    try {
+      console.log('Calling addToCart with:', productToAdd)
+      await addToCart(productToAdd, product.units_per_package)
+      console.log('addToCart completed successfully')
+    } catch (error) {
+      console.error('Error in handleAddToCart:', error)
+      toast.error('Error al añadir el producto')
+    }
+  }
+
+  const handleRemoveFromCart = async (e: React.MouseEvent, product: Product) => {
+    e.preventDefault()
+    e.stopPropagation()
+    
+    try {
+      await removeFromCart(product, product.units_per_package)
+    } catch (error) {
+      console.error('Error removing from cart:', error)
+      toast.error('Error al eliminar el producto')
+    }
   }
 
   return (
@@ -162,10 +196,7 @@ export function CategorySheet({ id, name, description, subdescription, imageUrl 
                       </span>
                       <button 
                         className="p-2.5 bg-gray-50 rounded-full transition-colors hover:bg-gray-100"
-                        onClick={(e) => {
-                          e.preventDefault();
-                          addToCart(product, product.units_per_package);
-                        }}
+                        onClick={(e) => handleAddToCart(e, product)}
                       >
                         <Plus className="w-5 h-5 text-green-600" />
                       </button>
@@ -178,10 +209,7 @@ export function CategorySheet({ id, name, description, subdescription, imageUrl 
                       {productQuantities[product.id] > 0 && (
                         <button 
                           className="p-2.5 bg-gray-50 rounded-full transition-colors hover:bg-gray-100"
-                          onClick={(e) => {
-                            e.preventDefault();
-                            removeFromCart(product, product.units_per_package);
-                          }}
+                          onClick={(e) => handleRemoveFromCart(e, product)}
                         >
                           <Minus className="w-5 h-5 text-red-600" />
                         </button>

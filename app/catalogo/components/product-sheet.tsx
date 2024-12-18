@@ -13,7 +13,7 @@ import { Button } from "@/components/ui/button"
 interface ProductSheetProps {
   isOpen: boolean
   onClose: () => void
-  product: Product
+  product: Product & { quantity?: number }
 }
 
 export function ProductSheet({ isOpen, onClose, product }: ProductSheetProps) {
