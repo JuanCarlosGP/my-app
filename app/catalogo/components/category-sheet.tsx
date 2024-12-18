@@ -69,7 +69,7 @@ export function CategorySheet({ id, name, description, subdescription, imageUrl 
     <Sheet>
       <SheetTrigger asChild>
         <button className="w-full px-4 py-5 flex items-center justify-between hover:bg-gray-50 transition-colors">
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-4 ">
             <div className="w-20 h-20 relative rounded-lg overflow-hidden border border-gray-200/50">
               <Image
                 src={imageUrl}
@@ -92,7 +92,7 @@ export function CategorySheet({ id, name, description, subdescription, imageUrl 
           <ChevronRight className="w-5 h-5 text-gray-400" />
         </button>
       </SheetTrigger>
-      <SheetContent className="w-full sm:max-w-md bg-gray-50 p-0 overflow-y-auto">
+      <SheetContent className="w-full sm:max-w-md bg-gray-50 p-0 overflow-y-auto ">
         <div className="sticky top-0 bg-white/70 backdrop-blur-xl border-b border-gray-200/50 z-10">
           <div className="flex items-center justify-between p-4">
             <SheetClose className="p-2 hover:bg-gray-100 rounded-full transition-colors">
@@ -113,7 +113,7 @@ export function CategorySheet({ id, name, description, subdescription, imageUrl 
           </div>
         </div>
         
-        <div className="p-4">
+        <div className="p-4 ">
           <div className={cn(
             "grid gap-3",
             isGridView ? "grid-cols-2" : "grid-cols-1"
@@ -125,7 +125,7 @@ export function CategorySheet({ id, name, description, subdescription, imageUrl 
             ) : products.map((product) => (
               <div 
                 key={product.id} 
-                className="flex flex-col bg-white rounded-lg border border-gray-200/50 overflow-hidden w-full"
+                className="flex flex-col bg-white rounded-lg border border overflow-hidden w-full "
                 onClick={(e) => handleProductClick(e, product)}
               >
                 <div className={cn(

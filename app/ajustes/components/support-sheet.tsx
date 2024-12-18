@@ -30,12 +30,23 @@ interface SupportSheetProps {
   onOpenChange: (open: boolean) => void
 }
 
+const storeItems = [
+  {
+    id: "acceptVerify",
+    label: "Quiero que mi cuenta sea revisada para poder crear mi tienda.",
+  },
+  {
+    id: "allowNotifications",
+    label: "Recibir notificaciones para el proceso de verificación.",
+  },
+] as const
+
 export function SupportSheet({ isOpen, onOpenChange }: SupportSheetProps) {
-  const [acceptNotifications, setAcceptNotifications] = useState(false)
+  const [acceptedItems, setAcceptedItems] = useState<string[]>([])
 
   const handleSubmit = () => {
-    if (!acceptNotifications) {
-      toast.error("Debes aceptar recibir notificaciones para continuar")
+    if (acceptedItems.length < 2) {
+      toast.error("Debes aceptar todos los términos para continuar")
       return
     }
     
@@ -48,6 +59,14 @@ export function SupportSheet({ isOpen, onOpenChange }: SupportSheetProps) {
       },
     })
     onOpenChange(false)
+  }
+
+  const toggleItem = (itemId: string) => {
+    setAcceptedItems(prev => 
+      prev.includes(itemId)
+        ? prev.filter(i => i !== itemId)
+        : [...prev, itemId]
+    )
   }
 
   return (
@@ -71,24 +90,22 @@ export function SupportSheet({ isOpen, onOpenChange }: SupportSheetProps) {
                   </CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-4">
-                  <div className="flex items-start space-x-2">
-                    <Checkbox 
-                      id="notifications" 
-                      checked={acceptNotifications}
-                      onCheckedChange={(checked) => setAcceptNotifications(checked as boolean)}
-                    />
-                    <div className="grid gap-1.5 leading-none">
-                      <Label
-                        htmlFor="notifications"
-                        className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                      >
-                        Acepto recibir notificaciones
-                      </Label>
-                      <p className="text-xs text-muted-foreground">
-                        Te contactaremos para guiarte durante el proceso de verificación
-                      </p>
+                  {storeItems.map((item) => (
+                    <div
+                      key={item.id}
+                      onClick={() => toggleItem(item.id)}
+                      className="flex items-start space-x-3 space-y-0 rounded-md border p-4 cursor-pointer hover:bg-blue-50/50 transition-colors"
+                    >
+                      <Checkbox
+                        checked={acceptedItems.includes(item.id)}
+                        onCheckedChange={() => toggleItem(item.id)}
+                        className="mt-0.5"
+                      />
+                      <label className="font-normal cursor-pointer flex-1">
+                        {item.label}
+                      </label>
                     </div>
-                  </div>
+                  ))}
                 </CardContent>
               </Card>
 
@@ -123,6 +140,14 @@ export function SupportSheet({ isOpen, onOpenChange }: SupportSheetProps) {
                       Al solicitar una cuenta de vendedor, aceptas nuestros términos y condiciones,
                       incluyendo las comisiones por venta, políticas de envío y estándares de servicio al cliente.
                       La aprobación final está sujeta a la verificación exitosa de toda la información proporcionada.
+                    </AccordionContent>
+                  </AccordionItem>
+                  <AccordionItem value="fees">
+                    <AccordionTrigger>Tarifas</AccordionTrigger>
+                    <AccordionContent className="text-sm">
+                      La aplicación se encuentra en modo beta, lo cual indica que estamos en búsqueda de fallos, 
+                      errores y mejoras. Por lo tanto los primeros usuarios podrán disfrutar de la plataforma de 
+                      forma gratuita, esta oportunidad será reemplazada en el futuro por una tarifa mensual.
                     </AccordionContent>
                   </AccordionItem>
                 </Accordion>

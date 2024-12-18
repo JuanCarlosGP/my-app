@@ -1,6 +1,6 @@
 "use client"
 
-import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger, SheetClose } from "@/components/ui/sheet"
+import { Sheet, SheetContent, SheetClose, SheetTrigger } from "@/components/ui/sheet"
 import { Search, ArrowLeft, Plus, Minus } from "lucide-react"
 import { useSearch } from '@/app/context/search-context'
 import { useParams } from 'next/navigation'
@@ -10,9 +10,9 @@ import Image from 'next/image'
 import { Badge } from "@/components/ui/badge"
 import { useCart } from "@/hooks/use-cart"
 import { ProductSheet } from "./product-sheet"
-import { QuickAccessButton } from "./quick-access-button"
-
-
+import { Input } from "@/components/ui/input"
+import { ViewToggleButton } from "./view-toggle-button"
+import { cn } from "@/lib/utils"
 
 interface SearchSheetProps {
   variant?: 'icon' | 'card'
@@ -23,15 +23,28 @@ export function SearchSheet({ variant = 'icon' }: SearchSheetProps) {
   const storeId = params.id as string
   const [products, setProducts] = useState<Product[]>([])
   const { searchTerm, setSearchTerm } = useSearch()
-  const { items, productQuantities, addToCart, removeFromCart } = useCart()
+  const { productQuantities, addToCart, removeFromCart } = useCart()
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null)
+  const [loading, setLoading] = useState(true)
+  const [isGridView, setIsGridView] = useState(true)
 
   useEffect(() => {
     async function loadProducts() {
-      const allProducts = await getAllProducts(storeId)
-      setProducts(allProducts)
+      setLoading(true)
+      try {
+        const allProducts = await getAllProducts(storeId)
+        console.log('Products loaded:', allProducts)
+        setProducts(allProducts)
+      } catch (error) {
+        console.error('Error loading products:', error)
+      } finally {
+        setLoading(false)
+      }
     }
-    loadProducts()
+
+    if (storeId) {
+      loadProducts()
+    }
   }, [storeId])
 
   const filteredProducts = products.filter(product =>
@@ -49,12 +62,11 @@ export function SearchSheet({ variant = 'icon' }: SearchSheetProps) {
     <Sheet>
       <SheetTrigger asChild>
         {variant === 'card' ? (
-          <div>
-            <QuickAccessButton
-              icon={<Search className="w-5 h-5 text-emerald-600" />}
-              label="Buscador"
-              color="bg-emerald-50"
-            />
+          <div className="flex flex-col items-center py-5 hover:bg-gray-50 transition-colors cursor-pointer">
+            <div className="p-3 bg-emerald-50 rounded-xl mb-2.5 transition-transform hover:scale-105">
+              <Search className="w-5 h-5 text-emerald-600" />
+            </div>
+            <span className="text-sm font-medium text-gray-600">Buscador</span>
           </div>
         ) : (
           <button className="p-2 hover:bg-gray-100 rounded-full">
@@ -62,95 +74,106 @@ export function SearchSheet({ variant = 'icon' }: SearchSheetProps) {
           </button>
         )}
       </SheetTrigger>
-      <SheetContent className="w-full sm:max-w-md bg-[#f5f5f5] p-0 overflow-y-auto">
-        <div className="sticky top-0 bg-white/70 backdrop-blur-md z-10">
+      <SheetContent className="w-full sm:max-w-md bg-gray-50 p-0 overflow-y-auto">
+        <div className="sticky top-0 bg-white/70 backdrop-blur-xl border-b border-gray-200/50 z-10">
           <div className="flex items-center justify-between p-4">
-            <div className="flex items-center gap-2">
-              <SheetClose className="p-2 hover:bg-gray-100 rounded-full">
-                <ArrowLeft className="h-6 w-6" />
-              </SheetClose>
-            </div>
+            <SheetClose className="p-2 hover:bg-gray-100 rounded-full">
+              <ArrowLeft className="h-6 w-6" />
+            </SheetClose>
             
-            <h2 className="font-semibold text-lg absolute left-1/2 -translate-x-1/2">
+            <h2 className="font-semibold text-lg max-w-[60%] truncate text-center">
               Buscador
             </h2>
+
+            <ViewToggleButton 
+              isGridView={isGridView}
+              onToggle={() => setIsGridView(!isGridView)}
+            />
           </div>
 
           <div className="px-4 pb-4">
-            <input
+            <Input
               type="text"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               placeholder="Buscar productos..."
-              className="w-full p-2 border rounded-lg"
+              className="w-full bg-white border-gray-200"
             />
           </div>
         </div>
         
-        <div className="grid grid-cols-2 gap-2 m-1 mt-4">
-          {filteredProducts.map((product) => {
-            const quantity = productQuantities[product.id] || 0
-            
-            return (
-              <div 
-                key={product.id} 
-                className="flex flex-col bg-white rounded-lg mb-3"
-                onClick={(e) => handleProductClick(e, product)}
-              >
-                <div className="relative aspect-square mb-2">
-                  {quantity > 0 && (
-                    <Badge 
-                      variant="destructive" 
-                      className="absolute top-2 left-2 z-[2]"
-                    >
-                      {quantity}
-                    </Badge>
-                  )}
-                  <Image
-                    src={product.image_url || '/placeholder.jpg'}
-                    alt={product.name}
-                    fill
-                    className="rounded-lg object-cover"
-                  />
-                </div>
-                <div className="h-[2.8em] overflow-hidden relative px-2">
-                  <h3 className="text-sm leading-[1.4em] line-clamp-2">
-                    {product.name}
-                  </h3>
-                </div>
-                <div className="flex flex-col pb-2 px-2">
-                  <div className="flex items-center justify-between">
-                    <span className="font-bold text-l">{product.price.toFixed(2)}€</span>
-                    <div className="flex gap-2">
-                      {quantity > 0 && (
+        <div className="p-4">
+          <div className={cn(
+            "grid gap-3",
+            isGridView ? "grid-cols-2" : "grid-cols-1"
+          )}>
+            {loading ? (
+              <div className="col-span-2 text-center py-10">Cargando productos...</div>
+            ) : filteredProducts.length === 0 ? (
+              <div className="col-span-2 text-center py-10">No se encontraron productos</div>
+            ) : (
+              filteredProducts.map((product) => (
+                <div 
+                  key={product.id} 
+                  className="flex flex-col bg-white rounded-lg border border-gray-200/50 overflow-hidden"
+                  onClick={(e) => handleProductClick(e, product)}
+                >
+                  <div className={cn(
+                    "relative",
+                    isGridView ? "aspect-square" : "aspect-[16/9]"
+                  )}>
+                    {productQuantities[product.id] > 0 && (
+                      <Badge 
+                        variant="destructive" 
+                        className="absolute top-3 left-3 z-[2]"
+                      >
+                        {productQuantities[product.id]}
+                      </Badge>
+                    )}
+                    <Image
+                      src={product.image_url || ''}
+                      alt={product.name}
+                      fill
+                      className="object-cover"
+                    />
+                  </div>
+                  <div className="p-4">
+                    <h3 className="text-base font-medium line-clamp-2 mb-3">
+                      {product.name}
+                    </h3>
+                    <div className="flex items-center justify-between">
+                      <span className="font-bold text-xl">{product.price.toFixed(2)}€</span>
+                      <div className="flex gap-2">
+                        {productQuantities[product.id] > 0 && (
+                          <button 
+                            className="p-2.5 bg-gray-50 rounded-full transition-colors hover:bg-gray-100"
+                            onClick={(e) => {
+                              e.preventDefault();
+                              removeFromCart(product, product.units_per_package);
+                            }}
+                          >
+                            <Minus className="w-5 h-5 text-red-600" />
+                          </button>
+                        )}
                         <button 
-                          className="p-2.5 bg-gray-100 rounded-full transition-transform active:scale-90 hover:bg-gray-200"
+                          className="p-2.5 bg-gray-50 rounded-full transition-colors hover:bg-gray-100"
                           onClick={(e) => {
                             e.preventDefault();
-                            e.stopPropagation();
-                            removeFromCart(product, product.units_per_box);
+                            addToCart(product, product.units_per_package);
                           }}
                         >
-                          <Minus className="w-5 h-5 text-red-600" />
+                          <Plus className="w-5 h-5 text-green-600" />
                         </button>
-                      )}
-                      <button 
-                        className="p-2.5 bg-gray-100 rounded-full transition-transform active:scale-90 hover:bg-gray-200"
-                        onClick={(e) => {
-                          e.preventDefault();
-                          e.stopPropagation();
-                          addToCart(product, product.units_per_box);
-                        }}
-                      >
-                        <Plus className="w-5 h-5 text-green-600" />
-                      </button>
+                      </div>
                     </div>
+                    <span className="text-sm text-gray-500 block mt-2">
+                      {product.units_per_package}u/pack ({product.units_per_box} u/caja)
+                    </span>
                   </div>
-                  <span className="text-sm text-gray-500">{product.units_per_box} u/c</span>
                 </div>
-              </div>
-            )
-          })}
+              ))
+            )}
+          </div>
         </div>
 
         {selectedProduct && (

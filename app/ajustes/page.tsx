@@ -322,10 +322,8 @@ export default function AjustesPage() {
             <MenuItem
               icon={PackagePlus}
               label="Crear mi Tienda"
-              description={profile?.is_seller ? "Crea una nueva tienda" : "Próximamente"}
-              disabled={!profile?.is_seller}
-              labelClassName={!profile?.is_seller ? "line-through" : ""}
-              onClick={() => setIsAddStoreOpen(true)}
+              description={profile?.is_seller ? "Gestiona tus tiendas" : "¿Quieres ser vendedor?"}
+              onClick={() => setIsSupportOpen(true)}
             />
             <Separator />
             <MenuItem
@@ -335,13 +333,6 @@ export default function AjustesPage() {
               disabled={!profile?.is_seller}
               labelClassName={!profile?.is_seller ? "line-through" : ""}
               onClick={() => setIsStoreSettingsOpen(true)}
-            />
-            <Separator />
-            <MenuItem
-              icon={HelpCircle}
-              label="Soporte"
-              description={profile?.is_seller ? "Centro de ayuda" : "¿Quieres ser vendedor?"}
-              onClick={() => setIsSupportOpen(true)}
             />
           </MenuSection>
 

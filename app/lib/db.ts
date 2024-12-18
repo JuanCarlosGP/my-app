@@ -128,17 +128,41 @@ export async function getCategoryProducts(storeId: string, categoryId: string): 
 }
 
 export async function getAllProducts(storeId: string) {
-  const { data, error } = await supabase
-    .from('products')
-    .select('*')
-    .eq('store_id', storeId)
-  
-  if (error) {
-    console.error('Error fetching all products:', error)
+  try {
+    const { data, error } = await supabase
+      .from('categories')
+      .select(`
+        id,
+        products (
+          id,
+          category_id,
+          name,
+          price,
+          units_per_box,
+          units_per_package,
+          reference,
+          barcode,
+          image_url,
+          image,
+          note
+        )
+      `)
+      .eq('store_id', storeId)
+
+    if (error) throw error
+
+    const allProducts = data?.flatMap(category => 
+      category.products.map(product => ({
+        ...product,
+        store_id: storeId
+      }))
+    ) || []
+
+    return allProducts
+  } catch (error) {
+    console.error('Error in getAllProducts:', error)
     return []
   }
-  
-  return data
 }
 
 export async function getCategories(storeId: string) {
