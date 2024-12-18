@@ -66,11 +66,6 @@ export function CategorySheet({ id, name, description, subdescription, imageUrl 
     e.stopPropagation()
     
     const storeId = Array.isArray(params.id) ? params.id[0] : params.id
-    console.log('handleAddToCart called with:', {
-      product,
-      storeId,
-      addToCartFunction: !!addToCart
-    })
     
     const productToAdd: Product = {
       ...product,
@@ -78,9 +73,7 @@ export function CategorySheet({ id, name, description, subdescription, imageUrl 
     }
 
     try {
-      console.log('Calling addToCart with:', productToAdd)
       await addToCart(productToAdd, product.units_per_package)
-      console.log('addToCart completed successfully')
     } catch (error) {
       console.error('Error in handleAddToCart:', error)
       toast.error('Error al añadir el producto')
@@ -194,26 +187,28 @@ export function CategorySheet({ id, name, description, subdescription, imageUrl 
                       <span className="font-bold text-xl text-blue-600">
                         {product.price.toFixed(2)}€
                       </span>
-                      <button 
-                        className="p-2.5 bg-gray-50 rounded-full transition-colors hover:bg-gray-100"
-                        onClick={(e) => handleAddToCart(e, product)}
-                      >
-                        <Plus className="w-5 h-5 text-green-600" />
-                      </button>
+                      <div className="flex items-center gap-2">
+                        {productQuantities[product.id] > 0 && (
+                          <button 
+                            className="p-2.5 bg-gray-50 rounded-full transition-colors hover:bg-gray-100"
+                            onClick={(e) => handleRemoveFromCart(e, product)}
+                          >
+                            <Minus className="w-5 h-5 text-red-600" />
+                          </button>
+                        )}
+                        <button 
+                          className="p-2.5 bg-gray-50 rounded-full transition-colors hover:bg-gray-100"
+                          onClick={(e) => handleAddToCart(e, product)}
+                        >
+                          <Plus className="w-5 h-5 text-green-600" />
+                        </button>
+                      </div>
                     </div>
                     <div className="flex items-center justify-between">
                       <div className="flex flex-col text-sm text-gray-500">
-                        <span>{product.units_per_package}u/pack</span>
-                        <span>{product.units_per_box}u/caja</span>
+                        <span>{product.units_per_package} uds/pack</span>
+                        <span className="text-gray-400">{product.units_per_box} uds/caja (info)</span>
                       </div>
-                      {productQuantities[product.id] > 0 && (
-                        <button 
-                          className="p-2.5 bg-gray-50 rounded-full transition-colors hover:bg-gray-100"
-                          onClick={(e) => handleRemoveFromCart(e, product)}
-                        >
-                          <Minus className="w-5 h-5 text-red-600" />
-                        </button>
-                      )}
                     </div>
                   </div>
                 </div>

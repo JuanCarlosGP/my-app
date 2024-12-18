@@ -129,7 +129,6 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
 
       // 1. Obtener o crear orden
       const orderId = await ensureOrderExists(product.store_id)
-      console.log('Using order:', orderId)
 
       // 2. Verificar si el item ya existe
       const { data: existingItems, error: searchError } = await supabase
@@ -146,10 +145,11 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
       const existingItem = existingItems?.[0]
       const newQuantity = (existingItem?.quantity || 0) + quantity
 
-      // 3. Crear o actualizar item
+      // 3. Crear o actualizar item (sin límite por cajas)
       const { error: upsertError } = await supabase
         .from('order_items')
         .upsert({
+          id: existingItem?.id || undefined,
           order_id: orderId,
           product_id: product.id,
           quantity: newQuantity,
@@ -168,7 +168,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
         if (existingIndex >= 0) {
           return prevItems.map((item, index) => 
             index === existingIndex 
-              ? { ...item, quantity: newQuantity, note: note || null }
+              ? { ...item, quantity: newQuantity }
               : item
           )
         }
