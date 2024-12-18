@@ -189,7 +189,9 @@ export default function PedidosPage() {
 
       <Button 
         size="icon"
-        className="fixed bottom-24 right-4 h-14 w-14 rounded-full shadow-lg"
+        className={`fixed right-4 h-14 w-14 rounded-full shadow-lg z-50 ${
+          filteredItems.length > 0 ? 'bottom-32' : 'bottom-24'
+        }`}
         onClick={() => setIsStoreSelectorOpen(true)}
       >
         <ArrowUpDown className="h-6 w-6" />
