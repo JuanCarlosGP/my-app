@@ -10,6 +10,7 @@ import Image from 'next/image'
 import { Badge } from "@/components/ui/badge"
 import { useCart } from "@/hooks/use-cart"
 import { ProductSheet } from "./product-sheet"
+import { QuickAccessButton } from "./quick-access-button"
 
 
 
@@ -48,11 +49,12 @@ export function SearchSheet({ variant = 'icon' }: SearchSheetProps) {
     <Sheet>
       <SheetTrigger asChild>
         {variant === 'card' ? (
-          <div className="flex flex-col items-center bg-white p-4 rounded-lg shadow-sm cursor-pointer">
-            <div className="p-2.5 bg-gray-100 rounded-full mb-2">
-              <Search className="w-5 h-5 text-green-600" />
-            </div>
-            <span className="text-xs font-medium text-gray-700">Buscador</span>
+          <div>
+            <QuickAccessButton
+              icon={<Search className="w-5 h-5 text-emerald-600" />}
+              label="Buscador"
+              color="bg-emerald-50"
+            />
           </div>
         ) : (
           <button className="p-2 hover:bg-gray-100 rounded-full">

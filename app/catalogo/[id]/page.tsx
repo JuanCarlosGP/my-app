@@ -3,17 +3,17 @@
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { HeaderCatalogo } from "@/app/catalogo/components/header-catalogo";
-import { CategoryCard } from "@/app/components/category-card";
 import { NewProductsSheet } from "../components/new-products-sheet";
 import { SearchSheet } from "../components/search-sheet";
 import { PromotionsSheet } from "../components/promotions-sheet";
 import { CategorySheet } from "../components/category-sheet";
 import { getStoreById, type Store } from "@/app/lib/db";
-import { SearchProvider } from '@/app/context/search-context'
-import { supabase } from '@/app/lib/supabase'
-import { useAuth } from '@/app/providers/auth-provider'
-import { toast } from "react-hot-toast"
-import { LoadingSpinner } from '@/app/components/loading'
+import { SearchProvider } from '@/app/context/search-context';
+import { supabase } from '@/app/lib/supabase';
+import { useAuth } from '@/app/providers/auth-provider';
+import { LoadingSpinner } from '@/app/components/loading';
+import { Card, CardContent } from "@/components/ui/card";
+import { Separator } from "@/components/ui/separator";
 
 export default function CatalogoPage({ params }: { params: { id: string } }) {
   const router = useRouter();
@@ -65,39 +65,55 @@ export default function CatalogoPage({ params }: { params: { id: string } }) {
 
   return (
     <SearchProvider>
-      <div>
-        <div className="sticky top-0 z-10 bg-white/70 backdrop-blur-md">
+      <div className="min-h-screen bg-gray-50">
+        <div className="sticky top-0 z-10 bg-white/70 backdrop-blur-xl border-b border-gray-200/50">
           <HeaderCatalogo title={store.name} />
         </div>
 
-        {/* Banner publicitario */}
-        <div className="px-4 mx-auto max-w-5xl">
-          <img
-            src={store.banner_image || ''}
-            alt="Banner publicitario"
-            className="w-full h-[48vw] md:h-60 object-cover rounded-lg mb-6"
-          />
-
-          {/* Iconos de categorías */}
-          <div className="grid grid-cols-3 gap-3 mb-6 px-1">
-            <NewProductsSheet />
-            <SearchSheet variant="card" />
-            <PromotionsSheet />
+        <div className="max-w-2xl mx-auto">
+          {/* Banner */}
+          <div className="p-4">
+            <div className="relative rounded-lg overflow-hidden border border-gray-200/50">
+              <img
+                src={store.banner_image || ''}
+                alt="Banner publicitario"
+                className="w-full h-[48vw] md:h-60 object-cover"
+              />
+            </div>
           </div>
-        </div>
-        
-        {/* Categorías */}
-        <div className="max-w-3xl mx-auto pb-20">
-          {store.categories?.map((category) => (
-            <CategorySheet
-              key={category.id}
-              id={category.id}
-              name={category.name}
-              description={category.description || ''}
-              subdescription={category.subdescription || ''}
-              imageUrl={category.image_url || ''}
-            />
-          ))}
+
+          <div className="space-y-6 px-4 pb-20">
+            {/* Accesos rápidos */}
+            <Card className="overflow-hidden">
+              <CardContent className="p-0">
+                <div className="grid grid-cols-3 divide-x divide-gray-100">
+                  <NewProductsSheet />
+                  <SearchSheet variant="card" />
+                  <PromotionsSheet />
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Categorías */}
+            <Card>
+              <CardContent className="p-0">
+                <div className="py-2">
+                  {store.categories?.map((category, index) => (
+                    <div key={category.id}>
+                      <CategorySheet
+                        id={category.id}
+                        name={category.name}
+                        description={category.description || ''}
+                        subdescription={category.subdescription || ''}
+                        imageUrl={category.image_url || ''}
+                      />
+                      {index < (store.categories?.length ?? 0) - 1 && <Separator className="my-2" />}
+                    </div>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+          </div>
         </div>
       </div>
     </SearchProvider>

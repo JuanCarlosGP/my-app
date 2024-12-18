@@ -15,7 +15,7 @@ interface StoreCardProps {
 export function StoreCard({ id, name, description, subdescription, imageUrl }: StoreCardProps) {
   return (
     <Link href={`/catalogo/${id}`}>
-      <div className="bg-white border-b border-gray-200 py-4 rounded-lg m-2 cursor-pointer hover:shadow-lg transition-shadow">
+      <div className="bg-white border border-gray-200 py-4 rounded-lg m-2 cursor-pointer hover:shadow-lg transition-shadow">
         <div className="flex items-start gap-4">
           <div className="w-20 h-20 relative shrink-0 ml-2">
             <Image
