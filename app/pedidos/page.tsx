@@ -13,6 +13,57 @@ import { getAllProducts } from "@/app/data/stores"
 import { Button } from "@/components/ui/button"
 import { FacturacionSheet } from './components/facturacion-sheet'
 import { StoreSelectorSheet } from './components/store-selector-sheet'
+import { CartItem } from "@/app/context/cart-context"
+
+function ProductCard({ item }: { item: CartItem }) {
+  return (
+    <div className="flex items-center space-x-4 p-4 bg-white rounded-lg border">
+      <div className="relative w-16 h-16 flex-shrink-0">
+        <Image
+          src={item.image_url || '/placeholder.jpg'}
+          alt={item.name}
+          fill
+          className="object-cover rounded-md"
+          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+          onError={(e) => {
+            const target = e.target as HTMLImageElement
+            target.src = '/placeholder.jpg'
+          }}
+        />
+      </div>
+      <div className="flex-1">
+        <div className="flex items-center justify-between mb-2">
+          <h3 className="font-semibold truncate max-w-[200px]">{item.name}</h3>
+          <ChevronRight className="h-7 w-7 text-gray-400" />
+        </div>
+        <div className="grid grid-cols-3 gap-8">
+          <div>
+            <p className="text-sm text-gray-500 mb-1">Precio</p>
+            <p className="font-medium text-blue-600">{formatPrice(item.price)}</p>
+            <p className="text-sm text-gray-500 mt-2 mb-1 whitespace-nowrap">
+              Pack: <span className="font-medium text-black">{item.units_per_package || 0}</span>
+            </p>
+          </div>
+          <div>
+            <p className="text-sm text-gray-500 mb-1">Cantidad</p>
+            <p className="font-medium">{item.quantity}</p>
+            <p className="text-sm text-gray-500 mt-2 mb-1 whitespace-nowrap">
+              Cajas: <span className="font-medium text-black">{item.units_per_box || 0}</span>
+            </p>
+          </div> 
+          <div>
+            <p className="text-sm text-gray-500 mb-1">Total</p>
+            
+              <p className="font-medium whitespace-nowrap text-sm">
+                {formatPrice(item.price * item.quantity)}
+              </p>
+            
+          </div>
+        </div>
+      </div>
+    </div>
+  )
+}
 
 export default function PedidosPage() {
   const { items, selectedStoreId, setSelectedStoreId } = useCart()
@@ -21,36 +72,55 @@ export default function PedidosPage() {
   const [isSheetOpen, setIsSheetOpen] = useState(false)
   const [isFacturacionOpen, setIsFacturacionOpen] = useState(false)
   const [isStoreSelectorOpen, setIsStoreSelectorOpen] = useState(false)
-  
-  const allStoreProducts = selectedStoreId ? getAllProducts(selectedStoreId) : []
+  const [storeProducts, setStoreProducts] = useState<Product[]>([])
   
   const storesWithItems = Array.from(new Set(items
-    .filter(item => item.quantity > 0)
-    .map(item => item.id.split('-')[1])
+    .filter(item => item.quantity > 0 && item.store_id)
+    .map(item => item.store_id)
   ))
 
   useEffect(() => {
+    console.log('Items:', items)
+    console.log('Stores with items:', storesWithItems)
+    
     if (selectedStoreId) {
-      const hasItemsInSelectedStore = items.some(item => {
-        const itemStoreId = item.id.split('-')[1]
-        return itemStoreId === selectedStoreId && item.quantity > 0
-      })
+      const hasItemsInSelectedStore = items.some(item => 
+        item.store_id === selectedStoreId && item.quantity > 0
+      )
 
       if (!hasItemsInSelectedStore && storesWithItems.length > 0) {
-
         setSelectedStoreId(storesWithItems[0])
       }
     } else if (storesWithItems.length > 0) {
-
       setSelectedStoreId(storesWithItems[0])
     }
   }, [items, selectedStoreId, setSelectedStoreId, storesWithItems])
 
+  useEffect(() => {
+    async function loadProducts() {
+      if (selectedStoreId) {
+        console.log('Loading products for store:', selectedStoreId)
+        const products = await getAllProducts(selectedStoreId)
+        console.log('Loaded products:', products)
+        setStoreProducts(products)
+      }
+    }
+    loadProducts()
+  }, [selectedStoreId])
+
+  useEffect(() => {
+    console.log('Current state:', {
+      selectedStoreId,
+      storesWithItems,
+      items,
+      storeProducts
+    })
+  }, [selectedStoreId, storesWithItems, items, storeProducts])
+
   const storeItems = selectedStoreId 
-    ? items.filter(item => {
-        const itemStoreId = item.id.split('-')[1]
-        return itemStoreId === selectedStoreId && item.quantity > 0
-      })
+    ? items.filter(item => 
+        item.store_id === selectedStoreId && item.quantity > 0
+      )
     : []
 
   const filteredItems = storeItems.filter(item =>
@@ -58,7 +128,7 @@ export default function PedidosPage() {
   )
 
   const handleCardClick = (cartItem: typeof items[0]) => {
-    const fullProduct = allStoreProducts.find(p => p.id === cartItem.id)
+    const fullProduct = storeProducts.find(p => p.id === cartItem.id)
     if (fullProduct) {
       setSelectedProduct({
         ...fullProduct,
@@ -109,52 +179,9 @@ export default function PedidosPage() {
             </div>
           ) : (
             filteredItems.map((item) => (
-              <Card 
-                key={item.id} 
-                className="p-4 relative mb-1 cursor-pointer hover:bg-gray-50"
-                onClick={() => handleCardClick(item)}
-              >
-                <div className="flex items-center gap-4">
-                  <div className="relative w-24 h-24">
-                    <Image
-                      src={item.image || '/placeholder.jpg'}
-                      alt={item.name}
-                      fill
-                      className="object-cover rounded-md"
-                    />
-                  </div>
-                  <div className="flex-1">
-                    <div className="flex items-center justify-between mb-2">
-                      <h3 className="font-semibold truncate max-w-[200px]">{item.name}</h3>
-                      <ChevronRight className="h-7 w-7 text-gray-400" />
-                    </div>
-                    <div className="grid grid-cols-3 gap-8">
-                      <div>
-                        <p className="text-sm text-gray-500 mb-1">Precio</p>
-                        <p className="font-medium text-blue-600">{formatPrice(item.price)}</p>
-                        <p className="text-sm text-gray-500 mt-2 mb-1 whitespace-nowrap">
-                          Pack: <span className="font-medium text-black">{item.units_per_package || 0}</span>
-                        </p>
-                      </div>
-                      <div>
-                        <p className="text-sm text-gray-500 mb-1">Cantidad</p>
-                        <p className="font-medium">{item.quantity}</p>
-                        <p className="text-sm text-gray-500 mt-2 mb-1 whitespace-nowrap">
-                          Cajas: <span className="font-medium text-black">{item.units_per_box || 0}</span>
-                        </p>
-                      </div> 
-                      <div>
-                        <p className="text-sm text-gray-500 mb-1">Total</p>
-                        
-                          <p className="font-medium whitespace-nowrap text-sm">
-                            {formatPrice(item.price * item.quantity)}
-                          </p>
-                        
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </Card>
+              <div key={item.id} onClick={() => handleCardClick(item)}>
+                <ProductCard item={item} />
+              </div>
             ))
           )}
         </div>

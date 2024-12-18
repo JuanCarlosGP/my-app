@@ -6,9 +6,10 @@ import { supabase } from '@/app/lib/supabase'
 import { useAuth } from '@/app/providers/auth-provider'
 import { toast } from 'react-hot-toast'
 
-interface CartItem extends Product {
+export interface CartItem extends Product {
   quantity: number
   note: string | null
+  store_name?: string
 }
 
 interface CartContextType {
@@ -20,6 +21,7 @@ interface CartContextType {
   clearCart: () => Promise<void>
   selectedStoreId: string | null
   setSelectedStoreId: (storeId: string | null) => void
+  getUniqueStores: () => { id: string; name: string }[]
 }
 
 export const CartContext = createContext<CartContextType>({} as CartContextType)
@@ -42,29 +44,40 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
       console.log('Loading current order...')
       const { data: orders, error: orderError } = await supabase
         .from('orders')
-        .select('*')
+        .select(`
+          *,
+          store:stores (
+            id,
+            name
+          )
+        `)
         .eq('profile_id', session!.user.id)
         .eq('status', 'draft')
+        .single()
 
       if (orderError) {
         console.error('Error loading order:', orderError)
         return
       }
 
-      // Tomar el pedido más reciente si existe
-      const order = orders?.[0]
-      if (order) {
-        console.log('Found draft order:', order)
-        setCurrentOrder(order.id)
+      if (orders) {
+        console.log('Found draft order:', orders)
+        setCurrentOrder(orders.id)
+        setSelectedStoreId(orders.store_id)
 
         // Cargar los items del pedido
         const { data: orderItems, error: itemsError } = await supabase
           .from('order_items')
           .select(`
             *,
-            product:products(*)
+            product:products (
+              *,
+              category:categories (
+                store_id
+              )
+            )
           `)
-          .eq('order_id', order.id)
+          .eq('order_id', orders.id)
 
         if (itemsError) {
           console.error('Error loading order items:', itemsError)
@@ -75,7 +88,8 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
         const cartItems = orderItems?.map(item => ({
           ...item.product,
           quantity: item.quantity,
-          note: item.note
+          note: item.note,
+          store_id: item.product.category.store_id
         })) || []
 
         setItems(cartItems)
@@ -283,6 +297,18 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     return acc
   }, {} as { [key: string]: number })
 
+  const getUniqueStores = () => {
+    const storeIds = new Set(items
+      .filter(item => item.store_id && item.quantity > 0)
+      .map(item => item.store_id)
+    )
+    
+    return Array.from(storeIds).map(id => ({
+      id,
+      name: 'Tienda ' + id.slice(0, 4)
+    }))
+  }
+
   return (
     <CartContext.Provider value={{
       items,
@@ -292,7 +318,8 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
       productQuantities,
       clearCart,
       selectedStoreId,
-      setSelectedStoreId
+      setSelectedStoreId,
+      getUniqueStores
     }}>
       {children}
     </CartContext.Provider>

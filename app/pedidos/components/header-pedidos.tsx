@@ -1,22 +1,56 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import { Search } from 'lucide-react'
 import { Button } from '@/components/ui/button'
-import { useCart } from "@/hooks/use-cart"
-import { useState } from 'react'
 import { Input } from "@/components/ui/input"
 import { StoreSelectorSheet } from './store-selector-sheet'
+import { supabase } from '@/app/lib/supabase'
+import { useAuth } from '@/app/providers/auth-provider'
 
 interface HeaderPedidosProps {
   title: string
   onSearch: (term: string) => void
 }
 
-export function HeaderPedidos({ title, onSearch }: HeaderPedidosProps) {
-  const { getUniqueStores, selectedStoreId } = useCart()
-  const uniqueStores = getUniqueStores()
-  const [isOpen, setIsOpen] = useState(false)
+interface Store {
+  id: string
+  name: string
+}
 
-  const selectedStore = uniqueStores.find(store => store.id === selectedStoreId)
+export function HeaderPedidos({ title, onSearch }: HeaderPedidosProps) {
+  const [stores, setStores] = useState<Store[]>([])
+  const [selectedStore, setSelectedStore] = useState<Store | null>(null)
+  const [isOpen, setIsOpen] = useState(false)
+  const { session } = useAuth()
+
+  useEffect(() => {
+    async function loadStores() {
+      if (!session?.user?.id) return
+
+      const { data, error } = await supabase
+        .from('orders')
+        .select(`
+          store:stores (
+            id,
+            name
+          )
+        `)
+        .eq('profile_id', session.user.id)
+        .eq('status', 'draft')
+        .single()
+
+      if (error) {
+        console.error('Error loading stores:', error)
+        return
+      }
+
+      if (data?.store) {
+        setStores([data.store])
+        setSelectedStore(data.store)
+      }
+    }
+
+    loadStores()
+  }, [session?.user?.id])
 
   return (
     <header className="mb-4 pt-4 px-4">
