@@ -38,7 +38,7 @@ export default function HomePage() {
   return (
     <div className="bg-gray-50 min-h-screen">
       <div className="max-w-2xl mx-auto">
-        <div className="sticky top-0 z-10 bg-white/70 backdrop-blur-md">
+        <div className="sticky top-0 z-10 bg-white/70 backdrop-blur-lg border-b border-gray-200/50">
           <Header title="Tiendas" />
           <div className="px-4 pb-4">
             <Input

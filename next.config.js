@@ -1,7 +1,7 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
     images: {
-      domains: ['cataas.com', 'images.pexels.com', 'pexels.com', 'cdn.discordapp.com', 'media.discordapp.net'],
+      domains: ['cataas.com', 'images.pexels.com', 'pexels.com', 'vwlrkhtpqvdgevwommkl.supabase.co'],
     },
   };
   

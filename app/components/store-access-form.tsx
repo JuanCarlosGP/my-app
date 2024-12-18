@@ -45,7 +45,6 @@ export function StoreAccessForm() {
       )
 
       if (result.success) {
-        toast.success(result.message)
         form.reset()
         window.location.reload()
       } else {
