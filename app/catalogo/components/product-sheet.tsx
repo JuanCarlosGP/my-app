@@ -196,14 +196,6 @@ export function ProductSheet({ isOpen, onClose, product }: ProductSheetProps) {
             </div>
           </div>
         </div>
-        <div className="p-4 mt-auto">
-          <Button 
-            className="w-full" 
-            onClick={handleSave}
-          >
-            Guardar
-          </Button>
-        </div>
       </SheetContent>
     </Sheet>
   )

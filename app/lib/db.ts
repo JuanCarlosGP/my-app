@@ -101,19 +101,30 @@ export async function getStoreById(storeId: string) {
   return data
 }
 
-export async function getCategoryProducts(storeId: string, categoryId: string) {
-  const { data, error } = await supabase
-    .from('products')
-    .select('*')
-    .eq('store_id', storeId)
-    .eq('category_id', categoryId)
-  
-  if (error) {
-    console.error('Error fetching category products:', error)
+export async function getCategoryProducts(storeId: string, categoryId: string): Promise<Product[]> {
+  try {
+    const { data, error } = await supabase
+      .from('products')
+      .select(`
+        *,
+        category:categories(
+          id,
+          store_id
+        )
+      `)
+      .eq('category_id', categoryId)
+      .filter('category.store_id', 'eq', storeId)
+
+    if (error) {
+      console.error('Error fetching products:', error)
+      throw error
+    }
+
+    return data || []
+  } catch (error) {
+    console.error('Error in getCategoryProducts:', error)
     return []
   }
-  
-  return data
 }
 
 export async function getAllProducts(storeId: string) {
