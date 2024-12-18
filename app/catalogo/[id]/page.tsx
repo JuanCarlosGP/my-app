@@ -29,20 +29,35 @@ export default function CatalogoPage({ params }: { params: { id: string } }) {
       }
 
       try {
-        // Verificar si el usuario tiene acceso a la tienda
+        console.log('Checking access for store:', params.id)
+        
+        // Primero verificamos el acceso
         const { data: access, error: accessError } = await supabase
           .from('profile_stores')
-          .select('store_id')
+          .select('*')
           .eq('profile_id', session.user.id)
           .eq('store_id', params.id)
           .single()
+
+        console.log('Access check result:', { access, error: accessError })
 
         if (accessError || !access) {
           router.push('/')
           return
         }
 
-        // Si tiene acceso, cargar los datos de la tienda
+        // Si tiene acceso, actualizamos el timestamp
+        const now = new Date().toISOString()
+        const { error: updateError } = await supabase
+          .from('profile_stores')
+          .update({ last_visited_at: now })
+          .eq('id', access.id)
+
+        if (updateError) {
+          console.error('Error updating last_visited_at:', updateError)
+        }
+
+        // Finalmente cargamos los datos de la tienda
         const storeData = await getStoreById(params.id)
         if (storeData) {
           setStore(storeData)
@@ -50,7 +65,7 @@ export default function CatalogoPage({ params }: { params: { id: string } }) {
           router.push('/')
         }
       } catch (error) {
-        console.error('Error loading store:', error)
+        console.error('Error in checkAccess:', error)
         router.push('/')
       } finally {
         setLoading(false)

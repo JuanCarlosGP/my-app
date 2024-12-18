@@ -23,12 +23,14 @@ export default function CatalogoPage() {
       try {
         const { data: stores, error } = await supabase
           .from('profile_stores')
-          .select('store_id')
+          .select('store_id, last_visited_at')
           .eq('profile_id', session.user.id)
+          .order('last_visited_at', { ascending: false, nullsFirst: false })
           .limit(1)
           .single()
 
         if (error || !stores) {
+          console.error('No stores found:', error)
           setHasStores(false)
         } else {
           router.push(`/catalogo/${stores.store_id}`)
