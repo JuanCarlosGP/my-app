@@ -156,6 +156,7 @@ export default function PedidosPage() {
   const [isSheetOpen, setIsSheetOpen] = useState(false)
   const [storeProducts, setStoreProducts] = useState<Product[]>([])
   const [viewMode, setViewMode] = useState<"compact" | "detailed">("compact")
+  const [isFacturacionOpen, setIsFacturacionOpen] = useState(false)
   
   const storesWithItems = Array.from(new Set(items
     .filter(item => item.quantity > 0 && item.store_id)
@@ -240,7 +241,7 @@ export default function PedidosPage() {
   }, 0)
 
   return (
-    <div className="bg-gray-50 min-h-screen">
+    <div className="bg-gray-50 min-h-screen pb-[120px]">
       <div className="max-w-2xl mx-auto">
         <div className="sticky top-0 z-10 bg-white/70 backdrop-blur-md pb-4">
           <HeaderPedidos 
@@ -277,7 +278,7 @@ export default function PedidosPage() {
               </p>
             </div>
           ) : (
-            <div className="space-y-2">
+            <div className="space-y-[0.1rem]">
               {filteredItems.map((item) => (
                 <div key={item.id} onClick={() => handleCardClick(item)}>
                   <ProductCard 
@@ -289,18 +290,45 @@ export default function PedidosPage() {
             </div>
           )}
         </div>
-      </div>
 
-      {selectedProduct && (
-        <ProductSheet
-          product={selectedProduct}
-          isOpen={isSheetOpen}
-          onClose={() => {
-            setIsSheetOpen(false)
-            setSelectedProduct(null)
-          }}
+        {storeItems.length > 0 && (
+          <>
+            <div className="fixed bottom-[56px] left-0 right-0 bg-white">
+              <div className="border-b border-gray-200" />
+              <div className="max-w-2xl mx-auto flex items-center justify-between p-4">
+                <div className="flex flex-col">
+                  <span className="text-sm text-muted-foreground">Total</span>
+                  <span className="font-semibold text-lg">{formatPrice(orderTotal)}</span>
+                </div>
+                <Button 
+                  className="bg-blue-600 hover:bg-blue-700 text-white px-8"
+                  onClick={() => setIsFacturacionOpen(true)}
+                >
+                  Pedir
+                </Button>
+              </div>
+            </div>
+          </>
+        )}
+
+        <FacturacionSheet
+          isOpen={isFacturacionOpen}
+          onClose={() => setIsFacturacionOpen(false)}
+          items={filteredItems}
+          total={orderTotal}
         />
-      )}
+
+        {selectedProduct && (
+          <ProductSheet
+            product={selectedProduct}
+            isOpen={isSheetOpen}
+            onClose={() => {
+              setIsSheetOpen(false)
+              setSelectedProduct(null)
+            }}
+          />
+        )}
+      </div>
     </div>
   )
 }
