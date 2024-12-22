@@ -1,13 +1,7 @@
 import { useState, useCallback } from 'react'
+import { CartItem } from '../types/cart'
 
-export interface CartItem {
-  id: string
-  name: string
-  price: number
-  quantity: number
-  note: string
-  // ... otros campos
-}
+export type { CartItem }
 
 export const useCart = () => {
   const [items, setItems] = useState<CartItem[]>([])
@@ -28,4 +22,4 @@ export const useCart = () => {
     // ... otros returns
     updateItemNote,
   }
-} 
+}

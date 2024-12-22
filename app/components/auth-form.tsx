@@ -21,13 +21,12 @@ export function AuthForm() {
       if (isLogin) {
         await signIn(formData.email, formData.password)
       } else {
-        await signUp(
-          formData.email,
-          formData.password,
-          formData.phone,
-          formData.name,
-          formData.wechat_id
-        )
+        const metadata = {
+          name: formData.name,
+          phone: formData.phone,
+          wechat_id: formData.wechat_id
+        }
+        await signUp(formData.email, formData.password, metadata)
       }
     } catch (error) {
       console.error('Auth error:', error)

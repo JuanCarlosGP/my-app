@@ -33,4 +33,31 @@ export async function getUser() {
     return null
   }
   return user
-} 
+}
+
+export async function signIn(email: string, password: string) {
+  const { data, error } = await supabase.auth.signInWithPassword({
+    email,
+    password,
+  })
+  if (error) {
+    console.error('Error signing in:', error)
+    throw error
+  }
+  return data
+}
+
+export async function signUp(email: string, password: string, metadata?: { [key: string]: any }) {
+  const { data, error } = await supabase.auth.signUp({
+    email,
+    password,
+    options: {
+      data: metadata
+    }
+  })
+  if (error) {
+    console.error('Error signing up:', error)
+    throw error
+  }
+  return data
+}

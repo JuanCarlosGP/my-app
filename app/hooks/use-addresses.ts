@@ -1,8 +1,10 @@
 "use client"
 
 import { useState, useEffect } from 'react'
-import { supabase } from '@/app/lib/supabase'
-import { type Address } from '@/app/lib/types'
+import { supabase } from '../lib/supabase'
+import type { Address } from '../types/address'
+
+export type { Address }
 
 export function useAddresses() {
   const [addresses, setAddresses] = useState<Address[]>([])

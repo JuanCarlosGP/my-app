@@ -2,14 +2,15 @@
 
 import { Sheet, SheetContent, SheetHeader, SheetClose, SheetTitle } from "@/components/ui/sheet"
 import { ArrowLeft, User, MapPin, Phone, Coins, Percent } from "lucide-react"
-import { CartItem } from "@/hooks/use-cart"
+import type { CartItem } from "@/app/types/cart"
 import { Button } from "@/components/ui/button"
 import { formatPrice } from "@/lib/utils"
 import { Textarea } from "@/components/ui/textarea"
 import { PersonalDataSheet } from "./personal-data-sheet"
 import { useState, useEffect } from "react"
 import { AddressesListSheet } from "./addresses-list-sheet"
-import { useAddresses, type Address } from "../../hooks/use-addresses"
+import { useAddresses } from "../../hooks/use-addresses"
+import type { Address } from "@/app/types/address"
 import { VisuallyHidden } from '@radix-ui/react-visually-hidden'
 import { useCart } from "@/hooks/use-cart"
 
@@ -95,7 +96,7 @@ export function FacturacionSheet({ isOpen, onClose, items, total }: FacturacionS
                   <div>
                     <p className="text-sm text-gray-500">Nombre</p>
                     <p className="font-medium">
-                      {selectedAddress?.name || "Sin especificar"}
+                      {selectedAddress?.company_name || "Sin especificar"}
                     </p>
                   </div>
                 </div>
@@ -197,4 +198,4 @@ export function FacturacionSheet({ isOpen, onClose, items, total }: FacturacionS
       />
     </>
   )
-} 
+}
