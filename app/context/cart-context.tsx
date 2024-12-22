@@ -47,60 +47,51 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   async function loadCurrentOrder() {
     try {
       console.log('Loading current order...')
+      const userId = session?.user?.id
+      if (!userId) {
+        console.log('No user ID found')
+        return
+      }
+      
       const { data: orders, error: orderError } = await supabase
         .from('orders')
-        .select(`
-          *,
-          store:stores (
-            id,
-            name
-          )
-        `)
-        .eq('profile_id', session!.user.id)
+        .select('*, store:stores(id,name)')
+        .eq('profile_id', userId)
         .eq('status', 'draft')
         .single()
 
       if (orderError) {
-        console.error('Error loading order:', orderError)
-        return
+        if (orderError.code === 'PGRST116') {
+          // No order found, this is not an error
+          console.log('No draft order found')
+          return
+        }
+        throw orderError
       }
 
       if (orders) {
-        console.log('Found draft order:', orders)
-        setCurrentOrder(orders.id)
-        setSelectedStoreId(orders.store_id)
-
-        // Cargar los items del pedido
+        const orderId = (orders as { id: string }).id
+        setCurrentOrder(orderId)
+        // Load order items
         const { data: orderItems, error: itemsError } = await supabase
           .from('order_items')
-          .select(`
-            *,
-            product:products (
-              *,
-              category:categories (
-                store_id
-              )
-            )
-          `)
-          .eq('order_id', orders.id)
+          .select('*')
+          .eq('order_id', orderId as string)
 
-        if (itemsError) {
-          console.error('Error loading order items:', itemsError)
-          return
+        if (itemsError) throw itemsError
+
+        if (orderItems) {
+          const cartItems = orderItems.map((item: any) => ({
+            quantity: item.quantity || 1,
+            note: item.note || null,
+            ...item
+          })) as CartItem[]
+          setItems(cartItems)
         }
-
-        console.log('Loaded order items:', orderItems)
-        const cartItems = orderItems?.map(item => ({
-          ...item.product,
-          quantity: item.quantity,
-          note: item.note,
-          store_id: item.product.category.store_id
-        })) || []
-
-        setItems(cartItems)
       }
     } catch (error) {
-      console.error('Error in loadCurrentOrder:', error)
+      console.error('Error loading order:', error)
+      toast.error('Error al cargar el pedido')
     }
   }
 
@@ -126,8 +117,9 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
         }
 
         console.log('Created new order:', data)
-        setCurrentOrder(data.id)
-        return data.id
+        const orderId = data.id
+        setCurrentOrder(orderId)
+        return orderId
       }
 
       console.log('Using existing order:', currentOrder)
@@ -351,4 +343,4 @@ export function useCart() {
     throw new Error('useCart must be used within a CartProvider')
   }
   return context
-} 
+}
