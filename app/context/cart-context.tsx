@@ -39,8 +39,28 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
 
   // Cargar el pedido actual al iniciar
   useEffect(() => {
-    if (session?.user?.id) {
-      loadCurrentOrder()
+    let isMounted = true
+    
+    async function initializeCart() {
+      if (session?.user?.id) {
+        try {
+          await loadCurrentOrder()
+        } catch (error) {
+          console.error('Error initializing cart:', error)
+        }
+      } else {
+        if (isMounted) {
+          setItems([])
+          setCurrentOrder(null)
+          setSelectedStoreId(null)
+        }
+      }
+    }
+
+    initializeCart()
+
+    return () => {
+      isMounted = false
     }
   }, [session?.user?.id])
 
@@ -53,45 +73,97 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
         return
       }
       
+      // Primero, obtener el pedido en estado draft
       const { data: orders, error: orderError } = await supabase
         .from('orders')
-        .select('*, store:stores(id,name)')
+        .select(`
+          *,
+          store:stores (
+            id,
+            name
+          )
+        `)
         .eq('profile_id', userId)
         .eq('status', 'draft')
         .single()
+
+      console.log('Orders query result:', { orders, orderError })
 
       if (orderError) {
         if (orderError.code === 'PGRST116') {
           // No order found, this is not an error
           console.log('No draft order found')
+          setItems([])
           return
         }
         throw orderError
       }
 
       if (orders) {
-        const orderId = (orders as { id: string }).id
+        const orderId = orders.id
         setCurrentOrder(orderId)
-        // Load order items
+        setSelectedStoreId(orders.store_id)
+
+        // Luego, obtener los items del pedido con toda la información del producto
         const { data: orderItems, error: itemsError } = await supabase
           .from('order_items')
-          .select('*')
-          .eq('order_id', orderId as string)
+          .select(`
+            quantity,
+            note,
+            price_per_unit,
+            order_id,
+            product:products!inner (
+              id,
+              name,
+              price,
+              units_per_box,
+              units_per_package,
+              reference,
+              barcode,
+              image_url,
+              note,
+              category_id
+            )
+          `)
+          .eq('order_id', orderId)
 
-        if (itemsError) throw itemsError
+        console.log('Order items query result:', { orderItems, itemsError })
 
-        if (orderItems) {
-          const cartItems = orderItems.map((item: any) => ({
-            quantity: item.quantity || 1,
-            note: item.note || null,
-            ...item
-          })) as CartItem[]
+        if (itemsError) {
+          console.error('Error loading order items:', itemsError)
+          throw itemsError
+        }
+
+        if (orderItems && Array.isArray(orderItems)) {
+          const cartItems = orderItems.map((item) => {
+            if (!item.product) {
+              console.warn('Missing product data for item:', item)
+              return null
+            }
+            return {
+              ...item.product,
+              quantity: item.quantity || 1,
+              note: item.note || null,
+              price: item.price_per_unit || item.product.price,
+              store_id: orders.store_id // Usamos el store_id del pedido
+            }
+          }).filter(Boolean) as CartItem[]
+
+          console.log('Processed cart items:', cartItems)
           setItems(cartItems)
+        } else {
+          console.warn('No order items found or invalid data:', orderItems)
+          setItems([])
         }
       }
     } catch (error) {
       console.error('Error loading order:', error)
-      toast.error('Error al cargar el pedido')
+      if (error instanceof Error) {
+        toast.error(`Error al cargar el pedido: ${error.message}`)
+      } else {
+        toast.error('Error al cargar el pedido')
+      }
+      setItems([])
     }
   }
 

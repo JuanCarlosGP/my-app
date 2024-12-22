@@ -1,24 +1,26 @@
 import { LayoutGrid, Grid2X2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
+import { cn } from "@/lib/utils"
 
 interface ViewToggleButtonProps {
-  isGridView: boolean
-  onToggle: () => void
+  viewMode: "compact" | "detailed"
+  onViewModeChange: (mode: "compact" | "detailed") => void
+  className?: string
 }
 
-export function ViewToggleButton({ isGridView, onToggle }: ViewToggleButtonProps) {
+export function ViewToggleButton({ viewMode, onViewModeChange, className }: ViewToggleButtonProps) {
   return (
     <Button
       variant="ghost"
       size="icon"
-      className="rounded-full"
-      onClick={onToggle}
+      className={cn("rounded-full", className)}
+      onClick={() => onViewModeChange(viewMode === "compact" ? "detailed" : "compact")}
     >
-      {isGridView ? (
+      {viewMode === "compact" ? (
         <Grid2X2 className="h-5 w-5 text-gray-600" />
       ) : (
         <LayoutGrid className="h-5 w-5 text-gray-600" />
       )}
     </Button>
   )
-} 
+}

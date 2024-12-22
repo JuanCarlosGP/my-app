@@ -1,12 +1,12 @@
 "use client"
 
-import { Card } from "@/components/ui/card"
+import { Card, CardContent } from "@/components/ui/card"
 import Image from "next/image"
 import { formatPrice } from "@/lib/utils"
 import { useCart } from "@/hooks/use-cart"
 import { HeaderPedidos } from '@/app/pedidos/components/header-pedidos'
 import { ChevronRight, ShoppingCart, ArrowUpDown } from 'lucide-react'
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 import { ProductSheet } from "@/app/catalogo/components/product-sheet"
 import { Product } from "@/app/lib/db"
 import { getAllProducts } from "@/app/data/stores"
@@ -14,65 +14,148 @@ import { Button } from "@/components/ui/button"
 import { FacturacionSheet } from './components/facturacion-sheet'
 import { StoreSelectorSheet } from './components/store-selector-sheet'
 import { CartItem } from "@/app/context/cart-context"
+import toast from 'react-hot-toast'
 
-function ProductCard({ item }: { item: CartItem }) {
+function CompactProductCard({ item }: { item: CartItem }) {
+  const calculateBoxes = () => {
+    if (!item.units_per_box || !item.units_per_package || !item.quantity) return 0
+    const totalUnits = item.units_per_package
+    const boxes = totalUnits / item.units_per_box
+    return Number(boxes.toFixed(2))
+  }
+
   return (
-    <div className="flex items-center space-x-4 p-4 bg-white rounded-lg border">
-      <div className="relative w-16 h-16 flex-shrink-0">
-        <Image
-          src={item.image_url || '/placeholder.jpg'}
-          alt={item.name}
-          fill
-          className="object-cover rounded-md"
-          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-          onError={(e) => {
-            const target = e.target as HTMLImageElement
-            target.src = '/placeholder.jpg'
-          }}
-        />
-      </div>
-      <div className="flex-1">
-        <div className="flex items-center justify-between mb-2">
-          <h3 className="font-semibold truncate max-w-[200px]">{item.name}</h3>
-          <ChevronRight className="h-7 w-7 text-gray-400" />
-        </div>
-        <div className="grid grid-cols-3 gap-8">
-          <div>
-            <p className="text-sm text-gray-500 mb-1">Precio</p>
-            <p className="font-medium text-blue-600">{formatPrice(item.price)}</p>
-            <p className="text-sm text-gray-500 mt-2 mb-1 whitespace-nowrap">
-              Pack: <span className="font-medium text-black">{item.units_per_package || 0}</span>
-            </p>
+    <Card className="hover:bg-gray-50 transition-colors">
+      <CardContent className="p-3">
+        <div className="flex items-center gap-3">
+          <div className="relative w-12 h-12 flex-shrink-0">
+            <Image
+              src={item.image_url || '/placeholder.jpg'}
+              alt={item.name}
+              fill
+              className="object-cover rounded-md"
+              sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+              onError={(e) => {
+                const target = e.target as HTMLImageElement
+                target.src = '/placeholder.jpg'
+              }}
+            />
           </div>
-          <div>
-            <p className="text-sm text-gray-500 mb-1">Cantidad</p>
-            <p className="font-medium">{item.quantity}</p>
-            <p className="text-sm text-gray-500 mt-2 mb-1 whitespace-nowrap">
-              Cajas: <span className="font-medium text-black">{item.units_per_box || 0}</span>
-            </p>
-          </div> 
-          <div>
-            <p className="text-sm text-gray-500 mb-1">Total</p>
-            
-              <p className="font-medium whitespace-nowrap text-sm">
-                {formatPrice(item.price * item.quantity)}
-              </p>
-            
+          <div className="flex-1 min-w-0">
+            <div className="flex items-center justify-between">
+              <div className="flex-1 min-w-0">
+                <h3 className="font-medium text-sm truncate">{item.name}</h3>
+                <p className="text-xs text-muted-foreground truncate">Ref: {item.reference || 'N/A'}</p>
+              </div>
+              <div className="flex items-center gap-4 ml-2">
+                <div className="text-right">
+                  <p className="text-xs text-muted-foreground">Total</p>
+                  <p className="font-medium text-sm text-primary">
+                    {formatPrice(item.price * (item.quantity/item.units_per_package))}
+                  </p>
+                </div>
+                <ChevronRight className="h-4 w-4 text-muted-foreground flex-shrink-0" />
+              </div>
+            </div>
+            <div className="flex gap-3 mt-1 text-xs text-muted-foreground">
+              <span>{item.units_per_package} uds/pack</span>
+              <span>•</span>
+              <span>{calculateBoxes()} cajas</span>
+            </div>
           </div>
         </div>
-      </div>
-    </div>
+      </CardContent>
+    </Card>
+  )
+}
+
+function ProductCard({ item, viewMode = "detailed" }: { item: CartItem, viewMode?: "compact" | "detailed" }) {
+  if (viewMode === "compact") {
+    return <CompactProductCard item={item} />
+  }
+
+  const calculateBoxes = () => {
+    if (!item.units_per_box || !item.units_per_package || !item.quantity) return 0
+    const totalUnits = item.units_per_package
+    const boxes = totalUnits / item.units_per_box
+    return Number(boxes.toFixed(2))
+  }
+
+  const totalUnits = item.units_per_package
+
+  return (
+    <Card className="hover:bg-gray-50 transition-colors">
+      <CardContent className="p-3 sm:p-4">
+        <div className="flex flex-col sm:flex-row sm:items-start gap-3 sm:gap-4">
+          <div className="relative w-full sm:w-20 h-32 sm:h-20 flex-shrink-0">
+            <Image
+              src={item.image_url || '/placeholder.jpg'}
+              alt={item.name}
+              fill
+              className="object-cover rounded-md"
+              sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+              onError={(e) => {
+                const target = e.target as HTMLImageElement
+                target.src = '/placeholder.jpg'
+              }}
+            />
+          </div>
+          <div className="flex-1 min-w-0">
+            <div className="flex items-start sm:items-center justify-between mb-2">
+              <div className="flex-1 min-w-0">
+                <h3 className="font-semibold text-base sm:text-lg truncate">{item.name}</h3>
+                <p className="text-sm text-muted-foreground truncate">Ref: {item.reference || 'N/A'}</p>
+              </div>
+              <ChevronRight className="h-5 w-5 text-muted-foreground flex-shrink-0 ml-2" />
+            </div>
+            
+            <div className="grid grid-cols-2 gap-3 mt-2 sm:mt-4">
+              <div className="space-y-1 bg-muted/50 p-2 rounded-md">
+                <p className="text-xs sm:text-sm text-muted-foreground">Pack</p>
+                <p className="font-medium text-sm sm:text-base">{item.units_per_package} uds</p>
+              </div>
+              <div className="space-y-1 bg-muted/50 p-2 rounded-md">
+                <p className="text-xs sm:text-sm text-muted-foreground">Unidades</p>
+                <p className="font-medium text-sm sm:text-base">{totalUnits}</p>
+              </div>
+              <div className="space-y-1 bg-muted/50 p-2 rounded-md">
+                <p className="text-xs sm:text-sm text-muted-foreground">Cajas</p>
+                <div className="flex items-center gap-1 flex-wrap">
+                  <p className="font-medium text-sm sm:text-base">{calculateBoxes()}</p>
+                  <span className="text-[10px] sm:text-xs text-muted-foreground">
+                    ({item.units_per_box} uds/caja)
+                  </span>
+                </div>
+              </div>
+              <div className="space-y-1 bg-muted/50 p-2 rounded-md">
+                <p className="text-xs sm:text-sm text-muted-foreground">Total</p>
+                <p className="font-medium text-sm sm:text-base text-primary">
+                  {formatPrice(item.price * (item.quantity/item.units_per_package))}
+                </p>
+              </div>
+            </div>
+
+            {item.note && (
+              <div className="mt-3 p-2 bg-muted rounded-md">
+                <p className="text-sm text-muted-foreground">
+                  <span className="font-medium">Nota:</span> {item.note}
+                </p>
+              </div>
+            )}
+          </div>
+        </div>
+      </CardContent>
+    </Card>
   )
 }
 
 export default function PedidosPage() {
   const { items, selectedStoreId, setSelectedStoreId } = useCart()
   const [searchTerm, setSearchTerm] = useState('')
-  const [selectedProduct, setSelectedProduct] = useState<Product | null>(null)
+  const [selectedProduct, setSelectedProduct] = useState<(Product & { quantity?: number }) | null>(null)
   const [isSheetOpen, setIsSheetOpen] = useState(false)
-  const [isFacturacionOpen, setIsFacturacionOpen] = useState(false)
-  const [isStoreSelectorOpen, setIsStoreSelectorOpen] = useState(false)
   const [storeProducts, setStoreProducts] = useState<Product[]>([])
+  const [viewMode, setViewMode] = useState<"compact" | "detailed">("compact")
   
   const storesWithItems = Array.from(new Set(items
     .filter(item => item.quantity > 0 && item.store_id)
@@ -100,9 +183,14 @@ export default function PedidosPage() {
     async function loadProducts() {
       if (selectedStoreId) {
         console.log('Loading products for store:', selectedStoreId)
-        const products = await getAllProducts(selectedStoreId)
-        console.log('Loaded products:', products)
-        setStoreProducts(products)
+        try {
+          const products = await getAllProducts(selectedStoreId)
+          console.log('Loaded products:', products)
+          setStoreProducts(products)
+        } catch (error) {
+          console.error('Error loading products:', error)
+          toast.error('Error al cargar los productos')
+        }
       }
     }
     loadProducts()
@@ -117,29 +205,38 @@ export default function PedidosPage() {
     })
   }, [selectedStoreId, storesWithItems, items, storeProducts])
 
-  const storeItems = selectedStoreId 
-    ? items.filter(item => 
-        item.store_id === selectedStoreId && item.quantity > 0
-      )
-    : []
+  const storeItems = useMemo(() => {
+    return selectedStoreId 
+      ? items.filter(item => 
+          item.store_id === selectedStoreId && 
+          item.quantity > 0 &&
+          item.id // asegurarse de que el item tenga un id válido
+        )
+      : []
+  }, [items, selectedStoreId])
 
-  const filteredItems = storeItems.filter(item =>
-    item.name.toLowerCase().includes(searchTerm.toLowerCase())
-  )
+  const filteredItems = useMemo(() => {
+    return storeItems.filter(item =>
+      item.name?.toLowerCase().includes(searchTerm.toLowerCase())
+    )
+  }, [storeItems, searchTerm])
 
-  const handleCardClick = (cartItem: typeof items[0]) => {
+  const handleCardClick = (cartItem: CartItem) => {
+    console.log('Cart item:', cartItem)
     const fullProduct = storeProducts.find(p => p.id === cartItem.id)
+    console.log('Full product:', fullProduct)
     if (fullProduct) {
       setSelectedProduct({
         ...fullProduct,
-        quantity: cartItem.quantity
-      } as Product & { quantity: number })
+        quantity: cartItem.quantity,
+        note: cartItem.note || null
+      })
       setIsSheetOpen(true)
     }
   }
 
   const orderTotal = filteredItems.reduce((total, item) => {
-    return total + (item.price * item.quantity)
+    return total + (item.price * (item.quantity/item.units_per_package))
   }, 0)
 
   return (
@@ -149,6 +246,8 @@ export default function PedidosPage() {
           <HeaderPedidos 
             title="Pedido" 
             onSearch={setSearchTerm}
+            viewMode={viewMode}
+            onViewModeChange={setViewMode}
           />
         </div>
 
@@ -178,62 +277,30 @@ export default function PedidosPage() {
               </p>
             </div>
           ) : (
-            filteredItems.map((item) => (
-              <div key={item.id} onClick={() => handleCardClick(item)}>
-                <ProductCard item={item} />
-              </div>
-            ))
+            <div className="space-y-2">
+              {filteredItems.map((item) => (
+                <div key={item.id} onClick={() => handleCardClick(item)}>
+                  <ProductCard 
+                    item={item} 
+                    viewMode={viewMode}
+                  />
+                </div>
+              ))}
+            </div>
           )}
         </div>
       </div>
 
-      <Button 
-        size="icon"
-        className={`fixed right-4 h-14 w-14 rounded-full shadow-lg z-50 ${
-          filteredItems.length > 0 ? 'bottom-32' : 'bottom-24'
-        }`}
-        onClick={() => setIsStoreSelectorOpen(true)}
-      >
-        <ArrowUpDown className="h-6 w-6" />
-      </Button>
-
-      <StoreSelectorSheet 
-        isOpen={isStoreSelectorOpen}
-        onClose={() => setIsStoreSelectorOpen(false)}
-      />
-
-      {filteredItems.length > 0 && selectedStoreId && (
-        <div className="fixed bottom-[60px] left-0 right-0 bg-white border-t shadow-lg mb-[-1vw]">
-          <div className="container mx-auto px-4 h-[60px] flex items-center justify-between max-w-3xl">
-            <div className="flex flex-col">
-              <span className="text-sm text-gray-500">Total</span>
-              <span className="text-lg font-semibold ml-1">{formatPrice(orderTotal)}</span>
-            </div>
-            <Button 
-              className="bg-blue-600 hover:bg-blue-700 text-white px-8"
-              onClick={() => setIsFacturacionOpen(true)}
-            >
-              Pedir
-            </Button>
-          </div>
-        </div>
-      )}
-
       {selectedProduct && (
         <ProductSheet
-          isOpen={isSheetOpen}
-          onClose={() => setIsSheetOpen(false)}
           product={selectedProduct}
+          isOpen={isSheetOpen}
+          onClose={() => {
+            setIsSheetOpen(false)
+            setSelectedProduct(null)
+          }}
         />
       )}
-
-      <FacturacionSheet
-        isOpen={isFacturacionOpen}
-        onClose={() => setIsFacturacionOpen(false)}
-        items={filteredItems}
-        total={orderTotal}
-      />
     </div>
   )
 }
-

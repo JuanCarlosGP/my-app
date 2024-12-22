@@ -6,7 +6,7 @@ import Image from 'next/image'
 import { Badge } from "@/components/ui/badge"
 import { useCart } from "@/hooks/use-cart"
 import { Product } from "@/app/lib/db"
-import { useState } from 'react'
+import { useState, useMemo } from 'react'
 import { Textarea } from "@/components/ui/textarea"
 import { Button } from "@/components/ui/button"
 
@@ -23,6 +23,31 @@ export function ProductSheet({ isOpen, onClose, product }: ProductSheetProps) {
   // Encontrar la nota existente del producto
   const existingItem = items.find(item => item.id === product.id)
   const [note, setNote] = useState(existingItem?.note || '')
+
+  const [imageError, setImageError] = useState(false)
+
+  const imageUrl = useMemo(() => {
+    if (!product.image_url) {
+      return "/placeholder-product.jpg"
+    }
+    
+    // Limpiar la URL si está dentro de una URL de Supabase
+    let cleanUrl = product.image_url
+    if (cleanUrl.includes('supabase.co/storage/v1/object/public/')) {
+      const match = cleanUrl.match(/public\/[^/]+\/(.+)/)
+      if (match) {
+        cleanUrl = match[1]
+      }
+    }
+
+    // Si la URL limpia comienza con http, usarla directamente
+    if (cleanUrl.startsWith('http')) {
+      return cleanUrl
+    }
+
+    // Si no, construir la URL de Supabase
+    return `https://vwlrkhtpqvdgevwommkl.supabase.co/storage/v1/object/public/products/${cleanUrl}`
+  }, [product.image_url])
 
   const handleNoteChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     const newNote = e.target.value
@@ -46,32 +71,14 @@ export function ProductSheet({ isOpen, onClose, product }: ProductSheetProps) {
     }
   }
 
-
   return (
     <Sheet open={isOpen} onOpenChange={onClose}>
       <SheetContent className="w-full sm:max-w-md bg-[#f5f5f5] p-0 overflow-y-auto">
-        <SheetHeader>
-          <SheetTitle className="sr-only">
-            {product.name}
-          </SheetTitle>
+        <SheetHeader className="p-6 pb-0">
+          <SheetTitle className="text-xl font-bold">{product.name}</SheetTitle>
         </SheetHeader>
-        
-        <div className="sticky top-0 bg-white/70 backdrop-blur-md z-10 ">
-          <div className="flex items-center justify-between p-4">
-            <div className="flex items-center gap-2">
-              <SheetClose className="p-2 hover:bg-gray-100 rounded-full">
-                <ArrowLeft className="h-6 w-6" />
-              </SheetClose>
-            </div>
-            
-            <h2 className="font-semibold text-lg absolute left-1/2 -translate-x-1/2 max-w-[60%] truncate text-center">
-              {product.name}
-            </h2>
-          </div>
-        </div>
-
-        <div className="p-4">
-          <div className="relative aspect-square w-full mb-4">
+        <div className="p-6">
+          <div className="relative w-full h-64 bg-gray-100 rounded-lg overflow-hidden mb-6">
             {productQuantities[product.id] > 0 && (
               <Badge 
                 variant="destructive" 
@@ -81,10 +88,13 @@ export function ProductSheet({ isOpen, onClose, product }: ProductSheetProps) {
               </Badge>
             )}
             <Image
-              src={product.image_url || ''}
+              src={imageError ? "/placeholder-product.jpg" : imageUrl}
               alt={product.name}
               fill
               className="rounded-lg object-cover"
+              onError={() => setImageError(true)}
+              priority
+              sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
             />
           </div>
 
@@ -155,7 +165,7 @@ export function ProductSheet({ isOpen, onClose, product }: ProductSheetProps) {
                 <span className="text-gray-600">Referencia:</span>
                 <span className="font-medium">{product.reference || 'N/A'}</span>
               </div>
-              
+　
               <div className="flex justify-between items-center">
                 <span className="text-gray-600">Código de barras:</span>
                 <span className="font-medium">{product.barcode || 'N/A'}</span>
@@ -182,7 +192,7 @@ export function ProductSheet({ isOpen, onClose, product }: ProductSheetProps) {
               >
                 Comentarios para este producto:
               </label>
-              <textarea
+              <Textarea
                 id="comment"
                 rows={3}
                 className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 resize-none bg-gray-50"
