@@ -3,6 +3,7 @@
 import { createContext, useContext, useEffect, useState } from 'react'
 import { useRouter, usePathname } from 'next/navigation'
 import { getSession, type Session } from '@/app/lib/auth'
+import { supabase } from '@/app/lib/supabase' // Importar supabase
 
 interface AuthContextType {
   session: Session | null
@@ -25,22 +26,33 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       try {
         const session = await getSession()
         setSession(session)
+        setLoading(false)
 
+        // Solo redirigir si la página actual requiere autenticación
         const isPublicRoute = ['/login', '/register'].includes(pathname)
-        
-        if (!session && !isPublicRoute) {
+        if (!session && !isPublicRoute && pathname !== '/login') {
           router.push('/login')
-        } else if (session && isPublicRoute) {
-          router.push('/')
         }
       } catch (error) {
         console.error('Error checking session:', error)
-      } finally {
         setLoading(false)
       }
     }
 
     checkSession()
+
+    // Suscribirse a cambios de sesión
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      setSession(session)
+      const isPublicRoute = ['/login', '/register'].includes(pathname)
+      if (!session && !isPublicRoute && pathname !== '/login') {
+        router.push('/login')
+      }
+    })
+
+    return () => {
+      subscription.unsubscribe()
+    }
   }, [pathname, router])
 
   if (loading) {
