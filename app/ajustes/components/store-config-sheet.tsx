@@ -147,6 +147,41 @@ export function StoreConfigSheet({ isOpen, onOpenChange, storeId }: StoreConfigS
     }
   }
 
+  const deleteOldImage = async (url: string, bucket: 'CompanyLogo' | 'CompanyBanner') => {
+    try {
+      if (!url) return;
+
+      // Extraer el nombre del archivo de la URL decodificando la URL
+      const urlObject = new URL(url);
+      const pathname = urlObject.pathname;
+      // El path será algo como /storage/v1/object/public/CompanyLogo/filename.jpg
+      const parts = pathname.split('/');
+      const fileName = parts[parts.length - 1];
+
+      if (!fileName) {
+        console.error('No se pudo extraer el nombre del archivo de la URL:', url);
+        return;
+      }
+
+      console.log('Intentando eliminar archivo:', fileName); // Para debugging
+
+      const { error } = await supabase.storage
+        .from(bucket)
+        .remove([decodeURIComponent(fileName)]);
+
+      if (error) {
+        console.error('Error al eliminar imagen antigua:', error);
+        throw error;
+      } else {
+        console.log('Archivo eliminado con éxito:', fileName);
+      }
+    } catch (error) {
+      console.error('Error en deleteOldImage:', error);
+      // Podemos lanzar el error para manejarlo en el componente si es necesario
+      throw error;
+    }
+  };
+
   const uploadImage = async (file: File, bucket: 'CompanyLogo' | 'CompanyBanner', storeId: string) => {
     try {
       // Verificar que el usuario es vendedor
@@ -167,7 +202,14 @@ export function StoreConfigSheet({ isOpen, onOpenChange, storeId }: StoreConfigS
         throw new Error('El archivo debe ser una imagen')
       }
 
-      // Subir la imagen
+      // Si hay una imagen anterior, eliminarla
+      if (bucket === 'CompanyLogo' && storeData.image_url) {
+        await deleteOldImage(storeData.image_url, bucket);
+      } else if (bucket === 'CompanyBanner' && storeData.banner_image) {
+        await deleteOldImage(storeData.banner_image, bucket);
+      }
+
+      // Subir la nueva imagen
       const { error: uploadError, data } = await supabase.storage
         .from(bucket)
         .upload(filePath, file, {
@@ -263,7 +305,17 @@ export function StoreConfigSheet({ isOpen, onOpenChange, storeId }: StoreConfigS
                           />
                           <button
                             type="button"
-                            onClick={() => setStoreData({ ...storeData, image_url: '' })}
+                            onClick={async () => {
+                              try {
+                                if (storeData.image_url) {
+                                  await deleteOldImage(storeData.image_url, 'CompanyLogo');
+                                }
+                                setStoreData({ ...storeData, image_url: '' });
+                              } catch (error) {
+                                console.error('Error al eliminar logo:', error);
+                                toast.error('Error al eliminar el logo');
+                              }
+                            }}
                             className="absolute top-2 right-2 p-1 rounded-full bg-red-100 hover:bg-red-200"
                           >
                             <X className="h-4 w-4 text-red-600" />
@@ -320,7 +372,17 @@ export function StoreConfigSheet({ isOpen, onOpenChange, storeId }: StoreConfigS
                           />
                           <button
                             type="button"
-                            onClick={() => setStoreData({ ...storeData, banner_image: '' })}
+                            onClick={async () => {
+                              try {
+                                if (storeData.banner_image) {
+                                  await deleteOldImage(storeData.banner_image, 'CompanyBanner');
+                                }
+                                setStoreData({ ...storeData, banner_image: '' });
+                              } catch (error) {
+                                console.error('Error al eliminar banner:', error);
+                                toast.error('Error al eliminar el banner');
+                              }
+                            }}
                             className="absolute top-2 right-2 p-1 rounded-full bg-red-100 hover:bg-red-200"
                           >
                             <X className="h-4 w-4 text-red-600" />
