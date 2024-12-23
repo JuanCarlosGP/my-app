@@ -75,7 +75,6 @@ export function StoreSettingsSheet({ isOpen, onOpenChange }: StoreSettingsSheetP
       }
 
       setStore(storeData)
-      toast.success(`Tienda ${storeData.name} cargada correctamente`)
 
     } catch (err) {
       console.error('Error loading store:', err)
@@ -125,7 +124,6 @@ export function StoreSettingsSheet({ isOpen, onOpenChange }: StoreSettingsSheetP
               Gestiona tu catálogo y configuración de tienda
             </SheetDescription>
           </SheetHeader>
-
           <div className="flex-1 overflow-y-auto px-6 md:px-0">
             <div className="space-y-6 py-6">
               {/* Sección de Configuración Básica */}
