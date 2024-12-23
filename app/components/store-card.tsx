@@ -22,6 +22,7 @@ export function StoreCard({ id, name, description, subdescription, imageUrl }: S
               src={imageUrl}
               alt={name}
               fill
+              sizes="(max-width: 768px) 5rem, 5rem"
               className="rounded object-cover"
             />
           </div>

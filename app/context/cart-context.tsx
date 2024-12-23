@@ -11,10 +11,50 @@ export interface Store {
   name: string
 }
 
-export interface CartItem extends Product {
+export interface CartItem {
+  id: string
+  name: string
+  price: number
   quantity: number
   note: string | null
+  store_id: string
   store_name?: string
+  category_id: string
+  units_per_box: number
+  units_per_package: number
+  reference: string | null
+  barcode: string | null
+  image_url: string | null
+}
+
+interface OrderItemResponse {
+  quantity: number
+  note: string | null
+  price_per_unit: number
+  order_id: string
+  product: {
+    id: string
+    name: string
+    price: number
+    units_per_box: number
+    units_per_package: number
+    reference: string | null
+    barcode: string | null
+    image_url: string | null
+    note: string | null
+    category_id: string
+  }
+}
+
+interface OrderResponse {
+  id: string
+  store_id: string
+  status: string
+  total_amount: number
+  store: {
+    id: string
+    name: string
+  }
 }
 
 interface CartContextType {
@@ -68,16 +108,21 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     try {
       console.log('Loading current order...')
       const userId = session?.user?.id
+      console.log('Current userId:', userId)
+      
       if (!userId) {
         console.log('No user ID found')
         return
       }
       
-      // Primero, obtener el pedido en estado draft
+      // Consulta básica de orders
       const { data: orders, error: orderError } = await supabase
         .from('orders')
         .select(`
-          *,
+          id,
+          store_id,
+          status,
+          total_amount,
           store:stores (
             id,
             name
@@ -85,13 +130,23 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
         `)
         .eq('profile_id', userId)
         .eq('status', 'draft')
-        .single()
+        .order('created_at', { ascending: false })
+        .limit(1)  // Tomamos la orden más reciente
+        .single() as { data: OrderResponse | null, error: any }
 
-      console.log('Orders query result:', { orders, orderError })
+      console.log('Raw orders response:', {
+        data: orders,
+        error: orderError,
+        userId
+      })
 
       if (orderError) {
+        console.error('Order error details:', {
+          code: orderError.code,
+          message: orderError.message,
+          details: orderError.details
+        })
         if (orderError.code === 'PGRST116') {
-          // No order found, this is not an error
           console.log('No draft order found')
           setItems([])
           return
@@ -125,9 +180,9 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
               category_id
             )
           `)
-          .eq('order_id', orderId)
+          .eq('order_id', orderId) as { data: OrderItemResponse[] | null, error: any }
 
-        console.log('Order items query result:', { orderItems, itemsError })
+        console.log('Raw orderItems from Supabase:', JSON.stringify(orderItems, null, 2))
 
         if (itemsError) {
           console.error('Error loading order items:', itemsError)
@@ -140,14 +195,23 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
               console.warn('Missing product data for item:', item)
               return null
             }
-            return {
-              ...item.product,
+            const cartItem: CartItem = {
+              id: item.product.id,
+              name: item.product.name,
+              price: item.price_per_unit || item.product.price,
               quantity: item.quantity || 1,
               note: item.note || null,
-              price: item.price_per_unit || item.product.price,
-              store_id: orders.store_id // Usamos el store_id del pedido
+              store_id: orders.store_id,
+              store_name: orders.store?.name,
+              category_id: item.product.category_id,
+              units_per_box: item.product.units_per_box,
+              units_per_package: item.product.units_per_package,
+              reference: item.product.reference || null,
+              barcode: item.product.barcode || null,
+              image_url: item.product.image_url || null
             }
-          }).filter(Boolean) as CartItem[]
+            return cartItem
+          }).filter((item): item is CartItem => item !== null)
 
           console.log('Processed cart items:', cartItems)
           setItems(cartItems)
