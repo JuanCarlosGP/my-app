@@ -2,9 +2,14 @@
 
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription, SheetClose } from "@/components/ui/sheet"
 import { Button } from "@/components/ui/button"
-import { Download, Upload, ArrowLeft, ArrowRight, FileEdit, Save, Store, ArrowDown, MessageSquare } from "lucide-react"
+import { Download, Upload, ArrowLeft, ArrowRight, FileEdit, Save, Store, ArrowDown, MessageSquare, LayoutGrid } from "lucide-react"
 import { cn } from "@/lib/utils"
-import { useState } from "react"
+import { useState, useEffect } from "react"
+import { useAuth } from "@/app/providers/auth-provider"
+import { supabase } from '@/app/lib/supabase'
+import { toast } from 'react-hot-toast'
+import { StoreConfigSheet } from './store-config-sheet'
+import { CategoriesSheet } from './categories-sheet'
 
 interface StoreSettingsSheetProps {
   isOpen: boolean
@@ -12,6 +17,76 @@ interface StoreSettingsSheetProps {
 }
 
 export function StoreSettingsSheet({ isOpen, onOpenChange }: StoreSettingsSheetProps) {
+  const { session } = useAuth()
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
+  const [store, setStore] = useState<{
+    id: string;
+    name: string;
+    description: string | null;
+    owner_id: string;
+  } | null>(null)
+  const [showStoreConfigSheet, setShowStoreConfigSheet] = useState(false)
+  const [showCategoriesSheet, setShowCategoriesSheet] = useState(false)
+
+  useEffect(() => {
+    if (isOpen && session?.user?.id) {
+      loadStore()
+    }
+  }, [isOpen, session?.user?.id])
+
+  const loadStore = async () => {
+    setLoading(true)
+    setError(null)
+
+    try {
+      if (!session?.user?.id) {
+        throw new Error('No hay sesión de usuario')
+      }
+
+      const { data: profile, error: profileError } = await supabase
+        .from('profiles')
+        .select('is_seller')
+        .eq('id', session.user.id)
+        .single()
+
+      if (profileError) throw profileError
+
+      if (!profile?.is_seller) {
+        setStore(null)
+        setError('No tienes permisos de vendedor')
+        return
+      }
+
+      const { data: storeData, error: storeError } = await supabase
+        .from('stores')
+        .select('*')
+        .eq('owner_id', session.user.id)
+        .single()
+
+      console.log('Store data:', storeData)
+
+      if (storeError) {
+        if (storeError.code === 'PGRST116') {
+          setStore(null)
+          return
+        }
+        throw storeError
+      }
+
+      setStore(storeData)
+      toast.success(`Tienda ${storeData.name} cargada correctamente`)
+
+    } catch (err) {
+      console.error('Error loading store:', err)
+      const errorMessage = err instanceof Error ? err.message : 'Error al cargar la tienda'
+      setError(errorMessage)
+      toast.error(errorMessage)
+    } finally {
+      setLoading(false)
+    }
+  }
+
   const [dragActive, setDragActive] = useState(false)
 
   const handleDrag = (e: React.DragEvent) => {
@@ -53,6 +128,46 @@ export function StoreSettingsSheet({ isOpen, onOpenChange }: StoreSettingsSheetP
 
           <div className="flex-1 overflow-y-auto px-6 md:px-0">
             <div className="space-y-6 py-6">
+              {/* Sección de Configuración Básica */}
+              <div className="bg-white rounded-lg p-6 shadow-md border border-gray-200">
+                <h3 className="text-lg font-semibold mb-4 text-gray-900">Configuración Básica</h3>
+                {loading ? (
+                  <div className="flex items-center justify-center h-32">
+                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600" />
+                  </div>
+                ) : error ? (
+                  <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-4">
+                    <p className="text-sm text-red-600">{error}</p>
+                  </div>
+                ) : (
+                  <>
+                    <div className="mb-6">
+                      <p className="text-sm text-gray-500">
+                        Configura los detalles de tu tienda y gestiona las categorías de productos.
+                      </p>
+                    </div>
+                    
+                    <div className="space-y-4">
+                      <Button 
+                        className="w-full sm:w-auto bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white"
+                        onClick={() => setShowStoreConfigSheet(true)}
+                      >
+                        <Store className="mr-2 h-4 w-4" />
+                        Configurar Tienda
+                      </Button>
+
+                      <Button 
+                        className="w-full sm:w-auto bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-white"
+                        onClick={() => setShowCategoriesSheet(true)}
+                      >
+                        <LayoutGrid className="mr-2 h-4 w-4" />
+                        Gestionar Categorías
+                      </Button>
+                    </div>
+                  </>
+                )}
+              </div>
+
               {/* Sección de Plantilla CSV */}
               <div className="bg-[#f9fafb] rounded-lg p-6 shadow-sm border">
                 <h3 className="text-lg font-semibold mb-2">Plantilla CSV</h3>
@@ -229,6 +344,18 @@ export function StoreSettingsSheet({ isOpen, onOpenChange }: StoreSettingsSheetP
             </div>
           </div>
         </div>
+
+        {/* Sheets adicionales */}
+        <StoreConfigSheet 
+          isOpen={showStoreConfigSheet}
+          onOpenChange={setShowStoreConfigSheet}
+          storeId={store?.id || ''}
+        />
+        <CategoriesSheet
+          isOpen={showCategoriesSheet}
+          onOpenChange={setShowCategoriesSheet}
+          storeId={store?.id || ''}
+        />
       </SheetContent>
     </Sheet>
   )
