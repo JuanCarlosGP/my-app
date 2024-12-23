@@ -5,9 +5,10 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sh
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Button } from "@/components/ui/button"
-import { Plus, Pencil, Trash2, ImagePlus, LayoutGrid } from "lucide-react"
+import { Plus, Pencil, Trash2, ImagePlus, LayoutGrid, X } from "lucide-react"
 import { supabase } from '@/app/lib/supabase'
 import { toast } from 'react-hot-toast'
+import Image from "next/image"
 
 interface Category {
   id: string
@@ -57,21 +58,79 @@ export function CategoriesSheet({ isOpen, onOpenChange, storeId }: CategoriesShe
     }
   }
 
-  const handleImageUpload = async (file: File) => {
-    const path = `category_${Date.now()}`
-    
-    const { data, error } = await supabase.storage
-      .from('CategoryImages')
-      .upload(path, file, { upsert: true })
+  const deleteOldImage = async (url: string) => {
+    try {
+      if (!url) return;
 
-    if (error) throw error
-    
-    const { data: { publicUrl } } = supabase.storage
-      .from('CategoryImages')
-      .getPublicUrl(path)
+      const urlObject = new URL(url);
+      const pathname = urlObject.pathname;
+      const parts = pathname.split('/');
+      const fileName = parts[parts.length - 1];
 
-    return publicUrl
-  }
+      if (!fileName) {
+        console.error('No se pudo extraer el nombre del archivo de la URL:', url);
+        return;
+      }
+
+      console.log('Intentando eliminar archivo:', fileName);
+
+      const { error } = await supabase.storage
+        .from('CompanyCategory')
+        .remove([decodeURIComponent(fileName)]);
+
+      if (error) {
+        console.error('Error al eliminar imagen antigua:', error);
+        throw error;
+      } else {
+        console.log('Archivo eliminado con éxito:', fileName);
+      }
+    } catch (error) {
+      console.error('Error en deleteOldImage:', error);
+      throw error;
+    }
+  };
+
+  const handleImageUpload = async (file: File, oldImageUrl: string | null | undefined) => {
+    try {
+      if (!file.type.startsWith('image/')) {
+        throw new Error('El archivo debe ser una imagen');
+      }
+
+      if (file.size > 5 * 1024 * 1024) {
+        throw new Error('La imagen debe ser menor a 5MB');
+      }
+
+      // Si hay una imagen anterior y no es null, eliminarla
+      if (oldImageUrl) {
+        await deleteOldImage(oldImageUrl);
+      }
+
+      const fileExt = file.name.split('.').pop();
+      const fileName = `category-${Date.now()}.${fileExt}`;
+      
+      const { error: uploadError } = await supabase.storage
+        .from('CompanyCategory')
+        .upload(fileName, file, {
+          cacheControl: '3600',
+          upsert: true,
+          contentType: file.type
+        });
+
+      if (uploadError) {
+        console.error('Error al subir imagen:', uploadError);
+        throw uploadError;
+      }
+      
+      const { data: { publicUrl } } = supabase.storage
+        .from('CompanyCategory')
+        .getPublicUrl(fileName);
+
+      return publicUrl;
+    } catch (error) {
+      console.error('Error en handleImageUpload:', error);
+      throw error;
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -118,27 +177,35 @@ export function CategoriesSheet({ isOpen, onOpenChange, storeId }: CategoriesShe
   }
 
   const handleDelete = async (categoryId: string) => {
-    if (!confirm('¿Estás seguro de que quieres eliminar esta categoría?')) return
+    if (!confirm('¿Estás seguro de que quieres eliminar esta categoría?')) return;
 
     try {
+      const category = categories.find(c => c.id === categoryId);
+      
+      // Primero eliminar la imagen si existe
+      if (category?.image_url) {
+        await deleteOldImage(category.image_url);
+      }
+
+      // Luego eliminar la categoría
       const { error } = await supabase
         .from('categories')
         .delete()
-        .eq('id', categoryId)
+        .eq('id', categoryId);
 
-      if (error) throw error
+      if (error) throw error;
       
-      toast.success('Categoría eliminada correctamente')
-      loadCategories()
+      toast.success('Categoría eliminada correctamente');
+      loadCategories();
     } catch (error) {
-      console.error('Error:', error)
-      toast.error('Error al eliminar la categoría')
+      console.error('Error:', error);
+      toast.error('Error al eliminar la categoría');
     }
   }
 
   return (
     <Sheet open={isOpen} onOpenChange={onOpenChange}>
-      <SheetContent side="right" className="w-full lg:w-[800px] p-6">
+      <SheetContent side="right" className="w-full lg:w-[800px] p-6 overflow-y-auto">
         <SheetHeader>
           <SheetTitle className="text-xl font-bold flex items-center gap-2">
             <LayoutGrid className="h-6 w-6" />
@@ -146,7 +213,7 @@ export function CategoriesSheet({ isOpen, onOpenChange, storeId }: CategoriesShe
           </SheetTitle>
         </SheetHeader>
 
-        <div className="mt-6 space-y-6">
+        <div className="mt-6 space-y-6 pb-20">
           {/* Formulario de categoría */}
           <form onSubmit={handleSubmit} className="bg-gray-50 p-4 rounded-lg border">
             <h3 className="text-lg font-semibold mb-4">
@@ -187,32 +254,68 @@ export function CategoriesSheet({ isOpen, onOpenChange, storeId }: CategoriesShe
 
               <div>
                 <label className="text-sm font-medium block mb-2">Imagen de Categoría</label>
-                <div className="flex items-center gap-4">
-                  <Button
-                    type="button"
-                    variant="outline"
-                    onClick={() => document.getElementById('category-image')?.click()}
-                  >
-                    <ImagePlus className="h-4 w-4 mr-2" />
-                    Subir Imagen
-                  </Button>
-                  <input
-                    id="category-image"
-                    type="file"
-                    className="hidden"
-                    accept="image/*"
-                    onChange={async (e) => {
-                      if (e.target.files?.[0]) {
-                        try {
-                          const url = await handleImageUpload(e.target.files[0])
-                          setNewCategory({...newCategory, image_url: url})
-                          toast.success('Imagen subida correctamente')
-                        } catch (error) {
-                          toast.error('Error al subir la imagen')
-                        }
-                      }
-                    }}
-                  />
+                <div className="space-y-2">
+                  <div className="relative">
+                    {newCategory.image_url ? (
+                      <div className="relative aspect-video w-full overflow-hidden rounded-lg border">
+                        <Image
+                          src={newCategory.image_url}
+                          alt="Category preview"
+                          fill
+                          className="object-cover"
+                        />
+                        <button
+                          type="button"
+                          onClick={async () => {
+                            try {
+                              if (newCategory.image_url) {
+                                await deleteOldImage(newCategory.image_url);
+                              }
+                              setNewCategory({ ...newCategory, image_url: '' });
+                              toast.success('Imagen eliminada correctamente');
+                            } catch (error) {
+                              console.error('Error al eliminar imagen:', error);
+                              toast.error('Error al eliminar la imagen');
+                            }
+                          }}
+                          className="absolute top-2 right-2 p-1 rounded-full bg-red-100 hover:bg-red-200"
+                        >
+                          <X className="h-4 w-4 text-red-600" />
+                        </button>
+                      </div>
+                    ) : (
+                      <label className="flex flex-col items-center justify-center w-full aspect-video rounded-lg border-2 border-dashed border-gray-300 hover:border-gray-400 cursor-pointer">
+                        <div className="flex flex-col items-center justify-center pt-5 pb-6">
+                          <ImagePlus className="h-8 w-8 text-gray-400 mb-2" />
+                          <p className="text-sm text-gray-500">Haz clic para subir una imagen</p>
+                        </div>
+                        <input
+                          type="file"
+                          className="hidden"
+                          accept="image/*"
+                          onChange={async (e) => {
+                            if (e.target.files?.[0]) {
+                              try {
+                                setLoading(true);
+                                const url = await handleImageUpload(
+                                  e.target.files[0],
+                                  editingCategory?.image_url || undefined
+                                );
+                                setNewCategory({ ...newCategory, image_url: url });
+                                toast.success('Imagen subida correctamente');
+                              } catch (error) {
+                                console.error('Error:', error);
+                                toast.error('Error al subir la imagen');
+                              } finally {
+                                setLoading(false);
+                              }
+                            }
+                          }}
+                        />
+                      </label>
+                    )}
+                  </div>
+                  <p className="text-xs text-gray-500">Formato: JPG, PNG. Máximo 5MB</p>
                 </div>
               </div>
 
