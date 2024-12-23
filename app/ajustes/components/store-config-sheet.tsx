@@ -17,6 +17,8 @@ import {
 } from "@/components/ui/accordion"
 import { Badge } from "@/components/ui/badge"
 import { Lock } from "lucide-react"
+import { UploadCloud, X } from "lucide-react"
+import Image from "next/image"
 
 interface StoreConfigSheetProps {
   isOpen: boolean
@@ -79,6 +81,16 @@ export function StoreConfigSheet({ isOpen, onOpenChange, storeId }: StoreConfigS
         throw new Error('No hay sesión de usuario')
       }
 
+      // Verificar que el usuario es vendedor
+      const { data: profile, error: profileError } = await supabase
+        .from('profiles')
+        .select('is_seller')
+        .single()
+
+      if (profileError || !profile?.is_seller) {
+        throw new Error('No tienes permisos para gestionar tiendas')
+      }
+
       if (!storeData.name.trim()) {
         throw new Error('El nombre de la tienda es requerido')
       }
@@ -89,6 +101,7 @@ export function StoreConfigSheet({ isOpen, onOpenChange, storeId }: StoreConfigS
 
       const storeDataToSave = {
         ...storeData,
+        owner_id: session.user.id,
         access_code: storeData.access_code || Math.random().toString(36).substring(2, 8).toUpperCase(),
         access_pin: storeData.access_pin || Math.random().toString(36).substring(2, 8).toUpperCase(),
         image_url: storeData.image_url || null,
@@ -131,6 +144,52 @@ export function StoreConfigSheet({ isOpen, onOpenChange, storeId }: StoreConfigS
       toast.error(error instanceof Error ? error.message : 'Error al guardar la tienda')
     } finally {
       setLoading(false)
+    }
+  }
+
+  const uploadImage = async (file: File, bucket: 'CompanyLogo' | 'CompanyBanner', storeId: string) => {
+    try {
+      // Verificar que el usuario es vendedor
+      const { data: profile, error: profileError } = await supabase
+        .from('profiles')
+        .select('is_seller')
+        .single()
+
+      if (profileError || !profile?.is_seller) {
+        throw new Error('No tienes permisos para subir imágenes')
+      }
+
+      const fileExt = file.name.split('.').pop()
+      const fileName = `${storeId}-${Date.now()}.${fileExt}`
+      const filePath = `${fileName}`
+
+      if (!file.type.startsWith('image/')) {
+        throw new Error('El archivo debe ser una imagen')
+      }
+
+      // Subir la imagen
+      const { error: uploadError, data } = await supabase.storage
+        .from(bucket)
+        .upload(filePath, file, {
+          cacheControl: '3600',
+          upsert: true,
+          contentType: file.type
+        })
+
+      if (uploadError) {
+        console.error('Error de Supabase:', uploadError)
+        throw new Error('Error al subir la imagen')
+      }
+
+      // Obtener la URL pública
+      const { data: { publicUrl } } = supabase.storage
+        .from(bucket)
+        .getPublicUrl(filePath)
+
+      return publicUrl
+    } catch (error) {
+      console.error('Error en uploadImage:', error)
+      throw error instanceof Error ? error : new Error('Error al subir la imagen')
     }
   }
 
@@ -191,23 +250,118 @@ export function StoreConfigSheet({ isOpen, onOpenChange, storeId }: StoreConfigS
               <div>
                 <label className="text-sm font-medium block mb-2">Imágenes de la Tienda</label>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div>
-                    <Input
-                      value={storeData.image_url}
-                      onChange={(e) => setStoreData({...storeData, image_url: e.target.value})}
-                      placeholder="URL del logo"
-                      type="url"
-                    />
-                    <p className="text-xs text-gray-500 mt-1">Logo de la tienda</p>
+                  {/* Logo Upload */}
+                  <div className="space-y-2">
+                    <div className="relative">
+                      {storeData.image_url ? (
+                        <div className="relative aspect-square w-full overflow-hidden rounded-lg border">
+                          <Image
+                            src={storeData.image_url}
+                            alt="Logo preview"
+                            fill
+                            className="object-cover"
+                          />
+                          <button
+                            type="button"
+                            onClick={() => setStoreData({ ...storeData, image_url: '' })}
+                            className="absolute top-2 right-2 p-1 rounded-full bg-red-100 hover:bg-red-200"
+                          >
+                            <X className="h-4 w-4 text-red-600" />
+                          </button>
+                        </div>
+                      ) : (
+                        <label className="flex flex-col items-center justify-center w-full aspect-square rounded-lg border-2 border-dashed border-gray-300 hover:border-gray-400 cursor-pointer">
+                          <div className="flex flex-col items-center justify-center pt-5 pb-6">
+                            <UploadCloud className="h-8 w-8 text-gray-400 mb-2" />
+                            <p className="text-sm text-gray-500">Logo de la tienda</p>
+                          </div>
+                          <input
+                            type="file"
+                            className="hidden"
+                            accept="image/*"
+                            onChange={async (e) => {
+                              try {
+                                const file = e.target.files?.[0]
+                                if (!file) return
+                                
+                                if (file.size > 5 * 1024 * 1024) {
+                                  toast.error('La imagen debe ser menor a 5MB')
+                                  return
+                                }
+
+                                setLoading(true)
+                                const publicUrl = await uploadImage(file, 'CompanyLogo', storeId)
+                                setStoreData({ ...storeData, image_url: publicUrl })
+                                toast.success('Logo subido correctamente')
+                              } catch (error) {
+                                console.error('Error uploading logo:', error)
+                                toast.error('Error al subir el logo')
+                              } finally {
+                                setLoading(false)
+                              }
+                            }}
+                          />
+                        </label>
+                      )}
+                    </div>
+                    <p className="text-xs text-gray-500">Formato: JPG, PNG. Máximo 5MB</p>
                   </div>
-                  <div>
-                    <Input
-                      value={storeData.banner_image}
-                      onChange={(e) => setStoreData({...storeData, banner_image: e.target.value})}
-                      placeholder="URL del banner"
-                      type="url"
-                    />
-                    <p className="text-xs text-gray-500 mt-1">Banner de la tienda</p>
+
+                  {/* Banner Upload */}
+                  <div className="space-y-2">
+                    <div className="relative">
+                      {storeData.banner_image ? (
+                        <div className="relative aspect-video w-full overflow-hidden rounded-lg border">
+                          <Image
+                            src={storeData.banner_image}
+                            alt="Banner preview"
+                            fill
+                            className="object-cover"
+                          />
+                          <button
+                            type="button"
+                            onClick={() => setStoreData({ ...storeData, banner_image: '' })}
+                            className="absolute top-2 right-2 p-1 rounded-full bg-red-100 hover:bg-red-200"
+                          >
+                            <X className="h-4 w-4 text-red-600" />
+                          </button>
+                        </div>
+                      ) : (
+                        <label className="flex flex-col items-center justify-center w-full aspect-video rounded-lg border-2 border-dashed border-gray-300 hover:border-gray-400 cursor-pointer">
+                          <div className="flex flex-col items-center justify-center pt-5 pb-6">
+                            <UploadCloud className="h-8 w-8 text-gray-400 mb-2" />
+                            <p className="text-sm text-gray-500">Banner de la tienda</p>
+                          </div>
+                          <input
+                            type="file"
+                            className="hidden"
+                            accept="image/*"
+                            onChange={async (e) => {
+                              try {
+                                const file = e.target.files?.[0]
+                                if (!file) return
+                                
+                                if (file.size > 5 * 1024 * 1024) {
+                                  toast.error('La imagen debe ser menor a 5MB')
+                                  return
+                                }
+
+                                setLoading(true)
+                                const publicUrl = await uploadImage(file, 'CompanyBanner', storeId)
+                                setStoreData({ ...storeData, banner_image: publicUrl })
+                                toast.success('Banner subido correctamente')
+                              } catch (error) {
+                                console.error('Error uploading banner:', error)
+                                toast.error('Error al subir el banner')
+                              } finally {
+                                setLoading(false)
+                              }
+                            }}
+                          />
+                        </label>
+                      )}
+                    </div>
+                    <p className="text-xs text-gray-500">Formato: JPG, PNG. Máximo 5MB</p>
                   </div>
                 </div>
               </div>
