@@ -13,6 +13,9 @@ import { useAddresses } from "../../hooks/use-addresses"
 import type { Address } from "@/app/types/address"
 import { VisuallyHidden } from '@radix-ui/react-visually-hidden'
 import { useCart } from "@/hooks/use-cart"
+import { useRouter } from 'next/navigation'
+import { toast } from "react-hot-toast"
+import { supabase } from "@/app/lib/supabase"
 
 interface FacturacionSheetProps {
   isOpen: boolean
@@ -22,22 +25,26 @@ interface FacturacionSheetProps {
 }
 
 export function FacturacionSheet({ isOpen, onClose, items, total }: FacturacionSheetProps) {
-  const [isAddressesListOpen, setIsAddressesListOpen] = useState(false)
-  const { getActiveAddress, selectAddress } = useAddresses()
+  const router = useRouter()
+  const { getActiveAddress, selectAddress, addresses, activeAddressId } = useAddresses()
   const [selectedAddress, setSelectedAddress] = useState<Address | undefined>(getActiveAddress())
-  const { updateItemNote } = useCart()
+  const [isAddressesListOpen, setIsAddressesListOpen] = useState(false)
+  const { updateItemNote, clearCart } = useCart()
+  const [generalNotes, setGeneralNotes] = useState('')
+  const [isProcessing, setIsProcessing] = useState(false)
 
-  // Actualizar la dirección seleccionada cuando cambie
+  // Actualizar la dirección seleccionada cuando cambie el activeAddressId o las direcciones
   useEffect(() => {
-    const address = getActiveAddress()
-    console.log('Effect: Active address changed:', address)
-    setSelectedAddress(address)
-  }, [getActiveAddress])
-
-  // Manejar el cierre del sheet de direcciones
-  const handleAddressesListClose = () => {
-    setIsAddressesListOpen(false)
-  }
+    if (activeAddressId && addresses.length > 0) {
+      const address = addresses.find(addr => addr.id === activeAddressId)
+      if (address) {
+        setSelectedAddress(address)
+      }
+    } else {
+      const activeAddress = getActiveAddress()
+      setSelectedAddress(activeAddress)
+    }
+  }, [activeAddressId, addresses, getActiveAddress])
 
   // Manejar la selección de dirección
   const handleAddressSelect = (address: Address | undefined) => {
@@ -45,11 +52,77 @@ export function FacturacionSheet({ isOpen, onClose, items, total }: FacturacionS
     if (address) {
       selectAddress(address.id)
       setSelectedAddress(address)
+      // Guardar en localStorage también
+      localStorage.setItem('activeAddressId', address.id)
     } else {
-      // Si no hay dirección, limpiamos el estado
       setSelectedAddress(undefined)
+      localStorage.removeItem('activeAddressId')
     }
     setIsAddressesListOpen(false)
+  }
+
+  // Manejar el cierre del sheet de direcciones
+  const handleAddressesListClose = () => {
+    setIsAddressesListOpen(false)
+  }
+
+  // Verificar si hay una dirección seleccionada
+  const canPlaceOrder = selectedAddress !== undefined
+
+  const processOrder = async () => {
+    if (!selectedAddress) return;
+    
+    try {
+      setIsProcessing(true)
+
+      // Obtener el ID del pedido actual (en estado draft)
+      const { data: orderData, error: orderError } = await supabase
+        .from('orders')
+        .select('id')
+        .eq('status', 'draft')
+        .single()
+
+      if (orderError) throw orderError
+
+      // Primero, asegurarnos de que todos los items están guardados
+      for (const item of items) {
+        const { error: itemError } = await supabase
+          .from('order_items')
+          .upsert({
+            order_id: orderData.id,
+            product_id: item.id,
+            quantity: item.quantity,
+            price_per_unit: item.price,
+            note: item.note || null
+          })
+
+        if (itemError) throw itemError
+      }
+
+      // Luego actualizar el pedido a estado 'done'
+      const { error: updateError } = await supabase
+        .from('orders')
+        .update({
+          status: 'done',
+          completed_at: new Date().toISOString(),
+          address_id: selectedAddress.id,
+          total_amount: total,
+          notes: generalNotes || null
+        })
+        .eq('id', orderData.id)
+
+      if (updateError) throw updateError
+
+      toast.success('Pedido realizado correctamente')
+      clearCart() // Solo limpia el estado local
+      onClose()
+      router.push('/pedidos')
+    } catch (error) {
+      console.error('Error al procesar el pedido:', error)
+      toast.error('Error al procesar el pedido')
+    } finally {
+      setIsProcessing(false)
+    }
   }
 
   return (
@@ -96,7 +169,7 @@ export function FacturacionSheet({ isOpen, onClose, items, total }: FacturacionS
                   <div>
                     <p className="text-sm text-gray-500">Nombre</p>
                     <p className="font-medium">
-                      {selectedAddress?.company_name || "Sin especificar"}
+                      {selectedAddress?.company_name || "------"}
                     </p>
                   </div>
                 </div>
@@ -106,7 +179,7 @@ export function FacturacionSheet({ isOpen, onClose, items, total }: FacturacionS
                   <div>
                     <p className="text-sm text-gray-500">Dirección</p>
                     <p className="font-medium">
-                      {selectedAddress?.address || "Sin especificar"}
+                      {selectedAddress?.address || "------"}
                     </p>
                   </div>
                 </div>
@@ -116,7 +189,7 @@ export function FacturacionSheet({ isOpen, onClose, items, total }: FacturacionS
                   <div>
                     <p className="text-sm text-gray-500">Teléfono</p>
                     <p className="font-medium">
-                      {selectedAddress?.phone || "Sin especificar"}
+                      {selectedAddress?.phone || "------"}
                     </p>
                   </div>
                 </div>
@@ -149,6 +222,8 @@ export function FacturacionSheet({ isOpen, onClose, items, total }: FacturacionS
                   <Textarea 
                     placeholder="Añade comentarios adicionales para tu pedido..."
                     className="w-full min-h-[100px]"
+                    value={generalNotes}
+                    onChange={(e) => setGeneralNotes(e.target.value)}
                   />
                 </div>
               </div>
@@ -177,16 +252,33 @@ export function FacturacionSheet({ isOpen, onClose, items, total }: FacturacionS
             </div>
           </div>
 
-          {/* Botón de Hacer Pedido */}
+          {/* Botón de Hacer Pedido - Modificado */}
           <div className="mt-auto border-t bg-white p-4">
             <Button 
-              className="w-full bg-blue-600 hover:bg-blue-700 text-white py-6 text-lg font-semibold"
-              onClick={() => {
-                console.log('Procesando pedido...')
-              }}
+              className={`w-full py-6 text-lg font-semibold ${
+                canPlaceOrder 
+                  ? 'bg-blue-600 hover:bg-blue-700 text-white' 
+                  : 'bg-gray-300 cursor-not-allowed text-gray-500'
+              }`}
+              disabled={!canPlaceOrder || isProcessing}
+              onClick={processOrder}
             >
-              Hacer Pedido
+              {isProcessing ? (
+                <div className="flex items-center justify-center">
+                  <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2" />
+                  Procesando...
+                </div>
+              ) : canPlaceOrder ? (
+                'Hacer Pedido'
+              ) : (
+                'Selecciona una dirección'
+              )}
             </Button>
+            {!canPlaceOrder && (
+              <p className="text-sm text-gray-500 text-center mt-2">
+                Debes seleccionar una dirección de envío para continuar
+              </p>
+            )}
           </div>
         </SheetContent>
       </Sheet>

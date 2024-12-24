@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { supabase } from '../lib/supabase'
 import type { Address } from '../types/address'
 
@@ -85,13 +85,38 @@ export function useAddresses() {
     }
   }
 
-  const selectAddress = (addressId: string) => {
+  const selectAddress = useCallback((addressId: string) => {
     setActiveAddressId(addressId)
-  }
+    // Guardar en localStorage para persistencia
+    localStorage.setItem('activeAddressId', addressId)
+  }, [])
 
-  const getActiveAddress = (): Address | undefined => {
-    return addresses.find(addr => addr.id === activeAddressId)
-  }
+  const getActiveAddress = useCallback(() => {
+    // Primero intentar obtener de state
+    if (activeAddressId) {
+      const address = addresses.find(addr => addr.id === activeAddressId)
+      if (address) return address
+    }
+
+    // Si no hay en state, intentar obtener de localStorage
+    const savedAddressId = localStorage.getItem('activeAddressId')
+    if (savedAddressId) {
+      const address = addresses.find(addr => addr.id === savedAddressId)
+      if (address) {
+        setActiveAddressId(savedAddressId)
+        return address
+      }
+    }
+
+    // Si no hay dirección activa, retornar la primera
+    if (addresses.length > 0) {
+      setActiveAddressId(addresses[0].id)
+      localStorage.setItem('activeAddressId', addresses[0].id)
+      return addresses[0]
+    }
+
+    return undefined
+  }, [activeAddressId, addresses])
 
   return {
     addresses,
@@ -101,6 +126,7 @@ export function useAddresses() {
     reloadAddresses: fetchAddresses,
     selectAddress,
     getActiveAddress,
-    isLoaded
+    isLoaded,
+    activeAddressId
   }
 } 
